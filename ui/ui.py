@@ -1,7 +1,20 @@
 #!/usr/bin/python3.4
 
 import curses
+import curses.ascii
 import math
+
+def handle_cmd_input(win):
+
+    while True:
+        key = win.getkey()
+        win.addstr(key)
+        win.noutrefresh()
+        curses.doupdate()
+        if not curses.ascii.isalnum(key):
+            break
+    return True
+
 
 def main(stdscr):
     # Clear the screen
@@ -50,17 +63,21 @@ def main(stdscr):
     map_win.addstr(2,2,"Map!")
     map_win.noutrefresh()
     curses.doupdate()
-    cmd_win.getkey()
+    #cmd_win.getkey()
 
     text_win.addstr(1,1,"Hello!")
     text_win.noutrefresh()
     curses.doupdate()
+    #cmd_win.getkey()
+
+    handle_cmd_input(cmd_win)
     cmd_win.getkey()
 
+    '''
     cmd_win.addstr("Yarr!")
     cmd_win.noutrefresh()
     curses.doupdate()
-    cmd_win.getkey()
+    '''
 
 
 if __name__ == "__main__":
