@@ -5,15 +5,33 @@ import curses.ascii
 import math
 
 def handle_cmd_input(win):
+    user_str = []
 
     while True:
         key = win.getkey()
-        win.addstr(key)
-        win.noutrefresh()
-        curses.doupdate()
-        if not curses.ascii.isalnum(key):
+        if curses.ascii.isalnum(key):
+            user_str.append(key)
+            win.addstr(key)
+            win.noutrefresh()
+            curses.doupdate()
+        elif ord(key) == 0x09:      # tab
             break
-    return True
+        elif ord(key) == 0x7f:      # backspace
+            break
+        elif ord(key) == 0x0a:      # carriage return
+            break
+        elif ord(key) == 0x20:      # space
+            break
+        elif ord(key) == 0x1b:      # ESC
+            break
+        """
+        else:
+            win.addstr(key)
+            win.noutrefresh()
+            curses.doupdate()
+            break
+        """
+    return "".join(user_str)
 
 
 def main(stdscr):
@@ -70,7 +88,10 @@ def main(stdscr):
     curses.doupdate()
     #cmd_win.getkey()
 
-    handle_cmd_input(cmd_win)
+    user_str = handle_cmd_input(cmd_win)
+    text_win.addstr(2,1,user_str)
+    text_win.noutrefresh()
+    curses.doupdate()
     cmd_win.getkey()
 
     '''
