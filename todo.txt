@@ -1,0 +1,10 @@
+!!!Two Weeks!!!
+
+Due 12/7/14:
+* able to move a character around on the map
+    * create entities
+    * create tiles
+    * create the world map, start with 5x5
+Bonus:
+    * read/write entities to DB
+    * read/write tiles to DB
