@@ -12,12 +12,17 @@ def mtile(uid, coord):
 
 if __name__ == "__main__":
 
-    world = model.tile.world
+    world = {}
 
     bob = model.tile.Entity()
     bob.name = "Bob"
     bob.symbol = "@"
     print("Name: {} Symbol: {}".format(bob.name, bob.symbol))
+
+    tim = model.tile.Entity()
+    tim.name = "Tim"
+    tim.symbol = "T"
+    print("Name: {} Symbol: {}".format(tim.name, tim.symbol))
 
     dim = 3
     uuid = 0
@@ -26,6 +31,10 @@ if __name__ == "__main__":
             world[(x,y)] = mtile(uuid, (x,y))
             uuid = uuid+1
 
-    control.move.move(bob, world[(1,1)], world[(1,0)])
+    world[(0,0)].entities.append(bob)
+    world[(1,0)].entities.append(tim)
+
+    control.move.move(bob, world[(0,0)], world[(0,1)])
 
     ui.map.display_map(world, (0,0), 3)
+

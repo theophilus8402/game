@@ -1,7 +1,5 @@
 #!/usr/bin/python3.4
 
-world = {}  # the key is going to be (x,y), value is the tile
-
 class Entity:
     symbol = ""
     name = ""
@@ -16,10 +14,10 @@ class Entity:
     """
 
     def __init__(self):
-        symbol = ""
-        name = ""
-        cur_loc_x = 0
-        cur_loc_y = 0
+        self.symbol = ""
+        self.name = ""
+        self.cur_loc_x = 0
+        self.cur_loc_y = 0
 
 
 class Tile:
@@ -31,9 +29,9 @@ class Tile:
     y = 0
 
     def __init__(self):
-        uid = 0
-        entities = []
-        ground = ""
+        self.uid = 0
+        self.entities = []
+        self.ground = ""
 
     def get_symbol(self):
         symbol = self.default_symbol
