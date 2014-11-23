@@ -7,30 +7,92 @@ import math
 def handle_cmd_input(win):
     user_str = []
 
+    """
+    curses.echo()
+    user_str = win.getstr()
+    curses.noecho()
+    return user_str
+    """
     while True:
+        str_index = 0
         key = win.getkey()
-        if curses.ascii.isalnum(key):
-            user_str.append(key)
-            win.addstr(key)
-            win.noutrefresh()
-            curses.doupdate()
-        elif ord(key) == 0x09:      # tab
-            break
+        y, index = win.getyx()
+        if curses.ascii.isprint(key):
+            # add the ch based on where the cursor is
+            user_str.insert(index, key)
+            try:
+                win.insch(key)
+                win.move(y, index+1)
+                str_index = str_index + 1
+            except:
+                # got to the end of the line
+                # draw the end of the user_str closest to the cursor's end
+                y, win_width = win.getmaxyx()
+                win.clear()
+                # NOTE! This is not correct... what if the string spills out over both ends?!
+                if index <= (win_width/2):
+                    # draw the beginning of the user_str
+                    win.addstr(0,0,"".join(user_str[:win_width]))
+                    win.move(y, index+1)
+                else:
+                    # draw the end of the user_str
+                    win.addstr(0,0,"".join(user_str[-win_width+1:]))
+                str_index = str_index + 1
+                win.noutrefresh()
+                curses.doupdate()
         elif ord(key) == 0x7f:      # backspace
-            break
+            # remove character (based on where the cursor is) from user_str
+            if index > 0:
+                user_str.pop(index-1)
+                win.clear()
+                # move cursor back one
+                win.move(y, index-1)
+                # redraw the line
+                win.addstr(0,0,"".join(user_str))
+                win.noutrefresh()
+                curses.doupdate()
         elif ord(key) == 0x0a:      # carriage return
-            break
-        elif ord(key) == 0x20:      # space
+            # clear the line
+            win.clear()
             break
         elif ord(key) == 0x1b:      # ESC
             break
+        elif ord(key) == 0x09:      # tab
+            # dunno what to do here yet... I don't think I want to actually tab
+            # I can use it to tab complete?
+            pass
+        # ctrl-f
+            # move the cursor forward one space
+        # ctrl-b
+            # move the cursor back one space
+        # alt-f
+            # move the cursor forward one word
+        # alt-b
+            # move the cursor back one word
+        # ctrl-d
+            # delete the ch where the cursor is
+            # move what's to the right over to the left
+            # remove the ch from user_str
+            # don't move the cursor
+        # alt-d
+            # delete from the cursor to the next space (i.e. word)
+        # ctrl-a
+            # move the cursor to the beginning of the line
+        # ctrl-e
+            # move the cursor to the end of the line
         """
-        else:
-            win.addstr(key)
-            win.noutrefresh()
-            curses.doupdate()
-            break
+        elif ord(key) == 0x20:      # space
+            # add the space based on where the cursor is
+            user_str.insert(index, " ")
+            # draw that space
+            win.insch(" ")
+            win.move(y, index+1)
         """
+        #else:
+            #win.addstr(key)
+            #win.noutrefresh()
+            #curses.doupdate()
+            #break
     return "".join(user_str)
 
 
