@@ -1,8 +1,67 @@
 #!/usr/bin/python3.4
 
-import curses
 import curses.ascii
+import ui.mymap
+import control.move
 import math
+import ui.text
+
+world = {}
+
+def handle_map_input(win, world, entity):
+    while True:
+        key = win.getkey()
+        if key == "h":
+            # determine current coords
+            x = entity.cur_loc_x
+            y = entity.cur_loc_y
+            # move west
+            try:
+                control.move.move(entity, world[(x,y)], world[(x-1,y)])
+                ui.mymap.display_map(world, (0,0), 3, win)
+                ui.text.add_msg(entity, "Moved west.")
+            except:
+                pass
+        elif key == "j":
+            # determine current coords
+            x = entity.cur_loc_x
+            y = entity.cur_loc_y
+            # move south
+            try:
+                control.move.move(entity, world[(x,y)], world[(x,y-1)])
+                ui.mymap.display_map(world, (0,0), 3, win)
+                ui.text.add_msg(entity, "Moved south.")
+            except:
+                pass
+        elif key == "k":
+            # determine current coords
+            x = entity.cur_loc_x
+            y = entity.cur_loc_y
+            # move north
+            try:
+                control.move.move(entity, world[(x,y)], world[(x,y+1)])
+                ui.mymap.display_map(world, (0,0), 3, win)
+                ui.text.add_msg(entity, "Moved north.")
+            except:
+                pass
+        elif key == "l":
+            # determine current coords
+            x = entity.cur_loc_x
+            y = entity.cur_loc_y
+            # move east
+            try:
+                control.move.move(entity, world[(x,y)], world[(x+1,y)])
+                ui.mymap.display_map(world, (0,0), 3, win)
+                ui.text.add_msg(entity, "Moved east.")
+            except:
+                pass
+        else:
+            win.addstr(20, 0, "Something else.")
+            break
+        win.noutrefresh()
+        curses.doupdate()
+    return True
+        
 
 def handle_cmd_input(win):
     user_str = []
@@ -96,30 +155,36 @@ def handle_cmd_input(win):
     return "".join(user_str)
 
 
-def main(stdscr):
+def setup_windows(stdscr):
     # Clear the screen
     stdscr.clear()
 
+    """
+    We are going to draw the borders on the main screen.
+    So, we need to shrink all the other windows by one on each side.
+    """
 
     # Determine Text Window
     # Width 60% of window
-    text_width = math.ceil(curses.COLS*.6)
-    text_height = curses.LINES-2
-    text_win = curses.newwin(text_height, text_width, 0, 0)
+    text_width = math.ceil(curses.COLS*.6) - 2
+    text_height = curses.LINES-4
+    text_win = curses.newwin(text_height, text_width, 1, 1)
 
     # Determine Map Window
     # Width is the rest
-    map_width = curses.COLS-text_width+1
-    map_start_x = text_width-1
+    map_width = curses.COLS-text_width-1
+    map_start_x = text_width
     map_height = text_height
-    map_win = curses.newwin(map_height, map_width, 0, map_start_x)
+    map_win = curses.newwin(map_height, map_width, 1, map_start_x)
 
+    """
     # Determine Command Border window
     cmd_brdr_width = curses.COLS
     cmd_brdr_height = 3
     cmd_brdr_start_x = 0
     cmd_brdr_start_y = curses.LINES-3
     cmd_brdr_win = curses.newwin(cmd_brdr_height, cmd_brdr_width, cmd_brdr_start_y, cmd_brdr_start_x)
+    """
 
     # Determine Command Line Window
     cmd_width = curses.COLS-2
@@ -129,32 +194,57 @@ def main(stdscr):
     cmd_win = curses.newwin(cmd_height, cmd_width, cmd_start_y, cmd_start_x)
 
     # Draw borders
+    """
     text_win.border()
     text_win.noutrefresh()
     cmd_brdr_win.border(curses.ACS_VLINE,curses.ACS_VLINE,curses.ACS_HLINE,curses.ACS_HLINE,curses.ACS_LTEE,)
     cmd_brdr_win.noutrefresh()
     map_win.border(curses.ACS_VLINE,curses.ACS_VLINE,curses.ACS_HLINE,curses.ACS_HLINE,curses.ACS_TTEE,curses.ACS_URCORNER,curses.ACS_BTEE,curses.ACS_RTEE)
     map_win.noutrefresh()
-
+    """
+    # draw top command window border
+    #stdscr.addstr("".join(line))
+    stdscr.border()
+    """
+    for i in range(cmd_width):
+        stdscr.addch(cmd_start_y-1, 5, curses.ACS_HLINE)
+    """
+    stdscr.hline(cmd_start_y-1, 1, curses.ACS_HLINE, cmd_width)
+    stdscr.noutrefresh()
     curses.doupdate()
-    cmd_win.getkey()
+    stdscr.addch(cmd_start_y-1, 1, curses.ACS_LTEE)
+    #stdscr.addch(cmd_start_y-1, 0, curses.ACS_LTEE)
+    stdscr.noutrefresh()
+    curses.doupdate()
+    #cmd_win.getkey()
 
     # Add stuff
-    map_win.addstr(2,2,"Map!")
+    #text_win.addstr(1,1,"Hello!")
+    #text_win.noutrefresh()
+
+    #ui.mymap.display_map(world, (0,0), 3, map_win)
+    # move the cursor to the middle of the map screen
+    center_x = math.floor(map_width/2)
+    center_y = math.floor(map_height/2)
+    map_win.move(center_y, center_x)
+    #map_win.addstr(2,2,"Map!")
     map_win.noutrefresh()
     curses.doupdate()
     #cmd_win.getkey()
 
-    text_win.addstr(1,1,"Hello!")
-    text_win.noutrefresh()
-    curses.doupdate()
+    #curses.doupdate()
     #cmd_win.getkey()
 
+    """
     user_str = handle_cmd_input(cmd_win)
     text_win.addstr(2,1,user_str)
     text_win.noutrefresh()
     curses.doupdate()
     cmd_win.getkey()
+    """
+
+    #handle_map_input(map_win)
+    #map_win.getkey()
 
     '''
     cmd_win.addstr("Yarr!")
@@ -162,6 +252,10 @@ def main(stdscr):
     curses.doupdate()
     '''
 
+    #return True
+    return (text_win, map_win, cmd_win)
+
 
 if __name__ == "__main__":
-    curses.wrapper(main)
+    import curses
+    text_win, map_win, cmd_win = curses.wrapper(setup_windows)

@@ -5,6 +5,9 @@ class Entity:
     name = ""
     cur_loc_x = 0
     cur_loc_y = 0
+    map_win = None
+    text_win = None
+    cmd_win = None
     """
     short_desc = ""
     long_desc = ""
@@ -18,6 +21,12 @@ class Entity:
         self.name = ""
         self.cur_loc_x = 0
         self.cur_loc_y = 0
+        self.map_win = None
+        self.text_win = None
+        self.cmd_win = None
+        self.messages = []
+        self.msg_len = 3000
+        self.msg_start = 0
 
 
 class Tile:
@@ -32,6 +41,8 @@ class Tile:
         self.uid = 0
         self.entities = []
         self.ground = ""
+        self.x = 0
+        self.y = 0
 
     def get_symbol(self):
         symbol = self.default_symbol

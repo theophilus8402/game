@@ -5,6 +5,11 @@ Due 12/7/14:
     * create entities
     * create tiles
     * create the world map, start with 5x5
-Bonus:
+# got it done!! woohoo!
+
+Due 12/21/14:
     * read/write entities to DB
     * read/write tiles to DB
+    * get text window to scroll properly
+    * add hit-points
+    * make it so I can hit a mob
