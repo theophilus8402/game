@@ -33,6 +33,12 @@ def main(stdscr):
     player.text_win.keypad(True)
     player.cmd_win.keypad(True)
 
+    # Make userinput non-blocking (use nodelay(True)):
+    # To make it wait some number of milliseconds, use timeout(ms)
+    player.cmd_win.timeout(1000)
+    player.map_win.timeout(100)
+    player.text_win.timeout(100)
+
     ui.text.add_msg(player, "Hey, hey!")
     #ui.ui.handle_map_input(map_win, ui.ui.world, player)
     should_exit = False
@@ -40,7 +46,7 @@ def main(stdscr):
         user_input = ui.ui.handle_cmd_input(cmd_win, player)
         should_exit = control.uinput.handle_user_input(player, user_input)
     
-    map_win.getkey()
+    #map_win.getkey()
     return True
 
 if __name__ == "__main__":

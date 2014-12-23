@@ -75,13 +75,25 @@ def handle_cmd_input(win, entity):
     """
     while True:
         str_index = 0
-        key = win.getkey()
-        ui.text.add_msg(entity, "handle_cmd_input key: {}".format(key))
+        try:
+            key = win.getkey()
+        #except KeyboardInterrupt:
+            #key = None
+            #ui.text.add_msg(entity, "handle_cmd_input key: {}".format(key))
+            #break
+        except:
+            #ui.text.add_msg(entity, "exception")
+            ui.text.add_msg(entity, "key problem!")
+            key = None
+        #ui.text.add_msg(entity, "handle_cmd_input key: {}".format(key))
         #control.uinput.handle_macro(entity, key)
         y, index = win.getyx()
-        if len(key) > 1:
-            control.uinput.handle_macro(entity, key)
-        elif curses.ascii.isprint(key):
+        if key is None:
+            pass
+        #elif len(key) > 1:
+            #control.uinput.handle_macro(entity, key)
+            #ui.text.add_msg(entity, "handle_cmd_input key: len>1 {}".format(key))
+        elif len(key) is 1 and curses.ascii.isprint(key):
             # add the ch based on where the cursor is
             user_str.insert(index, key)
             try:
@@ -104,7 +116,8 @@ def handle_cmd_input(win, entity):
                 str_index = str_index + 1
                 win.noutrefresh()
                 curses.doupdate()
-        elif ord(key) == 0x7f:      # backspace
+            ui.text.add_msg(entity, "handle_cmd_input key: print: {}".format(key))
+        elif key == "KEY_BACKSPACE":      # backspace  if getch... ox7f
             # remove character (based on where the cursor is) from user_str
             if index > 0:
                 user_str.pop(index-1)
@@ -115,18 +128,21 @@ def handle_cmd_input(win, entity):
                 win.addstr(0,0,"".join(user_str))
                 win.noutrefresh()
                 curses.doupdate()
-        elif ord(key) == 0x0a:      # carriage return
+        elif key == "\n":      # carriage return  if getch... 0x0a
             # clear the line
+            #ui.text.add_msg(entity, "handle_cmd_input key: carriage return")
             win.clear()
             break
+        else:
+            ui.text.add_msg(entity, "handle_cmd_input key: else... {}".format(key))
+        """
         elif ord(key) == 0x1b:      # ESC
             break
         elif ord(key) == 0x09:      # tab
             # dunno what to do here yet... I don't think I want to actually tab
             # I can use it to tab complete?
             pass
-        else:
-            control.uinput.handle_macro(entity, key)
+        """
         # ctrl-f
             # move the cursor forward one space
         # ctrl-b

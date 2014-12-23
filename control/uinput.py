@@ -12,7 +12,7 @@ def handle_user_input(bob, msg):
     if msg == curses.KEY_UP:
         ui.text.add_msg(bob, "handle_user_input... up")
     else:
-        ui.text.add_msg(bob, "Huh?")
+        ui.text.add_msg(bob, "Huh?  {}".format(msg))
 
     return should_exit
 
