@@ -38,10 +38,38 @@ def load_world():
     conn.close()
     return world
 
+
+def save_entities(entities):
+    conn = sqlite3.connect(db)
+    c = conn.cursor()
+    for entity in entities:
+        c.execute("INSERT INTO entities VALUES (?, ?, ?, ?)",
+            (entity.symbol, entity.name, entity.cur_loc_x, entity.cur_loc_y))
+    conn.commit()
+    conn.close()
+
+
+def load_entities():
+    conn = sqlite3.connect(db)
+    c = conn.cursor()
+    entities = []
+    for row in c.execute("SELECT * FROM entities"):
+        entity = model.tile.Entity()
+        symbol, name, x, y = row
+        entity.symbol = symbol
+        entity.name = name
+        entity.cur_loc_x = x
+        entity.cur_loc_y = y
+        entities.append(entity)
+    conn.close()
+    return entities
+
+
 def drop_tables():
     conn = sqlite3.connect(db)
     c = conn.cursor()
     c.execute("DROP TABLE IF EXISTS world")
+    c.execute("DROP TABLE IF EXISTS entities")
     conn.commit()
     conn.close()
 
@@ -49,6 +77,7 @@ def clean_tables():
     conn = sqlite3.connect(db)
     c = conn.cursor()
     c.execute("DELETE FROM world")
+    c.execute("DELETE FROM entities")
     conn.commit()
     conn.close()
 
@@ -57,6 +86,8 @@ def setup_tables():
     c = conn.cursor()
     c.execute('''CREATE TABLE world (uid text, ground text, def_symbol text,
         x integer, y integer)''')
+    c.execute('''CREATE TABLE entities (name text, symbol text,
+        cur_loc_x integer, cur_loc_y integer)''')
     conn.commit()
     conn.close()
     

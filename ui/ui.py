@@ -3,6 +3,7 @@
 import curses.ascii
 import ui.mymap
 import control.move
+import control.uinput
 import math
 import ui.text
 
@@ -56,14 +57,14 @@ def handle_map_input(win, world, entity):
             except:
                 pass
         else:
-            win.addstr(20, 0, "Something else.")
+            ui.text.add_msg(entity, "Something else.")
             break
         win.noutrefresh()
         curses.doupdate()
     return True
         
 
-def handle_cmd_input(win):
+def handle_cmd_input(win, entity):
     user_str = []
 
     """
@@ -75,8 +76,12 @@ def handle_cmd_input(win):
     while True:
         str_index = 0
         key = win.getkey()
+        ui.text.add_msg(entity, "handle_cmd_input key: {}".format(key))
+        #control.uinput.handle_macro(entity, key)
         y, index = win.getyx()
-        if curses.ascii.isprint(key):
+        if len(key) > 1:
+            control.uinput.handle_macro(entity, key)
+        elif curses.ascii.isprint(key):
             # add the ch based on where the cursor is
             user_str.insert(index, key)
             try:
@@ -120,6 +125,8 @@ def handle_cmd_input(win):
             # dunno what to do here yet... I don't think I want to actually tab
             # I can use it to tab complete?
             pass
+        else:
+            control.uinput.handle_macro(entity, key)
         # ctrl-f
             # move the cursor forward one space
         # ctrl-b
