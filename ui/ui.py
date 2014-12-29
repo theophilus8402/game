@@ -1,11 +1,13 @@
 #!/usr/bin/python3.4
 
-import curses.ascii
 import ui.mymap
+import ui.text
 import control.move
 import control.uinput
+import curses.ascii
 import math
-import ui.text
+import sys
+import traceback
 
 world = {}
 
@@ -77,10 +79,10 @@ def handle_cmd_input(win, entity):
         str_index = 0
         try:
             key = win.getkey()
-        #except KeyboardInterrupt:
+        except KeyboardInterrupt:
             #key = None
-            #ui.text.add_msg(entity, "handle_cmd_input key: {}".format(key))
-            #break
+            ui.text.add_msg(entity, "handle_cmd_input key: key int: {}".format(traceback.print_tb(sys.exc_info()[2])))
+            break
         except:
             #ui.text.add_msg(entity, "exception")
             ui.text.add_msg(entity, "key problem!")
@@ -135,6 +137,7 @@ def handle_cmd_input(win, entity):
             break
         else:
             ui.text.add_msg(entity, "handle_cmd_input key: else... {}".format(key))
+            control.uinput.handle_macro(entity, key)
         """
         elif ord(key) == 0x1b:      # ESC
             break
