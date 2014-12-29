@@ -19,9 +19,14 @@ Due 12/21/14:
 
 Due 1/4/14:
     * get text window to scroll properly
+        # done
     * add shortcut keys for num pad
+        # done
         * alt+3 on numpad
+            # later
     * add hit-points
+        # need to save it to db and load it
     * make it so I can hit a mob
+        # created control/roll.py to roll the dice for me
     * make it so I can page up in the text window
     * make it so side-to-side scrolling works properly in cmd_win

@@ -29,6 +29,8 @@ class Entity:
         self.msg_len = 3000
         self.disp_msg_start = 0
         self.text_scroll = True
+        self.hp = 0
+        self.default_hp = 0
 
 
 class Tile:
