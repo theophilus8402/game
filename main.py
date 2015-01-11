@@ -51,26 +51,32 @@ def main(stdscr):
 
 if __name__ == "__main__":
 
-    world = {}
 
     """
-    temp_entities = []
+    entities = []
     bob = model.tile.Entity()
     bob.name = "Bob"
     bob.symbol = "@"
-    temp_entities.append(bob)
+    bob.cur_loc_x = 0
+    bob.cur_loc_y = 0
+    bob.hp = 20
+    bob.default_hp = 20
+    entities.append(bob)
     #print("Name: {} Symbol: {}".format(bob.name, bob.symbol))
 
     tim = model.tile.Entity()
     tim.name = "Tim"
     tim.symbol = "T"
-    temp_entities.append(tim)
+    tim.cur_loc_x = 1
+    tim.cur_loc_y = 0
+    tim.hp = 20
+    tim.default_hp = 20
+    entities.append(tim)
     #print("Name: {} Symbol: {}".format(tim.name, tim.symbol))
-    """
 
-    """
     dim = 3
     uuid = 0
+    world = {}
     for y in range(-dim, dim+1):
         for x in range(-dim, dim+1):
             world[(x,y)] = mtile(uuid, (x,y))
@@ -91,14 +97,23 @@ if __name__ == "__main__":
 
     #print("Now loading the world!")
     ui.ui.world = control.db.load_world()
-
-    #control.db.save_entities(temp_entities)
     entities = control.db.load_entities()
 
+    entities[0].cur_loc_x = 0
+    entities[0].cur_loc_y = 0
+    entities[1].cur_loc_x = 1
+    entities[1].cur_loc_y = 0
     ui.ui.world[(0,0)].entities.append(entities[0])     #bob
     ui.ui.world[(1,0)].entities.append(entities[1])     #tim
 
     curses.wrapper(main)
+
+    """
+    control.db.drop_tables()
+    control.db.setup_tables()
+    control.db.save_entities(entities)
+    control.db.save_world(ui.ui.world)
+    """
 
     #control.move.move(bob, world[(0,0)], world[(0,1)])
 

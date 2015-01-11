@@ -12,20 +12,18 @@ Due 12/21/14:
     * read/write tiles to DB
     * change focus from map control to cmd_win control
 # got the above done
-    * get text window to scroll properly
-    * add shortcut keys for num pad
-    * add hit-points
-    * make it so I can hit a mob
 
-Due 1/4/14:
+Due 1/4/15:
     * get text window to scroll properly
         # done
     * add shortcut keys for num pad
         # done
-        * alt+3 on numpad
-            # later
+        * TODO: alt+3 on numpad
+
+Due 1/18/15
     * add hit-points
         # need to save it to db and load it
+        # done!
     * make it so I can hit a mob
         # created control/roll.py to roll the dice for me
     * make it so I can page up in the text window

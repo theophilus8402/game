@@ -43,8 +43,8 @@ def save_entities(entities):
     conn = sqlite3.connect(db)
     c = conn.cursor()
     for entity in entities:
-        c.execute("INSERT INTO entities VALUES (?, ?, ?, ?)",
-            (entity.symbol, entity.name, entity.cur_loc_x, entity.cur_loc_y))
+        c.execute("INSERT INTO entities VALUES (?, ?, ?, ?, ?, ?)",
+            (entity.symbol, entity.name, entity.cur_loc_x, entity.cur_loc_y,                entity.hp, entity.default_hp))
     conn.commit()
     conn.close()
 
@@ -55,11 +55,14 @@ def load_entities():
     entities = []
     for row in c.execute("SELECT * FROM entities"):
         entity = model.tile.Entity()
-        symbol, name, x, y = row
+        symbol, name, x, y, hp, default_hp = row
+        #symbol, name, x, y = row
         entity.symbol = symbol
         entity.name = name
         entity.cur_loc_x = x
         entity.cur_loc_y = y
+        entity.hp = hp
+        entity.default_hp = default_hp
         entities.append(entity)
     conn.close()
     return entities
@@ -87,7 +90,8 @@ def setup_tables():
     c.execute('''CREATE TABLE world (uid text, ground text, def_symbol text,
         x integer, y integer)''')
     c.execute('''CREATE TABLE entities (name text, symbol text,
-        cur_loc_x integer, cur_loc_y integer)''')
+        cur_loc_x integer, cur_loc_y integer, hp integer,
+        default_hp integer)''')
     conn.commit()
     conn.close()
     

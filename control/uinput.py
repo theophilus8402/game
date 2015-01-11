@@ -2,7 +2,39 @@
 
 import ui.text
 import control.move
+import control.roll
 import curses
+import re
+
+re_hit = re.compile("hit (?P<who>\w+)")
+
+def find_entity_in_tile(target_name, entities):
+    for entity in entities:
+        if target_name.lower() == entity.name.lower():
+            return entity
+
+def find_target_nearby(bob, target_name):
+    x = bob.cur_loc_x
+    y = bob.cur_loc_y
+    n = (0, 1)
+    ne = (1, 1)
+    e = (1, 0)
+    se = (1, -1)
+    s = (0, -1)
+    sw = (-1, -1)
+    w = (-1, 0)
+    nw = (-1, 1)
+    directions = [n, ne, e, se, s, sw, w, nw]
+    target = None
+    for mod_x, mod_y in directions:
+        try:
+            target = find_entity_in_tile(target_name,
+                ui.ui.world[(x+mod_x, y+mod_y)].entities)
+            if target:
+                break
+        except:
+            target = None
+    return target
 
 def handle_user_input(bob, msg):
 
@@ -10,7 +42,24 @@ def handle_user_input(bob, msg):
 
     if msg == "exit":
         should_exit = True
-    if msg == curses.KEY_UP:
+    elif re_hit.match(msg):
+        result = re_hit.match(msg)
+        target_name = result.group("who")
+        ui.text.add_msg(bob, "You want to hit {}?!".format(target_name))
+        attack_roll = control.roll.roll(2, 6, 1)
+        ui.text.add_msg(bob, "Attack roll: {}".format(attack_roll))
+        dmg_roll = control.roll.roll(1, 6, 2)
+        ui.text.add_msg(bob, "Dmg roll: {}".format(dmg_roll))
+
+        # find the target nearby
+        target_entity = find_target_nearby(bob, target_name)
+        if target_entity:
+            ui.text.add_msg(bob, "Found him at ({},{})".format(
+                target_entity.cur_loc_x, target_entity.cur_loc_y))
+        else:
+            ui.text.add_msg(bob, "Couldn't find him...")
+        
+    elif msg == curses.KEY_UP:
         ui.text.add_msg(bob, "handle_user_input... up")
     else:
         ui.text.add_msg(bob, "Huh?  {}".format(msg))
