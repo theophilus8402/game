@@ -17,7 +17,6 @@ def mtile(uid, coord):
     tile = model.tile.Tile()
     tile.uid = uid
     tile.coord = coord
-    #tile.x, tile.y = coord
     return tile
 """
 This function initializes the different windows for the logged in user.

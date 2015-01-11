@@ -10,8 +10,6 @@ def save_world(world):
     c = conn.cursor()
     for coord in world.keys():
         tile = world[coord]
-        #print("Saving tile {} at ({},{})...".format(tile.uid, tile.x,
-            #tile.y))
         # TODO: save the entities!!!
         x, y = tile.coord
         c.execute("INSERT INTO world VALUES (?, ?, ?, ?, ?)",
