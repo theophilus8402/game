@@ -17,5 +17,4 @@ def move(entity, cur_tile, dest_tile):
 
     # add entity to dest_tile
     dest_tile.entities.append(entity)
-    entity.cur_loc_x = dest_tile.x
-    entity.cur_loc_y = dest_tile.y
+    entity.cur_loc = dest_tile.coord

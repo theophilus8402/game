@@ -14,8 +14,7 @@ def find_entity_in_tile(target_name, entities):
             return entity
 
 def find_target_nearby(bob, target_name):
-    x = bob.cur_loc_x
-    y = bob.cur_loc_y
+    x, y = bob.cur_loc
     n = (0, 1)
     ne = (1, 1)
     e = (1, 0)
@@ -54,8 +53,13 @@ def handle_user_input(bob, msg):
         # find the target nearby
         target_entity = find_target_nearby(bob, target_name)
         if target_entity:
-            ui.text.add_msg(bob, "Found him at ({},{})".format(
-                target_entity.cur_loc_x, target_entity.cur_loc_y))
+            ui.text.add_msg(bob, "Found him at {}".format(
+                target_entity.cur_loc))
+            # apply dmg
+            target_entity.hp = target_entity.hp - dmg_roll
+            if target_entity.hp <= 0:
+                ui.text.add_msg(bob, "You killed {}!".format(target_name))
+                ui.mymap.kill_creature(ui.ui.world, bob, target_entity)
         else:
             ui.text.add_msg(bob, "Couldn't find him...")
         
@@ -70,8 +74,7 @@ def handle_user_input(bob, msg):
 def handle_macro(bob, key):
 
     if key == "KEY_UP":
-        x = bob.cur_loc_x
-        y = bob.cur_loc_y
+        x, y = bob.cur_loc
         world = ui.ui.world
         try:
             control.move.move(bob, world[(x,y)], world[(x,y+1)])
@@ -82,8 +85,7 @@ def handle_macro(bob, key):
         except:
             pass
     elif key == "KEY_LEFT":
-        x = bob.cur_loc_x
-        y = bob.cur_loc_y
+        x, y = bob.cur_loc
         world = ui.ui.world
         try:
             control.move.move(bob, world[(x,y)], world[(x-1,y)])
@@ -94,8 +96,7 @@ def handle_macro(bob, key):
         except:
             pass
     elif key == "KEY_RIGHT":
-        x = bob.cur_loc_x
-        y = bob.cur_loc_y
+        x, y = bob.cur_loc
         world = ui.ui.world
         try:
             control.move.move(bob, world[(x,y)], world[(x+1,y)])
@@ -106,8 +107,7 @@ def handle_macro(bob, key):
         except:
             pass
     elif key == "KEY_DOWN":
-        x = bob.cur_loc_x
-        y = bob.cur_loc_y
+        x, y = bob.cur_loc
         world = ui.ui.world
         try:
             control.move.move(bob, world[(x,y)], world[(x,y-1)])

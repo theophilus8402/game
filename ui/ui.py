@@ -16,8 +16,7 @@ def handle_map_input(win, world, entity):
         key = win.getkey()
         if key == "h":
             # determine current coords
-            x = entity.cur_loc_x
-            y = entity.cur_loc_y
+            x, y = entity.cur_loc
             # move west
             try:
                 control.move.move(entity, world[(x,y)], world[(x-1,y)])
@@ -27,8 +26,7 @@ def handle_map_input(win, world, entity):
                 pass
         elif key == "j":
             # determine current coords
-            x = entity.cur_loc_x
-            y = entity.cur_loc_y
+            x, y = entity.cur_loc
             # move south
             try:
                 control.move.move(entity, world[(x,y)], world[(x,y-1)])
@@ -38,8 +36,7 @@ def handle_map_input(win, world, entity):
                 pass
         elif key == "k":
             # determine current coords
-            x = entity.cur_loc_x
-            y = entity.cur_loc_y
+            x, y = entity.cur_loc
             # move north
             try:
                 control.move.move(entity, world[(x,y)], world[(x,y+1)])
@@ -49,8 +46,7 @@ def handle_map_input(win, world, entity):
                 pass
         elif key == "l":
             # determine current coords
-            x = entity.cur_loc_x
-            y = entity.cur_loc_y
+            x, y = entity.cur_loc
             # move east
             try:
                 control.move.move(entity, world[(x,y)], world[(x+1,y)])

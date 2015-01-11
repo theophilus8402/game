@@ -13,8 +13,9 @@ def save_world(world):
         #print("Saving tile {} at ({},{})...".format(tile.uid, tile.x,
             #tile.y))
         # TODO: save the entities!!!
+        x, y = tile.coord
         c.execute("INSERT INTO world VALUES (?, ?, ?, ?, ?)",
-            (tile.uid, tile.ground, tile.default_symbol, tile.x, tile.y))
+            (tile.uid, tile.ground, tile.default_symbol, x, y))
 
     conn.commit()
     conn.close()
@@ -30,8 +31,7 @@ def load_world():
         tile.uid = uid
         tile.ground = ground
         tile.default_symbol = def_sym
-        tile.x = x
-        tile.y = y
+        tile.coord = (x, y)
         # don't forget about the entities!
         world[(x,y)] = tile
         #print(row)
@@ -43,8 +43,10 @@ def save_entities(entities):
     conn = sqlite3.connect(db)
     c = conn.cursor()
     for entity in entities:
+        x, y = entity.cur_loc
         c.execute("INSERT INTO entities VALUES (?, ?, ?, ?, ?, ?)",
-            (entity.symbol, entity.name, entity.cur_loc_x, entity.cur_loc_y,                entity.hp, entity.default_hp))
+            (entity.symbol, entity.name, x, y, entity.hp,
+            entity.default_hp))
     conn.commit()
     conn.close()
 
@@ -56,11 +58,9 @@ def load_entities():
     for row in c.execute("SELECT * FROM entities"):
         entity = model.tile.Entity()
         symbol, name, x, y, hp, default_hp = row
-        #symbol, name, x, y = row
         entity.symbol = symbol
         entity.name = name
-        entity.cur_loc_x = x
-        entity.cur_loc_y = y
+        entity.cur_loc = (x, y)
         entity.hp = hp
         entity.default_hp = default_hp
         entities.append(entity)
