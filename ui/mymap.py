@@ -12,17 +12,22 @@ def display_map(world, center, dimension, map_win):
         row = []
         for i in range(-dimension, dimension+1):
             coord = (x+i,y+j)
-            if world.__contains__(coord):
+            try:
                 """
+                # this will be used in the future to have a legend of
+                #   all the creatures on the map
                 ents = []
                 for ent in world[coord].entities:
                     ents.append(ent.name)
-                print("{}: {}".format(coord, ents))
                 """
                 row.append(world[coord].get_symbol())
+            except:
+                # the a tile doesn't exist in the corresponding coord
+                row.append(" ")
         #if len(row) > 0: print("".join(row))
         if len(row) > 0: map_win.addstr(n, 1, "".join(row))
         n = n+1
+
 
 def kill_creature(world, killer, dead_guy):
     # remove creature from the map

@@ -18,15 +18,39 @@ def mtile(uid, coord):
     tile.uid = uid
     tile.coord = coord
     return tile
+
+
+def create_temp_world():
+    # create the temporary world (it is a 4x4 world)
+    dim = 3
+    uuid = 0
+    world = {}
+    for y in range(-dim, dim+1):
+        for x in range(-dim, dim+1):
+            world[(x,y)] = mtile(uuid, (x,y))
+            uuid = uuid+1
+    return world
+
+
+def create_temp_guy(name, sym, coord, hp, def_hp):
+    # creates entity bob
+    bob = model.tile.Entity()
+    bob.name = name
+    bob.symbol = sym
+    bob.cur_loc = coord
+    bob.hp = hp
+    bob.default_hp = def_hp
+    return bob
+
+
 """
 This function initializes the different windows for the logged in user.
 It also starts the main loop of the game.
 TODO: The "logged" in user is statically assigned.  Need to actually
     let someone log in to the game.
 """
-def main(stdscr):
+def main(stdscr, player):
     # attach the window screens to the logged in user
-    player = entities[0]
     text_win, map_win, cmd_win = ui.ui.setup_windows(stdscr)
     player.map_win = map_win
     player.text_win = text_win
@@ -59,74 +83,44 @@ def main(stdscr):
     
     return True
 
+
 if __name__ == "__main__":
 
-
     """
-    entities = []
-    # creates entity bob
-    bob = model.tile.Entity()
-    bob.name = "Bob"
-    bob.symbol = "@"
-    bob.cur_loc = (0, 0)
-    bob.hp = 20
-    bob.default_hp = 20
-    entities.append(bob)
-    #print("Name: {} Symbol: {}".format(bob.name, bob.symbol))
-
-    # creates entity tim
-    tim = model.tile.Entity()
-    tim.name = "Tim"
-    tim.symbol = "T"
-    tim.cur_loc = (1, 0)
-    tim.hp = 20
-    tim.default_hp = 20
-    entities.append(tim)
-    #print("Name: {} Symbol: {}".format(tim.name, tim.symbol))
-
-    # create the temporary world (it is a 4x4 world)
-    dim = 3
-    uuid = 0
-    world = {}
-    for y in range(-dim, dim+1):
-        for x in range(-dim, dim+1):
-            world[(x,y)] = mtile(uuid, (x,y))
-            uuid = uuid+1
-    ui.ui.world = world
+    # Create the temp world:
+    ui.ui.world = create_temp_world()
+    bob = create_temp_guy("Bob", "@", (0, 0), 20, 20)
+    tim = create_temp_guy("Tim", "T", (1, 0), 20, 20)
+    entities = [bob, tim]
+    ui.ui.world[(0,0)].entities.append(bob)
+    ui.ui.world[(1,0)].entities.append(tim)
     """
 
-    #ui.ui.world = world
-
-    #control.db.clean_tables()
     """
-    control.db.drop_tables()
-    print("Saving the world!")
-    control.db.setup_tables()
-    control.db.save_world(ui.ui.world)
-    print("Done saving the world!")
+    empty the tables:
+    control.db.clean_tables()
+
+    # add the temp guys
+    control.db.add_entity(bob)
+    control.db.add_entity(tim)
     """
 
-    #print("Now loading the world!")
+    """
+    Now loading the world!
+    """
     ui.ui.world = control.db.load_world()
-    entities = control.db.load_entities()
-
-    entities[0].cur_loc = (0, 0)
-    entities[1].cur_loc = (1, 0)
-    ui.ui.world[(0,0)].entities.append(entities[0])     #bob
-    ui.ui.world[(1,0)].entities.append(entities[1])     #tim
-
-    # need to attach curses windows to the player (bob)
-    # I do this in the  main function
-
-    curses.wrapper(main)
+    entities = control.db.load_entities(ui.ui.world)
 
     """
-    control.db.drop_tables()
-    control.db.setup_tables()
+    give em bob as the player:
+    """
+    bob = entities[0]
+    curses.wrapper(main, bob)
+
     control.db.save_entities(entities)
     control.db.save_world(ui.ui.world)
+
     """
-
-    #control.move.move(bob, world[(0,0)], world[(0,1)])
-
-    #ui.mymap.display_map(world, (0,0), 3)
+    control.db.drop_tables()
+    control.db.setup_tables()
+    """

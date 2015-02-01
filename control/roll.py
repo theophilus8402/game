@@ -3,6 +3,7 @@
 import random
 
 """
+
 2d6+3
 Roll two die 1-6 then add 3.
 """
@@ -33,5 +34,5 @@ if __name__ == "__main__":
     print(md)
     """
 
-    print(roll(1,6,0))
+    print(roll(3,6,0))
     print(roll(1,8,7))

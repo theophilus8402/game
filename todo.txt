@@ -30,7 +30,6 @@ Due 1/18/15:
 Due 2/1/15:
     * clean up and make comments for each function:
         main.py
-        TODO:
         control/db.py
         control/move.py
         control/roll.py
