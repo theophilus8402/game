@@ -3,6 +3,12 @@
 import sqlite3
 import model.tile
 
+"""
+TODO: currently, bob can ssh in and automagically start the game.
+    That's his shell in /etc/passwd.  But, he needs a link to the game.db
+    in family's home dir.  That's because most of the work is being done
+    there.  Later, I'll have to move everything to some place else.
+"""
 db = "game.db"
 
 """
@@ -41,7 +47,6 @@ def load_world():
         tile.ground = ground
         tile.default_symbol = def_sym
         tile.coord = (x, y)
-        # don't forget about the entities!
         world[(x,y)] = tile
     conn.close()
     return world
@@ -134,7 +139,7 @@ def setup_tables():
         
 
 if __name__ == "__main__":
-
+    """
     conn = sqlite3.connect('game.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE world (uid text, ground text, def_symbol text,
@@ -142,3 +147,4 @@ if __name__ == "__main__":
     c.execute("INSERT INTO world VALUES ('0', 'plain', '.', 0, 0)")
     conn.commit()
     conn.close()
+    """

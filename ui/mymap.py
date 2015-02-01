@@ -32,6 +32,7 @@ def display_map(world, center, dimension, map_win):
 def kill_creature(world, killer, dead_guy):
     # remove creature from the map
     world[dead_guy.cur_loc].entities.remove(dead_guy)
+    #TODO: need to figure out how to remove the dead_guy's cur_loc
 
     # update map window
     display_map(world, (0, 0), 3, killer.map_win)
