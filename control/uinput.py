@@ -5,8 +5,10 @@ import control.move
 import control.roll
 import curses
 import re
+import control.admin
 
 re_hit = re.compile("hit (?P<who>\w+)")
+re_make_tile = re.compile("make tile (?P<direction>\w+)")
 
 def find_entity_in_tile(target_name, entities):
     for entity in entities:
@@ -41,6 +43,8 @@ def handle_user_input(bob, msg):
 
     if msg == "exit":
         should_exit = True
+    elif control.admin.make_tile_handle:
+        control.admin.make_tile
     elif re_hit.match(msg):
         result = re_hit.match(msg)
         target_name = result.group("who")
@@ -62,6 +66,10 @@ def handle_user_input(bob, msg):
                 ui.mymap.kill_creature(ui.ui.world, bob, target_entity)
         else:
             ui.text.add_msg(bob, "Couldn't find him...")
+    elif re_make_tile.match(msg):
+        result = re_make_tile.match(msg)
+        direction = result.group("direction")
+        control.admin.make_tile(bob, msg, direction)
         
     elif msg == curses.KEY_UP:
         ui.text.add_msg(bob, "handle_user_input... up")

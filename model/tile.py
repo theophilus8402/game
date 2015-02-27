@@ -1,5 +1,7 @@
 #!/usr/bin/python3.4
 
+import queue
+
 class Entity:
 
     def __init__(self):
@@ -9,6 +11,8 @@ class Entity:
         self.map_win = None
         self.text_win = None
         self.cmd_win = None
+        self.sock = None
+        self.msg_queue = queue.Queue()
         self.messages = []
         self.disp_msgs = []   # temporary, recalculated when win resized
         self.msg_len = 3000
