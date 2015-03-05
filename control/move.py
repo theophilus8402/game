@@ -6,12 +6,12 @@ blocking it...
 """
 def move(entity, cur_tile, dest_tile):
     # make sure entity is in cur_tile
-    if entity not in cur_tile.entities:
-        return False
+    if entity in cur_tile.entities:
 
-    # remove entity from cur_tile
-    cur_tile.entities.remove(entity)
+        # remove entity from cur_tile
+        cur_tile.entities.remove(entity)
 
-    # add entity to dest_tile
-    dest_tile.entities.append(entity)
-    entity.cur_loc = dest_tile.coord
+        # add entity to dest_tile
+        dest_tile.entities.append(entity)
+        entity.cur_loc = dest_tile.coord
+    return True

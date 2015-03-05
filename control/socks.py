@@ -22,6 +22,7 @@ class LoginGuy:
         # the following two items are set so that user can login
         self.special_state = True
         self.state = "login"
+        return True
 
 
 class World:
@@ -39,6 +40,7 @@ class World:
 
         self.outputs = []
         self.passwds = {}        # key is name, passwd is value
+        return True
 
 
 # sends all messages in bob's msg_queue
@@ -55,8 +57,10 @@ def actually_send_msgs(world, bob):
         else:
             print("Sending {}... to {}".format(next_msg, s.getpeername()))
             s.send(next_msg)
+    return True
 
 
+# msg should always be a string with no '\n'
 def send_msg(world, bob, msg):
     bmsg = b''
     try:
@@ -68,13 +72,16 @@ def send_msg(world, bob, msg):
     bob.msg_queue.put(bmsg)
     if bob.sock not in world.outputs:
         world.outputs.append(bob.sock)
+    return True
 
 
 # should get a world, socket, and a LoginGuy object
+# TODO: I don't check for multiple bob's
 def add_connection(world, sock, bob):
     bob.sock = sock
     world.peeps.append(bob)
     world.sock_peeps[sock] = bob
+    return True
 
 
 def remove_connection(world, sock):
@@ -84,15 +91,16 @@ def remove_connection(world, sock):
     if sock in world.outputs:
         world.outputs.remove(sock)
     sock.close()
+    return True
 
 
 def login(world, bob, msg=None):
 
-    if not msg:
+    if (bob.state == "login") and (not msg):
         # send: who are you?
         if bob.name is None:
             send_msg(world, bob, "What is your name? ")
-    else:
+    elif bob.state == "login":
         # get: name
         if not bob.name:
             send_msg(world, bob, "Ah, so your name is {}?".format(msg))
@@ -113,6 +121,8 @@ def login(world, bob, msg=None):
                 bob.state = None
             else:
                 send_msg(world, bob, "Sorry! Wrong password!")
+    # if we got here when bob.state was not login, do nothing
+    return True
 
 
 def handle_input(world, bob, msg):
@@ -123,6 +133,7 @@ def handle_input(world, bob, msg):
         send_msg(world, bob, "Well, we'll miss you!  Goodbye!")
         actually_send_msgs(world, bob)
         remove_connection(world, bob.sock)
+    return True
 
 
 def server_loop(world):
@@ -194,6 +205,7 @@ def server_loop(world):
             print("Handling exceptional condition for {}".format(
                 s.getpeername()))
             remove_connection(world, s)
+    return True
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 
 #import control.roll
 import unittest
-import test.testRoll
+#import test.testRoll
 
 #roll(num_die, sides, modifier)
 #class test.roll.TestSequenceFunctions(unittest.TestCase)

@@ -1,4 +1,10 @@
 !!!Two Weeks!!!
+* move ui.mymap stuff to control
+* move ui.ui.world to world being passed around or in control
+* make displaying the map more flexible
+    * right now we're stuck to dim of 3x3 and centered on (0, 0)
+* finish removing curses stuff from the server, I'm at the TODO line
+    in control.uinput
 
 Due 12/7/14:
 * able to move a character around on the map

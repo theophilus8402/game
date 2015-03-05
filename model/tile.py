@@ -8,16 +8,9 @@ class Entity:
         self.symbol = ""
         self.name = ""
         self.cur_loc = (0, 0)
-        self.map_win = None
-        self.text_win = None
-        self.cmd_win = None
         self.sock = None
         self.msg_queue = queue.Queue()
         self.messages = []
-        self.disp_msgs = []   # temporary, recalculated when win resized
-        self.msg_len = 3000
-        self.disp_msg_start = 0
-        self.text_scroll = True
         self.hp = 0
         self.default_hp = 0
         """

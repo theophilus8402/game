@@ -43,6 +43,47 @@ def create_temp_guy(name, sym, coord, hp, def_hp):
     return bob
 
 
+"""
+This function initializes the different windows for the logged in user.
+It also starts the main loop of the game.
+TODO: The "logged" in user is statically assigned.  Need to actually
+    let someone log in to the game.
+"""
+def main(stdscr, player):
+    # attach the window screens to the logged in user
+    text_win, map_win, cmd_win = ui.ui.setup_windows(stdscr)
+    player.map_win = map_win
+    player.text_win = text_win
+    player.cmd_win = cmd_win
+
+    # display the world map
+    ui.mymap.display_map(ui.ui.world, (0,0), 3, map_win)
+    map_win.noutrefresh()
+
+    # I think this is to make sure the numpad gets interpreted properly
+    player.map_win.keypad(True)
+    player.text_win.keypad(True)
+    player.cmd_win.keypad(True)
+
+    # Make userinput non-blocking (use nodelay(True)):
+    # To make it wait some number of milliseconds, use timeout(ms)
+    player.cmd_win.timeout(1000)
+    player.map_win.timeout(100)
+    player.text_win.timeout(100)
+
+    # The following would be for centering control on the map window
+    #ui.ui.handle_map_input(map_win, ui.ui.world, player)
+
+    # We are going to center control of the game on the command window
+    ui.text.add_msg(player, "Welcome to my game!")
+    should_exit = False
+    while not should_exit:
+        user_input = ui.ui.handle_cmd_input(cmd_win, player)
+        should_exit = control.uinput.handle_user_input(player, user_input)
+    
+    return True
+
+
 if __name__ == "__main__":
 
     """
@@ -74,8 +115,7 @@ if __name__ == "__main__":
     give em bob as the player:
     """
     bob = entities[0]
-
-    # enter main loop of the game
+    curses.wrapper(main, bob)
 
     control.db.save_entities(entities)
     control.db.save_world(ui.ui.world)

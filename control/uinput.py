@@ -11,9 +11,12 @@ re_hit = re.compile("hit (?P<who>\w+)")
 re_make_tile = re.compile("make tile (?P<direction>\w+)")
 
 def find_entity_in_tile(target_name, entities):
+    the_entity = None
     for entity in entities:
         if target_name.lower() == entity.name.lower():
-            return entity
+            the_entity = entity
+            break
+    return the_entity
 
 def find_target_nearby(bob, target_name):
     x, y = bob.cur_loc
@@ -43,26 +46,33 @@ def handle_user_input(bob, msg):
 
     if msg == "exit":
         should_exit = True
-    elif control.admin.make_tile_handle:
-        control.admin.make_tile
+    # the problem with the below is that we need to make the variable
+    #   attached to individual not the game at large
+    #elif control.admin.make_tile_handle:
+        #control.admin.make_tile
     elif re_hit.match(msg):
         result = re_hit.match(msg)
         target_name = result.group("who")
-        ui.text.add_msg(bob, "You want to hit {}?!".format(target_name))
+        control.socks.send_msg(ui.ui.world, bob,
+            "You want to hit {}?!".format(target_name))
         attack_roll = control.roll.roll(2, 6, 1)
-        ui.text.add_msg(bob, "Attack roll: {}".format(attack_roll))
+        control.socks.send_msg(ui.ui.world, bob,
+            "Attack roll: {}".format(attack_roll))
         dmg_roll = control.roll.roll(1, 6, 2)
-        ui.text.add_msg(bob, "Dmg roll: {}".format(dmg_roll))
+        control.socks.send_msg(ui.ui.world, bob,
+            "Dmg roll: {}".format(dmg_roll))
 
         # find the target nearby
         target_entity = find_target_nearby(bob, target_name)
         if target_entity:
-            ui.text.add_msg(bob, "Found him at {}".format(
-                target_entity.cur_loc))
+            control.socks.send_msg(ui.ui.world, bob,
+                "Found him at {}".format(target_entity.cur_loc))
             # apply dmg
             target_entity.hp = target_entity.hp - dmg_roll
             if target_entity.hp <= 0:
-                ui.text.add_msg(bob, "You killed {}!".format(target_name))
+                control.socks.send_msg(bob, "You killed {}!".format(
+                    target_name))
+                #TODO:
                 ui.mymap.kill_creature(ui.ui.world, bob, target_entity)
         else:
             ui.text.add_msg(bob, "Couldn't find him...")

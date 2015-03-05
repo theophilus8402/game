@@ -5,7 +5,8 @@ import curses
 """
 map_win is a curses window
 """
-def display_map(world, center, dimension, map_win):
+def display_map(world, center, dimension, bob):
+    map_rows = []     # a list of the string for each row
     x, y = center
     n = 1   # keeps track of where we are on the map screen
     for j in range(-dimension, dimension+1).__reversed__():
@@ -24,9 +25,11 @@ def display_map(world, center, dimension, map_win):
             except:
                 # the a tile doesn't exist in the corresponding coord
                 row.append(" ")
-        #if len(row) > 0: print("".join(row))
-        if len(row) > 0: map_win.addstr(n, 1, "".join(row))
+        # turn the row into a string and append it to the list
+        if len(row) > 0: map_rows.append("".join(row))
         n = n+1
+    control.send_msg(world, bob, "\n".join(map_rows))
+    return True
 
 
 def kill_creature(world, killer, dead_guy):
@@ -35,6 +38,5 @@ def kill_creature(world, killer, dead_guy):
     #TODO: need to figure out how to remove the dead_guy's cur_loc
 
     # update map window
-    display_map(world, (0, 0), 3, killer.map_win)
-    killer.map_win.noutrefresh()
-    curses.doupdate()
+    display_map(world, (0, 0), 3, killer)
+    return True
