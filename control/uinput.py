@@ -72,68 +72,16 @@ def handle_user_input(bob, msg):
             if target_entity.hp <= 0:
                 control.socks.send_msg(bob, "You killed {}!".format(
                     target_name))
-                #TODO:
                 ui.mymap.kill_creature(ui.ui.world, bob, target_entity)
         else:
-            ui.text.add_msg(bob, "Couldn't find him...")
+            control.socks.send_msg(ui.ui.world, bob, "Couldn't find him...")
     elif re_make_tile.match(msg):
         result = re_make_tile.match(msg)
         direction = result.group("direction")
         control.admin.make_tile(bob, msg, direction)
-        
     elif msg == curses.KEY_UP:
-        ui.text.add_msg(bob, "handle_user_input... up")
+        control.socks.send_msg(ui.ui.world, bob, "handle_user_input... up")
     else:
-        ui.text.add_msg(bob, "Huh?  {}".format(msg))
+        control.socks.send_msg(ui.ui.world, bob, "Huh?  {}".format(msg))
 
     return should_exit
-
-
-def handle_macro(bob, key):
-
-    if key == "KEY_UP":
-        x, y = bob.cur_loc
-        world = ui.ui.world
-        try:
-            control.move.move(bob, world[(x,y)], world[(x,y+1)])
-            ui.mymap.display_map(world, (0,0), 3, bob.map_win)
-            ui.text.add_msg(bob, "Up arrow!")
-            bob.map_win.noutrefresh()
-            curses.doupdate()
-        except:
-            pass
-    elif key == "KEY_LEFT":
-        x, y = bob.cur_loc
-        world = ui.ui.world
-        try:
-            control.move.move(bob, world[(x,y)], world[(x-1,y)])
-            ui.mymap.display_map(world, (0,0), 3, bob.map_win)
-            ui.text.add_msg(bob, "Left arrow!")
-            bob.map_win.noutrefresh()
-            curses.doupdate()
-        except:
-            pass
-    elif key == "KEY_RIGHT":
-        x, y = bob.cur_loc
-        world = ui.ui.world
-        try:
-            control.move.move(bob, world[(x,y)], world[(x+1,y)])
-            ui.mymap.display_map(world, (0,0), 3, bob.map_win)
-            ui.text.add_msg(bob, "Right arrow!")
-            bob.map_win.noutrefresh()
-            curses.doupdate()
-        except:
-            pass
-    elif key == "KEY_DOWN":
-        x, y = bob.cur_loc
-        world = ui.ui.world
-        try:
-            control.move.move(bob, world[(x,y)], world[(x,y-1)])
-            ui.mymap.display_map(world, (0,0), 3, bob.map_win)
-            ui.text.add_msg(bob, "Down arrow!")
-            bob.map_win.noutrefresh()
-            curses.doupdate()
-        except:
-            pass
-    else:
-        ui.text.add_msg(bob, "macro... err...")
