@@ -4,10 +4,9 @@ import model.tile
 import control.move
 import control.db
 import control.uinput
+import control.socks
 import ui.mymap
-import ui.ui
 import curses
-import ui.text
 
 """
 This is a temporary function to help setup a world for me.
@@ -24,10 +23,10 @@ def create_temp_world():
     # create the temporary world (it is a 4x4 world)
     dim = 3
     uuid = 0
-    world = {}
+    world = model.tile.World()
     for y in range(-dim, dim+1):
         for x in range(-dim, dim+1):
-            world[(x,y)] = mtile(uuid, (x,y))
+            world.tiles[(x,y)] = mtile(uuid, (x,y))
             uuid = uuid+1
     return world
 
@@ -47,12 +46,12 @@ if __name__ == "__main__":
 
     """
     # Create the temp world:
-    ui.ui.world = create_temp_world()
+    world = create_temp_world()
     bob = create_temp_guy("Bob", "@", (0, 0), 20, 20)
     tim = create_temp_guy("Tim", "T", (1, 0), 20, 20)
     entities = [bob, tim]
-    ui.ui.world[(0,0)].entities.append(bob)
-    ui.ui.world[(1,0)].entities.append(tim)
+    world.tiles[(0,0)].entities.append(bob)
+    world.tiles[(1,0)].entities.append(tim)
     """
 
     """
@@ -67,18 +66,24 @@ if __name__ == "__main__":
     """
     Now loading the world!
     """
-    ui.ui.world = control.db.load_world()
-    entities = control.db.load_entities(ui.ui.world)
+    world = control.db.load_world()
+    world.entities = control.db.load_entities(world)
+
+    passwds = {}
+    passwds["bob"] = "bob123"
+    passwds["tim"] = "tim123"
+    world.passwds = passwds
 
     """
-    give em bob as the player:
-    """
+    #give em bob as the player:
     bob = entities[0]
+    """
 
     # enter main loop of the game
+    control.socks.server_loop(world)
 
-    control.db.save_entities(entities)
-    control.db.save_world(ui.ui.world)
+    control.db.save_entities(world.entities)
+    control.db.save_world(world)
 
     """
     control.db.drop_tables()

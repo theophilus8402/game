@@ -1,6 +1,7 @@
 #!/usr/bin/python3.4
 
 import curses
+import control.socks
 
 """
 map_win is a curses window
@@ -18,23 +19,23 @@ def display_map(world, center, dimension, bob):
                 # this will be used in the future to have a legend of
                 #   all the creatures on the map
                 ents = []
-                for ent in world[coord].entities:
+                for ent in world.tiles[coord].entities:
                     ents.append(ent.name)
                 """
-                row.append(world[coord].get_symbol())
+                row.append(world.tiles[coord].get_symbol())
             except:
                 # the a tile doesn't exist in the corresponding coord
                 row.append(" ")
         # turn the row into a string and append it to the list
         if len(row) > 0: map_rows.append("".join(row))
         n = n+1
-    control.send_msg(world, bob, "\n".join(map_rows))
+    control.socks.send_msg(world, bob, "\n".join(map_rows))
     return True
 
 
 def kill_creature(world, killer, dead_guy):
     # remove creature from the map
-    world[dead_guy.cur_loc].entities.remove(dead_guy)
+    world.tiles[dead_guy.cur_loc].entities.remove(dead_guy)
     #TODO: need to figure out how to remove the dead_guy's cur_loc
 
     # update map window

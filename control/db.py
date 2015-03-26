@@ -18,8 +18,8 @@ db = "game.db"
 def save_world(world):
     conn = sqlite3.connect(db)
     c = conn.cursor()
-    for coord in world.keys():
-        tile = world[coord]
+    for coord in world.tiles.keys():
+        tile = world.tiles[coord]
         # TODO: save the entities!!!
             # might not need to worry about this because the entity
             # will have it's current coord listed
@@ -39,7 +39,7 @@ def save_world(world):
 def load_world():
     conn = sqlite3.connect(db)
     c = conn.cursor()
-    world = {}
+    world = model.tile.World()
     for row in c.execute("SELECT * FROM world"):
         tile = model.tile.Tile()
         uid, ground, def_sym, x, y = row
@@ -47,7 +47,7 @@ def load_world():
         tile.ground = ground
         tile.default_symbol = def_sym
         tile.coord = (x, y)
-        world[(x,y)] = tile
+        world.tiles[(x,y)] = tile
     conn.close()
     return world
 
@@ -104,7 +104,7 @@ def load_entities(world):
         entity.hp = hp
         entity.default_hp = default_hp
         entities.append(entity)
-        world[(x, y)].entities.append(entity)
+        world.tiles[(x, y)].entities.append(entity)
     conn.close()
     return entities
 

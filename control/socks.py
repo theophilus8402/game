@@ -4,43 +4,10 @@ import socket
 import select
 import queue
 import sys
+import model.tile
+import control.uinput
 
 # http://pymotw.com/2/select/
-
-"""
-def send_all(socks, msg):
-    for sock, addr in socks:
-        sock.send(msg)
-"""
-
-
-class LoginGuy:
-    def __init__(self):
-        self.name = None
-        self.sock = None
-        self.msg_queue = queue.Queue()
-        # the following two items are set so that user can login
-        self.special_state = True
-        self.state = "login"
-        return True
-
-
-class World:
-    def __init__(self):
-        stdin = LoginGuy()
-        stdin.name = "stdin"
-        stdin.sock = sys.stdin
-        stdin.special_state = False
-        stdin.state = None
-        self.peeps = [stdin]
-
-        # key is the socket, value is the LoginGuy
-        self.sock_peeps = {}
-        self.sock_peeps[sys.stdin] = stdin
-
-        self.outputs = []
-        self.passwds = {}        # key is name, passwd is value
-        return True
 
 
 # sends all messages in bob's msg_queue
@@ -75,23 +42,39 @@ def send_msg(world, bob, msg):
     return True
 
 
-# should get a world, socket, and a LoginGuy object
+# should get a world, socket, and a Entity object
 # TODO: I don't check for multiple bob's
 def add_connection(world, sock, bob):
     bob.sock = sock
-    world.peeps.append(bob)
     world.sock_peeps[sock] = bob
     return True
 
 
 def remove_connection(world, sock):
-    bob = world.sock_peeps[sock]
-    world.peeps.remove(bob)
     del world.sock_peeps[sock]
     if sock in world.outputs:
         world.outputs.remove(sock)
     sock.close()
     return True
+
+
+def find_bob(world, name):
+    ret_bob = None
+    for bob in world.entities:
+        if bob.name.lower() == name.lower():
+            ret_bob = bob
+            break
+    return ret_bob
+
+
+def transfer_bobs(world, temp_entity, entity):
+    # temp_entity is the entity that has the sock
+    entity.sock = temp_entity.sock
+
+    # change world.sock_peeps from temp_entity to entity
+    world.sock_peeps[temp_entity.sock] = entity
+
+    return entity
 
 
 def login(world, bob, msg=None):
@@ -117,6 +100,9 @@ def login(world, bob, msg=None):
             # check password
             if world.passwds[bob.name] == msg:
                 send_msg(world, bob, "Hey! Your password is correct!")
+                # return the actual bob entity
+                entities_bob = find_bob(world, bob.name)
+                bob = transfer_bobs(world, bob, entities_bob)
                 bob.special_state = False
                 bob.state = None
             else:
@@ -125,6 +111,8 @@ def login(world, bob, msg=None):
     return True
 
 
+"""
+# integrated into control.uinput handle_user_input
 def handle_input(world, bob, msg):
     if bob.special_state:
         if bob.state == "login":
@@ -134,6 +122,7 @@ def handle_input(world, bob, msg):
         actually_send_msgs(world, bob)
         remove_connection(world, bob.sock)
     return True
+"""
 
 
 def server_loop(world):
@@ -146,7 +135,7 @@ def server_loop(world):
     server.listen(5)
     conn_count = 0
 
-    server_guy = LoginGuy()
+    server_guy = model.tile.Entity()
     server_guy.name = "server"
     server_guy.special_state = False    # server doesn't need to login
     server_guy.state = None
@@ -167,7 +156,7 @@ def server_loop(world):
                 connection, client_addr = s.accept()
                 print("New connection from {}".format(client_addr))
                 connection.setblocking(0)
-                bob = LoginGuy()
+                bob = model.tile.Entity()
                 add_connection(world, connection, bob)
                 print("Login stuff...")
                 login(world, bob)
@@ -192,7 +181,8 @@ def server_loop(world):
                     if s not in world.outputs:
                         world.outputs.append(s)
                     # handle it
-                    handle_input(world, bob, msg)
+                    #handle_input(world, bob, msg)
+                    control.uinput.handle_user_input(world, bob, msg)
                 else:
                     # data is empty means the client closed the connection
                     print("Closing {}...".format(s.getpeername()))

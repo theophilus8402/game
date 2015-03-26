@@ -1,11 +1,9 @@
 #!/usr/bin/python3.4
 
-import ui.text
-
 make_tile_handle = False
 make_tile_handle_symbol = False
 make_tile_handle_ground = False
-
+"""
 def make_tile(bob, msg, direction):
     if !(make_tile_handle_symbol or make_tile_handle_ground):
         ui.text.add_msg(bob, "You want to add a tile in this direction: {}?"
@@ -25,3 +23,4 @@ def make_tile_handle(bob, msg):
 
         symbol = msg
         make_tile_handle_symbol = False
+"""
