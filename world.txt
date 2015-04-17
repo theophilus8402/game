@@ -1,0 +1,2 @@
+#max_tile_uid: 0
+#max_entity_uid: 0

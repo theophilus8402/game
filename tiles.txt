@@ -1,0 +1,7 @@
+#UID: 0
+#Entities: 0,2,7 (these correspond to entity objects)
+#Ground: flat (or muddy, water, rough...?)
+#Outside: False
+#Coord: (0, 0)
+#Default Symbol: .
+--------------------------------

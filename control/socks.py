@@ -17,7 +17,7 @@ def actually_send_msgs(world, bob):
         try:
             next_msg = bob.msg_queue.get_nowait()
         except queue.Empty:
-            print("Output queue for {} is empty.".format(s.getpeername()))
+            #print("Output queue for {} is empty.".format(s.getpeername()))
             if s in world.outputs:
                 world.outputs.remove(s)
             break
@@ -102,27 +102,18 @@ def login(world, bob, msg=None):
                 send_msg(world, bob, "Hey! Your password is correct!")
                 # return the actual bob entity
                 entities_bob = find_bob(world, bob.name)
-                bob = transfer_bobs(world, bob, entities_bob)
-                bob.special_state = False
-                bob.state = None
+                if entities_bob:
+                    bob = transfer_bobs(world, bob, entities_bob)
+                    bob.special_state = False
+                    bob.state = None
+                else:
+                    print("Eeep!  I couldn't find: {}".format(bob.name))
+                    bob.name = None
+                    login(world, bob)
             else:
                 send_msg(world, bob, "Sorry! Wrong password!")
     # if we got here when bob.state was not login, do nothing
     return True
-
-
-"""
-# integrated into control.uinput handle_user_input
-def handle_input(world, bob, msg):
-    if bob.special_state:
-        if bob.state == "login":
-            login(world, bob, msg)
-    elif msg == "exit":
-        send_msg(world, bob, "Well, we'll miss you!  Goodbye!")
-        actually_send_msgs(world, bob)
-        remove_connection(world, bob.sock)
-    return True
-"""
 
 
 def server_loop(world):
@@ -158,11 +149,9 @@ def server_loop(world):
                 connection.setblocking(0)
                 bob = model.tile.Entity()
                 add_connection(world, connection, bob)
-                print("Login stuff...")
                 login(world, bob)
             elif s is sys.stdin:
                 # stdin input!
-                print("stdin stuff!")
                 data = s.readline().strip()
                 if data:
                     print("Recieved from stdin: {}".format(data))

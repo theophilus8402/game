@@ -1,15 +1,19 @@
 #!/usr/bin/python3.4
 
-import curses
 import control.socks
 
-"""
-map_win is a curses window
-"""
-def display_map(world, center, dimension, bob):
+def display_map(world, bob, center=None, dimension=None):
+    if center == None:
+        center = bob.cur_loc
+    if dimension == None:
+        dimension = bob.vision_range
     map_rows = []     # a list of the string for each row
     x, y = center
-    n = 1   # keeps track of where we are on the map screen
+    """
+    print("Center: {}".format(center))
+    print("Top Left: {}  Top Right: {}".format((x-dimension,y+dimension),
+        (x+dimension,y-dimension)))
+    """
     for j in range(-dimension, dimension+1).__reversed__():
         row = []
         for i in range(-dimension, dimension+1):
@@ -28,7 +32,6 @@ def display_map(world, center, dimension, bob):
                 row.append(" ")
         # turn the row into a string and append it to the list
         if len(row) > 0: map_rows.append("".join(row))
-        n = n+1
     control.socks.send_msg(world, bob, "\n".join(map_rows))
     return True
 
@@ -39,5 +42,5 @@ def kill_creature(world, killer, dead_guy):
     #TODO: need to figure out how to remove the dead_guy's cur_loc
 
     # update map window
-    display_map(world, (0, 0), 3, killer)
+    display_map(world, killer)
     return True

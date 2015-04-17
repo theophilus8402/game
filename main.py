@@ -5,7 +5,6 @@ import control.move
 import control.db
 import control.uinput
 import control.socks
-import ui.mymap
 import curses
 
 """
@@ -73,6 +72,8 @@ if __name__ == "__main__":
     passwds["bob"] = "bob123"
     passwds["tim"] = "tim123"
     world.passwds = passwds
+
+    control.db.rebuild_entities_table(world.entities)
 
     """
     #give em bob as the player:

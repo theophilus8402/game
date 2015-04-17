@@ -6,16 +6,21 @@ import sys
 class Entity:
 
     def __init__(self):
-        self.symbol = ""
+        # stuff stored in db in order
+        self.entity_uid = 0 # TODO: implement this more
         self.name = None
+        self.symbol = ""
         self.cur_loc = (0, 0)
+        self.hp = 0
+        self.default_hp = 0 # TODO: change this to max_hp
+        self.vision_range = 5
+
+        # stuff not stored in db
         self.sock = None
         self.msg_queue = queue.Queue()
         # the following two items are set so that user can login
         self.special_state = True
         self.state = "login"
-        self.hp = 0
-        self.default_hp = 0
         """
         short_desc = ""
         long_desc = ""

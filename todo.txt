@@ -1,29 +1,31 @@
 !!!Two Weeks!!!
-* clean up what I print
-* move ui.mymap stuff to control
-* move ui.ui.world to world being passed around or in control
-* make displaying the map more flexible
-    * right now we're stuck to dim of 3x3 and centered on (0, 0)
-* finish removing curses stuff from the server, I'm at the TODO line
-    in control.uinput
+* change from a db to flat text file... I know it's not ideal
+    * but I think I'm getting too hung up on the db thing
+* make it so I can make tiles easily
+* figure out what I want to do about testing stuff...
+* handle someone dying
+    * mebbe make another room to put them in
+    * make a heal spell
+    * make a resurrection spell
+
+
 
 Due 12/7/14:
-* able to move a character around on the map
-    * create entities
-    * create tiles
-    * create the world map, start with 5x5
-# got it done!! woohoo!
+x able to move a character around on the map
+    x create entities
+    x create tiles
+    x create the world map, start with 5x5
+x got it done!! woohoo!
 
 Due 12/21/14:
-    * read/write entities to DB
-    * read/write tiles to DB
-    * change focus from map control to cmd_win control
+    x read/write entities to DB
+    x read/write tiles to DB
+    x change focus from map control to cmd_win control
 # got the above done
 
 Due 1/4/15:
-    * get text window to scroll properly
-        # done
-    * add shortcut keys for num pad
+    x get text window to scroll properly
+    x add shortcut keys for num pad
         # done
         * TODO: alt+3 on numpad
 
@@ -62,4 +64,14 @@ Due 3/1/15:
     * separate player from main server so we can have multiple players
         * need to setup messaging/sockets
     * make it so I can page up in the text window
-    * make it so side-to-side scrolling works properly in cmd_win
+
+Before 5/25/15
+x clean up what I print
+x move ui.mymap stuff to control
+x make displaying the map more flexible
+    x right now we're stuck to dim of 3x3 and centered on (0, 0)
+    x integrate entity.vision_range into displaying the map
+    x !!integrate vision range into the db!!
+x move ui.ui.world to world being passed around or in control
+x finish removing curses stuff from the server
+   * make it so side-to-side scrolling works properly in cmd_win

@@ -4,7 +4,7 @@ import control.move
 import control.roll
 import control.admin
 import control.socks
-import ui.mymap
+import control.mymap
 import curses
 import re
 
@@ -80,27 +80,22 @@ def handle_user_input(world, bob, msg):
             if target_entity.hp <= 0:
                 control.socks.send_msg(world, bob, "You killed {}!".format(
                     target_name))
-                ui.mymap.kill_creature(world, bob, target_entity)
+                control.mymap.kill_creature(world, bob, target_entity)
         else:
             control.socks.send_msg(world, bob, "Couldn't find him...")
     elif msg == "n":
         x, y = bob.cur_loc
-        print(bob)
         try:
-            control.socks.send_msg(world, bob,
-                "cur loc: {}".format(bob.cur_loc))
             control.move.move(world, bob, (x,y), (x,y+1))
-            ui.mymap.display_map(world, (0,0), 3, bob)
+            control.mymap.display_map(world, bob)
             control.socks.send_msg(world, bob, "Moving north!")
-            control.socks.send_msg(world, bob,
-                "cur loc: {}".format(bob.cur_loc))
         except:
             pass
     elif msg == "e":
         x, y = bob.cur_loc
         try:
             control.move.move(world, bob, (x,y), (x+1,y))
-            ui.mymap.display_map(world, (0,0), 3, bob)
+            control.mymap.display_map(world, bob)
             control.socks.send_msg(world, bob, "moving east!")
         except:
             pass
@@ -108,7 +103,7 @@ def handle_user_input(world, bob, msg):
         x, y = bob.cur_loc
         try:
             control.move.move(world, bob, (x,y), (x,y-1))
-            ui.mymap.display_map(world, (0,0), 3, bob)
+            control.mymap.display_map(world, bob)
             control.socks.send_msg(world, bob, "moving south!")
         except:
             pass
@@ -116,7 +111,7 @@ def handle_user_input(world, bob, msg):
         x, y = bob.cur_loc
         try:
             control.move.move(world, bob, (x,y), (x-1,y))
-            ui.mymap.display_map(world, (0,0), 3, bob)
+            control.mymap.display_map(world, bob)
             control.socks.send_msg(world, bob, "moving west!")
         except:
             pass
