@@ -1,7 +1,10 @@
 !!!Two Weeks!!!
 * change from a db to flat text file... I know it's not ideal
     * but I think I'm getting too hung up on the db thing
+    * I'm almost done.  Just need to finish writing the lil world stuff
 * make it so I can make tiles easily
+    * got mostly working
+    * need to make it so I can give multiple coords at the same time
 * figure out what I want to do about testing stuff...
 * handle someone dying
     * mebbe make another room to put them in

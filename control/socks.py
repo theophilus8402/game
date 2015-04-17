@@ -6,6 +6,7 @@ import queue
 import sys
 import model.tile
 import control.uinput
+import control.mymap
 
 # http://pymotw.com/2/select/
 
@@ -29,16 +30,23 @@ def actually_send_msgs(world, bob):
 
 # msg should always be a string with no '\n'
 def send_msg(world, bob, msg):
-    bmsg = b''
-    try:
-        # make sure msg is a bytearray
-        # will error if msg is already a bytearray
-        bmsg = bytearray("{}\n".format(msg), "utf-8")
-    except:
-        bmsg = msg + b'\n'
-    bob.msg_queue.put(bmsg)
-    if bob.sock not in world.outputs:
-        world.outputs.append(bob.sock)
+    # I'm adding the ability to send msg to the local screen
+    # this should help with testing.  I shouldn't need it in the future
+    # so, I can get rid of this feature later and just have it send
+    # stuff via a socket.
+    if bob.sock:
+        bmsg = b''
+        try:
+            # make sure msg is a bytearray
+            # will error if msg is already a bytearray
+            bmsg = bytearray("{}\n".format(msg), "utf-8")
+        except:
+            bmsg = msg + b'\n'
+        bob.msg_queue.put(bmsg)
+        if bob.sock not in world.outputs:
+            world.outputs.append(bob.sock)
+    else:
+        print(msg)
     return True
 
 
@@ -61,6 +69,7 @@ def remove_connection(world, sock):
 def find_bob(world, name):
     ret_bob = None
     for bob in world.entities:
+        print("find_bob testing name: {}".format(bob.name))
         if bob.name.lower() == name.lower():
             ret_bob = bob
             break
@@ -106,6 +115,7 @@ def login(world, bob, msg=None):
                     bob = transfer_bobs(world, bob, entities_bob)
                     bob.special_state = False
                     bob.state = None
+                    control.mymap.display_map(world, bob)
                 else:
                     print("Eeep!  I couldn't find: {}".format(bob.name))
                     bob.name = None

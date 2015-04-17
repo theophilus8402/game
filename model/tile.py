@@ -7,12 +7,12 @@ class Entity:
 
     def __init__(self):
         # stuff stored in db in order
-        self.entity_uid = 0 # TODO: implement this more
+        self.uid = 0 # TODO: implement this more
         self.name = None
         self.symbol = ""
         self.cur_loc = (0, 0)
-        self.hp = 0
-        self.default_hp = 0 # TODO: change this to max_hp
+        self.cur_hp = 0
+        self.max_hp = 10
         self.vision_range = 5
 
         # stuff not stored in db
@@ -68,3 +68,12 @@ class World:
 
         self.tiles = {}
         self.entities = []
+
+        # these max uids are the current highest uid
+        # so, to create a new uid, return max_uid++
+        self.max_tile_uid = 0
+        self.max_entity_uid = 0
+
+    def get_new_tile_uid(self):
+        self.max_tile_uid += 1
+        return self.max_tile_uid

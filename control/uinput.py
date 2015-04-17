@@ -9,7 +9,7 @@ import curses
 import re
 
 re_hit = re.compile("hit (?P<who>\w+)")
-re_make_tile = re.compile("make tile (?P<direction>\w+)")
+re_make_tile = re.compile("make tile (\([-0-9]+, [-0-9]+\))")
 
 def find_entity_in_tile(target_name, entities):
     the_entity = None
@@ -76,13 +76,17 @@ def handle_user_input(world, bob, msg):
             control.socks.send_msg(world, bob,
                 "Found him at {}".format(target_entity.cur_loc))
             # apply dmg
-            target_entity.hp = target_entity.hp - dmg_roll
-            if target_entity.hp <= 0:
+            target_entity.cur_hp = target_entity.cur_hp - dmg_roll
+            if target_entity.cur_hp <= 0:
                 control.socks.send_msg(world, bob, "You killed {}!".format(
                     target_name))
                 control.mymap.kill_creature(world, bob, target_entity)
         else:
             control.socks.send_msg(world, bob, "Couldn't find him...")
+    elif re_make_tile.match(msg):
+        result = re_make_tile.match(msg)
+        coord = result.group(1)
+        control.admin.make_tile(bob, coord)
     elif msg == "n":
         x, y = bob.cur_loc
         try:
@@ -119,11 +123,5 @@ def handle_user_input(world, bob, msg):
         control.socks.send_msg(world, bob, "handle_user_input... up")
     else:
         control.socks.send_msg(world, bob, "Huh?  {}".format(msg))
-    """
-    elif re_make_tile.match(msg):
-        result = re_make_tile.match(msg)
-        direction = result.group("direction")
-        control.admin.make_tile(bob, msg, direction)
-    """
  
     return should_exit
