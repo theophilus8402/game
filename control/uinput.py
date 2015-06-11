@@ -9,7 +9,7 @@ import curses
 import re
 
 re_hit = re.compile("hit (?P<who>\w+)")
-re_make_tile = re.compile("make tile (\([-0-9]+, [-0-9]+\))")
+re_make_tile = re.compile("make tile \(([-0-9]+), ([-0-9]+)\) ?(\d+x\d+)?")
 
 def find_entity_in_tile(target_name, entities):
     the_entity = None
@@ -51,10 +51,6 @@ def handle_user_input(world, bob, msg):
             "Well, we'll miss you!  Goodbye!")
         control.socks.actually_send_msgs(world, bob)
         control.socks.remove_connection(world, bob.sock)
-    # the problem with the below is that we need to make the variable
-    #   attached to individual not the game at large
-    #elif control.admin.make_tile_handle:
-        #control.admin.make_tile
     elif bob.special_state:
         if bob.state == "login":
             control.socks.login(world, bob, msg)
@@ -85,14 +81,19 @@ def handle_user_input(world, bob, msg):
             control.socks.send_msg(world, bob, "Couldn't find him...")
     elif re_make_tile.match(msg):
         result = re_make_tile.match(msg)
-        coord = result.group(1)
-        control.admin.make_tile(bob, coord)
+        x = int(result.group(1))
+        y = int(result.group(2))
+        coord = (x, y)
+        dimensions = result.group(3)
+        #dimensions = None
+        control.admin.make_tile(world, bob, coord, dimensions)
     elif msg == "n":
         x, y = bob.cur_loc
         try:
             control.move.move(world, bob, (x,y), (x,y+1))
             control.mymap.display_map(world, bob)
-            control.socks.send_msg(world, bob, "Moving north!")
+            control.socks.send_msg(world, bob,
+                "Now at: {}".format(bob.cur_loc))
         except:
             pass
     elif msg == "e":
@@ -100,7 +101,8 @@ def handle_user_input(world, bob, msg):
         try:
             control.move.move(world, bob, (x,y), (x+1,y))
             control.mymap.display_map(world, bob)
-            control.socks.send_msg(world, bob, "moving east!")
+            control.socks.send_msg(world, bob,
+                "Now at: {}".format(bob.cur_loc))
         except:
             pass
     elif msg == "s":
@@ -108,7 +110,8 @@ def handle_user_input(world, bob, msg):
         try:
             control.move.move(world, bob, (x,y), (x,y-1))
             control.mymap.display_map(world, bob)
-            control.socks.send_msg(world, bob, "moving south!")
+            control.socks.send_msg(world, bob,
+                "Now at: {}".format(bob.cur_loc))
         except:
             pass
     elif msg == "w":
@@ -116,7 +119,8 @@ def handle_user_input(world, bob, msg):
         try:
             control.move.move(world, bob, (x,y), (x-1,y))
             control.mymap.display_map(world, bob)
-            control.socks.send_msg(world, bob, "moving west!")
+            control.socks.send_msg(world, bob,
+                "Now at: {}".format(bob.cur_loc))
         except:
             pass
     elif msg == curses.KEY_UP:

@@ -1,7 +1,7 @@
 uid: 0
 name: Bob
 symbol: @
-cur_loc: (-1, 1)
+cur_loc: (0, 2)
 hp: 0/10
 vision_range: 5
 ----------------------------

@@ -91,11 +91,12 @@ if __name__ == "__main__":
 
     # enter main loop of the game
     control.socks.server_loop(world)
-    #control.admin.make_tile(world, world.entities[0], (5, 3))
+    #control.admin.make_tile(world, world.entities[0], (3, 0), "2x1")
+    #control.mymap.display_map(world, world.entities[0])
 
     control.db.save_entities(world.entities, "entities.txt")
     control.db.save_tiles(world.tiles, "tiles2.txt")
-    control.sqldb.save_world(world)
+    #control.sqldb.save_world(world)
 
 
     """

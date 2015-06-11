@@ -1,7 +1,13 @@
-uid: 36
+uid: 55
 entities: 
 ground: 
-coord: (-2, 2)
+coord: (4, -3)
+default_symbol: .
+----------------------------
+uid: 21
+entities: 
+ground: 
+coord: (-3, 0)
 default_symbol: .
 ----------------------------
 uid: 46
@@ -16,10 +22,10 @@ ground:
 coord: (-2, 0)
 default_symbol: .
 ----------------------------
-uid: 7
+uid: 27
 entities: 
 ground: 
-coord: (-3, -2)
+coord: (3, 0)
 default_symbol: .
 ----------------------------
 uid: 5
@@ -28,82 +34,40 @@ ground:
 coord: (2, -3)
 default_symbol: .
 ----------------------------
+uid: 92
+entities: 
+ground: 
+coord: (13, 4)
+default_symbol: .
+----------------------------
+uid: 72
+entities: 
+ground: 
+coord: (8, 0)
+default_symbol: .
+----------------------------
+uid: 33
+entities: 
+ground: 
+coord: (2, 1)
+default_symbol: .
+----------------------------
+uid: 75
+entities: 
+ground: 
+coord: (8, -3)
+default_symbol: .
+----------------------------
+uid: 36
+entities: 
+ground: 
+coord: (-2, 2)
+default_symbol: .
+----------------------------
 uid: 6
 entities: 
 ground: 
 coord: (3, -3)
-default_symbol: .
-----------------------------
-uid: 1
-entities: 
-ground: 
-coord: (-2, -3)
-default_symbol: .
-----------------------------
-uid: 10
-entities: 
-ground: 
-coord: (0, 0)
-default_symbol: .
-----------------------------
-uid: 20
-entities: 
-ground: 
-coord: (3, -1)
-default_symbol: .
-----------------------------
-uid: 12
-entities: 
-ground: 
-coord: (2, -2)
-default_symbol: .
-----------------------------
-uid: 42
-entities: 
-ground: 
-coord: (-3, 3)
-default_symbol: .
-----------------------------
-uid: 45
-entities: 
-ground: 
-coord: (0, 3)
-default_symbol: .
-----------------------------
-uid: 18
-entities: 
-ground: 
-coord: (1, -1)
-default_symbol: .
-----------------------------
-uid: 23
-entities: 
-ground: 
-coord: (-1, 0)
-default_symbol: .
-----------------------------
-uid: 39
-entities: 
-ground: 
-coord: (1, 2)
-default_symbol: .
-----------------------------
-uid: 29
-entities: 
-ground: 
-coord: (-2, 1)
-default_symbol: .
-----------------------------
-uid: 0
-entities: 
-ground: 
-coord: (-3, -3)
-default_symbol: .
-----------------------------
-uid: 26
-entities: 
-ground: 
-coord: (2, 0)
 default_symbol: .
 ----------------------------
 uid: 11
@@ -112,40 +76,34 @@ ground:
 coord: (1, -2)
 default_symbol: .
 ----------------------------
-uid: 14
+uid: 95
 entities: 
 ground: 
-coord: (-3, -1)
+coord: (8, 1)
 default_symbol: .
 ----------------------------
-uid: 27
+uid: 23
 entities: 
 ground: 
-coord: (3, 0)
+coord: (-1, 0)
 default_symbol: .
 ----------------------------
-uid: 35
+uid: 74
 entities: 
 ground: 
-coord: (-3, 2)
+coord: (8, -2)
 default_symbol: .
 ----------------------------
-uid: 15
+uid: 7
 entities: 
 ground: 
-coord: (-2, -1)
+coord: (-3, -2)
 default_symbol: .
 ----------------------------
-uid: 4
+uid: 57
 entities: 
 ground: 
-coord: (1, -3)
-default_symbol: .
-----------------------------
-uid: 50
-entities: 
-ground: 
-coord: (5, 3)
+coord: (5, 0)
 default_symbol: .
 ----------------------------
 uid: 32
@@ -154,16 +112,34 @@ ground:
 coord: (1, 1)
 default_symbol: .
 ----------------------------
+uid: 90
+entities: 
+ground: 
+coord: (12, 3)
+default_symbol: .
+----------------------------
 uid: 41
 entities: 
 ground: 
 coord: (3, 2)
 default_symbol: .
 ----------------------------
-uid: 19
+uid: 94
 entities: 
 ground: 
-coord: (2, -1)
+coord: (13, 2)
+default_symbol: .
+----------------------------
+uid: 79
+entities: 
+ground: 
+coord: (8, 2)
+default_symbol: .
+----------------------------
+uid: 65
+entities: 
+ground: 
+coord: (6, -3)
 default_symbol: .
 ----------------------------
 uid: 40
@@ -172,46 +148,22 @@ ground:
 coord: (2, 2)
 default_symbol: .
 ----------------------------
-uid: 9
+uid: 81
 entities: 
 ground: 
-coord: (-1, -2)
+coord: (9, 3)
 default_symbol: .
 ----------------------------
-uid: 37
+uid: 62
 entities: 
 ground: 
-coord: (-1, 2)
-default_symbol: .
-----------------------------
-uid: 30
-entities: 0
-ground: 
-coord: (-1, 1)
-default_symbol: .
-----------------------------
-uid: 21
-entities: 
-ground: 
-coord: (-3, 0)
-default_symbol: .
-----------------------------
-uid: 8
-entities: 
-ground: 
-coord: (-2, -2)
+coord: (6, 0)
 default_symbol: .
 ----------------------------
 uid: 28
 entities: 
 ground: 
 coord: (-3, 1)
-default_symbol: .
-----------------------------
-uid: 33
-entities: 
-ground: 
-coord: (2, 1)
 default_symbol: .
 ----------------------------
 uid: 47
@@ -226,16 +178,22 @@ ground:
 coord: (-1, -3)
 default_symbol: .
 ----------------------------
-uid: 17
+uid: 69
 entities: 
 ground: 
-coord: (0, -1)
+coord: (7, -2)
 default_symbol: .
 ----------------------------
-uid: 25
+uid: 71
 entities: 
 ground: 
-coord: (1, 0)
+coord: (7, -4)
+default_symbol: .
+----------------------------
+uid: 51
+entities: 
+ground: 
+coord: (4, 2)
 default_symbol: .
 ----------------------------
 uid: 3
@@ -244,10 +202,16 @@ ground:
 coord: (0, -3)
 default_symbol: .
 ----------------------------
-uid: 48
+uid: 60
 entities: 
 ground: 
-coord: (3, 3)
+coord: (5, -3)
+default_symbol: .
+----------------------------
+uid: 50
+entities: 
+ground: 
+coord: (5, 3)
 default_symbol: .
 ----------------------------
 uid: 31
@@ -256,10 +220,22 @@ ground:
 coord: (0, 1)
 default_symbol: .
 ----------------------------
-uid: 44
+uid: 56
 entities: 
 ground: 
-coord: (-1, 3)
+coord: (4, -4)
+default_symbol: .
+----------------------------
+uid: 67
+entities: 
+ground: 
+coord: (7, 0)
+default_symbol: .
+----------------------------
+uid: 43
+entities: 
+ground: 
+coord: (-2, 3)
 default_symbol: .
 ----------------------------
 uid: 34
@@ -274,16 +250,298 @@ ground:
 coord: (-1, -1)
 default_symbol: .
 ----------------------------
+uid: 64
+entities: 
+ground: 
+coord: (6, -2)
+default_symbol: .
+----------------------------
+uid: 44
+entities: 
+ground: 
+coord: (-1, 3)
+default_symbol: .
+----------------------------
+uid: 76
+entities: 
+ground: 
+coord: (8, -4)
+default_symbol: .
+----------------------------
+uid: 77
+entities: 
+ground: 
+coord: (8, 4)
+default_symbol: .
+----------------------------
+uid: 58
+entities: 
+ground: 
+coord: (5, -1)
+default_symbol: .
+----------------------------
+uid: 88
+entities: 
+ground: 
+coord: (11, 2)
+default_symbol: .
+----------------------------
+uid: 42
+entities: 
+ground: 
+coord: (-3, 3)
+default_symbol: .
+----------------------------
+uid: 1
+entities: 
+ground: 
+coord: (-2, -3)
+default_symbol: .
+----------------------------
+uid: 68
+entities: 
+ground: 
+coord: (7, -1)
+default_symbol: .
+----------------------------
 uid: 13
 entities: 
 ground: 
 coord: (3, -2)
 default_symbol: .
 ----------------------------
-uid: 43
+uid: 80
 entities: 
 ground: 
-coord: (-2, 3)
+coord: (9, 4)
+default_symbol: .
+----------------------------
+uid: 45
+entities: 
+ground: 
+coord: (0, 3)
+default_symbol: .
+----------------------------
+uid: 63
+entities: 
+ground: 
+coord: (6, -1)
+default_symbol: .
+----------------------------
+uid: 84
+entities: 
+ground: 
+coord: (10, 3)
+default_symbol: .
+----------------------------
+uid: 53
+entities: 
+ground: 
+coord: (4, -1)
+default_symbol: .
+----------------------------
+uid: 8
+entities: 
+ground: 
+coord: (-2, -2)
+default_symbol: .
+----------------------------
+uid: 39
+entities: 
+ground: 
+coord: (1, 2)
+default_symbol: .
+----------------------------
+uid: 91
+entities: 
+ground: 
+coord: (12, 2)
+default_symbol: .
+----------------------------
+uid: 30
+entities: 
+ground: 
+coord: (-1, 1)
+default_symbol: .
+----------------------------
+uid: 0
+entities: 
+ground: 
+coord: (-3, -3)
+default_symbol: .
+----------------------------
+uid: 12
+entities: 
+ground: 
+coord: (2, -2)
+default_symbol: .
+----------------------------
+uid: 93
+entities: 
+ground: 
+coord: (13, 3)
+default_symbol: .
+----------------------------
+uid: 19
+entities: 
+ground: 
+coord: (2, -1)
+default_symbol: .
+----------------------------
+uid: 18
+entities: 
+ground: 
+coord: (1, -1)
+default_symbol: .
+----------------------------
+uid: 14
+entities: 
+ground: 
+coord: (-3, -1)
+default_symbol: .
+----------------------------
+uid: 54
+entities: 
+ground: 
+coord: (4, -2)
+default_symbol: .
+----------------------------
+uid: 73
+entities: 
+ground: 
+coord: (8, -1)
+default_symbol: .
+----------------------------
+uid: 35
+entities: 
+ground: 
+coord: (-3, 2)
+default_symbol: .
+----------------------------
+uid: 9
+entities: 
+ground: 
+coord: (-1, -2)
+default_symbol: .
+----------------------------
+uid: 4
+entities: 
+ground: 
+coord: (1, -3)
+default_symbol: .
+----------------------------
+uid: 70
+entities: 
+ground: 
+coord: (7, -3)
+default_symbol: .
+----------------------------
+uid: 59
+entities: 
+ground: 
+coord: (5, -2)
+default_symbol: .
+----------------------------
+uid: 10
+entities: 
+ground: 
+coord: (0, 0)
+default_symbol: .
+----------------------------
+uid: 86
+entities: 
+ground: 
+coord: (11, 4)
+default_symbol: .
+----------------------------
+uid: 83
+entities: 
+ground: 
+coord: (10, 4)
+default_symbol: .
+----------------------------
+uid: 37
+entities: 
+ground: 
+coord: (-1, 2)
+default_symbol: .
+----------------------------
+uid: 29
+entities: 
+ground: 
+coord: (-2, 1)
+default_symbol: .
+----------------------------
+uid: 15
+entities: 
+ground: 
+coord: (-2, -1)
+default_symbol: .
+----------------------------
+uid: 17
+entities: 
+ground: 
+coord: (0, -1)
+default_symbol: .
+----------------------------
+uid: 52
+entities: 
+ground: 
+coord: (4, 0)
+default_symbol: .
+----------------------------
+uid: 25
+entities: 
+ground: 
+coord: (1, 0)
+default_symbol: .
+----------------------------
+uid: 48
+entities: 
+ground: 
+coord: (3, 3)
+default_symbol: .
+----------------------------
+uid: 78
+entities: 
+ground: 
+coord: (8, 3)
+default_symbol: .
+----------------------------
+uid: 82
+entities: 
+ground: 
+coord: (9, 2)
+default_symbol: .
+----------------------------
+uid: 87
+entities: 
+ground: 
+coord: (11, 3)
+default_symbol: .
+----------------------------
+uid: 20
+entities: 
+ground: 
+coord: (3, -1)
+default_symbol: .
+----------------------------
+uid: 26
+entities: 
+ground: 
+coord: (2, 0)
+default_symbol: .
+----------------------------
+uid: 89
+entities: 
+ground: 
+coord: (12, 4)
+default_symbol: .
+----------------------------
+uid: 66
+entities: 
+ground: 
+coord: (6, -4)
 default_symbol: .
 ----------------------------
 uid: 49
@@ -292,9 +550,21 @@ ground:
 coord: (0, -2)
 default_symbol: x
 ----------------------------
-uid: 38
+uid: 61
 entities: 
 ground: 
+coord: (5, -4)
+default_symbol: .
+----------------------------
+uid: 38
+entities: 0
+ground: 
 coord: (0, 2)
+default_symbol: .
+----------------------------
+uid: 85
+entities: 
+ground: 
+coord: (10, 2)
 default_symbol: .
 ----------------------------
