@@ -5,6 +5,7 @@ import control.roll
 import control.admin
 import control.socks
 import control.mymap
+import control.entities
 import curses
 import re
 
@@ -72,11 +73,8 @@ def handle_user_input(world, bob, msg):
             control.socks.send_msg(world, bob,
                 "Found him at {}".format(target_entity.cur_loc))
             # apply dmg
-            target_entity.cur_hp = target_entity.cur_hp - dmg_roll
-            if target_entity.cur_hp <= 0:
-                control.socks.send_msg(world, bob, "You killed {}!".format(
-                    target_name))
-                control.mymap.kill_creature(world, bob, target_entity)
+            control.entities.change_hp_entity(world, bob, target_entity,
+                dmg_roll)
         else:
             control.socks.send_msg(world, bob, "Couldn't find him...")
     elif re_make_tile.match(msg):

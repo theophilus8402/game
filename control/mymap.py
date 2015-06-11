@@ -37,9 +37,12 @@ def display_map(world, bob, center=None, dimension=None):
 
 
 def kill_creature(world, killer, dead_guy):
-    # remove creature from the map
+    # remove creature from the current location
     world.tiles[dead_guy.cur_loc].entities.remove(dead_guy)
-    #TODO: need to figure out how to remove the dead_guy's cur_loc
+    # move dead guy to the dead room
+    world.dead_room.entities.append(dead_guy)
+    dead_guy.cur_loc = world.dead_room.coord
+    # TODO: give exp to the killer
 
     # update map window
     display_map(world, killer)

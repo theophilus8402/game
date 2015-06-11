@@ -2,6 +2,7 @@
 
 import re
 import model.tile
+import model.spells
 
 def save_tiles(tiles, file_name):
     with open(file_name, "w") as f:
@@ -98,6 +99,7 @@ def load_entities(file_name):
             if "-" == line[0]:
                 entities.append(new_ent)
                 new_ent = model.tile.Entity()
+                continue
             result = re_uid.match(line)
             if result:
                 new_ent.uid = int(result.group(1))
@@ -124,6 +126,48 @@ def load_entities(file_name):
                 new_ent.vision_range = int(result.group(1))
                 continue
     return entities
+
+
+def load_spells(file_name):
+
+    re_name = re.compile("name: (.*)")
+    re_msg = re.compile("msg: (.*)")
+    re_change_hp = re.compile("change_hp: ([-0-9]*)")
+    re_mp_cost = re.compile("mp_cost: ([-0-9]*)")
+    re_recipient_status_effect = re.compile("recipient_status_effect: (.*)")
+    re_status_effect_duration = re.compile("status_effect_duration: (.*)")
+    re_cast_time = re.compile("cast_time: ([-0-9]*)")
+    re_requirements = re.compile("requirements: (.*)")
+    re_tile_effect = re.compile("tile_effect: (.*)")
+    re_radius = re.compile("radius: (\d+)")
+    re_area_type = re.compile("area_type: (.*)")
+
+    spells = []
+
+    with open(file_name, "r") as f:
+
+        new_spell = model.spells.Spell()
+        for line in f.readlines():
+            if "-" == line[0]:
+                print("name: {}".format(new_spell.name))
+                print("msg: {}".format(new_spell.msg))
+                print("change_hp: {}".format(new_spell.change_hp))
+                print("---------------------")
+                spells.append(new_spell)
+                new_spell = model.spells.Spell()
+                continue
+            result = re_name.match(line)
+            if result:
+                new_spell.name = result.group(1)
+                continue
+            result = re_msg.match(line)
+            if result:
+                new_spell.msg = result.group(1)
+                continue
+            result = re_change_hp.match(line)
+            if result:
+                new_spell.change_hp = result.group(1)
+                continue
 
 
 if __name__ == '__main__':

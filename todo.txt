@@ -6,10 +6,21 @@ x make it so I can make tiles easily
     x got mostly working
     x need to make it so I can give multiple coords at the same time
 * figure out what I want to do about testing stuff...
-* handle someone dying
-    * mebbe make another room to put them in
-    * make a heal spell
+* make spells
     * make a resurrection spell
+    * make a heal spell
+    * finish loading spells from a text file via control/db.py
+    * make it so I can actually cast the spell
+    * need to figure out how to apply known spells to an entity
+* handle someone dying
+    x mebbe make another room to put them in
+    x put the dead person in there
+    * make a resurrection spell
+    * make a heal spell
+    * make a corpse
+    * make items drop
+    * make it so the dead person can't really do anything
+* maybe move some functions that involve entities into control/entities.py
 
 
 

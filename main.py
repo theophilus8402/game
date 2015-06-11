@@ -1,6 +1,7 @@
 #!/usr/bin/python3.4
 
 import model.tile
+import model.spells
 import control.move
 import control.sqldb
 import control.db
@@ -77,6 +78,8 @@ if __name__ == "__main__":
     #world.entities = control.sqldb.load_entities(world)
     world.tiles, world.max_tile_uid = control.db.load_tiles("tiles.txt")
     world.entities = control.db.load_entities("entities.txt")
+    # TODO: I should figure out a better way to set the dead room
+    world.dead_room = world.tiles[(5, 3)]
     # put the entities on the map
     for entity in world.entities:
         world.tiles[entity.cur_loc].entities.append(entity)
@@ -88,9 +91,10 @@ if __name__ == "__main__":
 
     #control.sqldb.rebuild_entities_table(world.entities)
 
+    control.db.load_spells("spells.txt")
 
     # enter main loop of the game
-    control.socks.server_loop(world)
+    #control.socks.server_loop(world)
     #control.admin.make_tile(world, world.entities[0], (3, 0), "2x1")
     #control.mymap.display_map(world, world.entities[0])
 
