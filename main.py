@@ -1,7 +1,7 @@
 #!/usr/bin/python3.4
 
 import model.tile
-import model.spells
+import control.spells
 import control.move
 import control.sqldb
 import control.db
@@ -81,7 +81,8 @@ if __name__ == "__main__":
     # TODO: I should figure out a better way to set the dead room
     world.dead_room = world.tiles[(5, 3)]
     # put the entities on the map
-    for entity in world.entities:
+    for entity_name in world.entities.keys():
+        entity = world.entities[entity_name]
         world.tiles[entity.cur_loc].entities.append(entity)
 
     passwds = {}
@@ -91,10 +92,15 @@ if __name__ == "__main__":
 
     #control.sqldb.rebuild_entities_table(world.entities)
 
-    world.spells = control.db.load_spells("spells.txt")
-    bob = world.entities[0]
-    tim = world.entities[1]
-    control.entities.cast_spell(world, world.entities[0], world.entities[1], "resurrection")
+    simple_spells = control.db.load_spells("spells.txt")
+    world.spells = control.spells.initialize_spells(simple_spells)
+    bob = world.entities["bob"]
+    tim = world.entities["tim"]
+    bob.special_state = None
+    res_spell = world.spells["resurrection"]
+    res_spell.cast(res_spell, world, bob, tim)
+    #control.uinput.handle_user_input(world, bob, "cast heal at tim")
+    #control.entities.cast_spell(world, world.entities[0], world.entities[1], "resurrection")
 
     # enter main loop of the game
     #control.socks.server_loop(world)

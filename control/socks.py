@@ -66,16 +66,6 @@ def remove_connection(world, sock):
     return True
 
 
-def find_bob(world, name):
-    ret_bob = None
-    for bob in world.entities:
-        print("find_bob testing name: {}".format(bob.name))
-        if bob.name.lower() == name.lower():
-            ret_bob = bob
-            break
-    return ret_bob
-
-
 def transfer_bobs(world, temp_entity, entity):
     # temp_entity is the entity that has the sock
     entity.sock = temp_entity.sock
@@ -110,7 +100,7 @@ def login(world, bob, msg=None):
             if world.passwds[bob.name] == msg:
                 send_msg(world, bob, "Hey! Your password is correct!")
                 # return the actual bob entity
-                entities_bob = find_bob(world, bob.name)
+                entities_bob = world.find_entity(bob.name)
                 if entities_bob:
                     bob = transfer_bobs(world, bob, entities_bob)
                     bob.special_state = False

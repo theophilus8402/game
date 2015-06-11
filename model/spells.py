@@ -13,3 +13,6 @@ class Spell:
         self.tile_effect = ""
         self.radius = 1
         self.area_type = ""
+
+
+

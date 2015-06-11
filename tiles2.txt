@@ -143,13 +143,13 @@ coord: (1, -3)
 default_symbol: .
 ----------------------------
 uid: 50
-entities: 1
+entities: 
 ground: 
 coord: (5, 3)
 default_symbol: .
 ----------------------------
 uid: 32
-entities: 
+entities: 1
 ground: 
 coord: (1, 1)
 default_symbol: .
@@ -233,7 +233,7 @@ coord: (0, -2)
 default_symbol: x
 ----------------------------
 uid: 51
-entities: 
+entities: 0
 ground: 
 coord: (4, 2)
 default_symbol: .
@@ -257,7 +257,7 @@ coord: (3, 3)
 default_symbol: .
 ----------------------------
 uid: 31
-entities: 0
+entities: 
 ground: 
 coord: (0, 1)
 default_symbol: .

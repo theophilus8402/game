@@ -12,6 +12,8 @@ x make it so I can make tiles easily
     * finish loading spells from a text file via control/db.py
     * make it so I can actually cast the spell
     * need to figure out how to apply known spells to an entity
+    * make a separate instance of resurrection spell
+    * maybe change control.socks.send_msg such that it's built into the ent
 * handle someone dying
     x mebbe make another room to put them in
     x put the dead person in there

@@ -1,15 +1,3 @@
-name: resurrection
-msg: You waggle your fingers near your temples and accidentally resurrect {target}!
-hp_change: 4
-mp_change: -8
-recipient_status_effect: 
-status_effect_duration: 
-cast_time: 3
-requirements: "hands"
-tile_effect: 
-radius: 1
-area_type: circle
------------------------
 name: heal
 msg: You do a somber dance in {target}'s general direction, and he feels better!
 hp_change: 7

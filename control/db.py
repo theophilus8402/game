@@ -70,7 +70,8 @@ def load_tiles(file_name):
 def save_entities(entities, file_name):
 
     with open(file_name, "w") as f:
-        for entity in entities:
+        for name in entities.keys():
+            entity = entities[name]
             f.write("uid: {}\n".format(entity.uid))
             f.write("name: {}\n".format(entity.name))
             f.write("symbol: {}\n".format(entity.symbol))
@@ -92,14 +93,14 @@ def load_entities(file_name):
     re_mp = re.compile("mp: ([-0-9]+)/([-0-9]+)")
     re_vision_range = re.compile("vision_range: (\d+)")
 
-    entities = []
+    entities = {}
 
     with open(file_name, "r") as f:
 
         new_ent = model.tile.Entity()
         for line in f.readlines():
             if "-" == line[0]:
-                entities.append(new_ent)
+                entities[new_ent.name.lower()] = new_ent
                 new_ent = model.tile.Entity()
                 continue
             result = re_uid.match(line)
@@ -149,13 +150,14 @@ def load_spells(file_name):
     re_radius = re.compile("radius: (\d+)")
     re_area_type = re.compile("area_type: (.*)")
 
-    spells = {}
+    spells = []
 
     with open(file_name, "r") as f:
 
         new_spell = model.spells.Spell()
         for line in f.readlines():
             if "-" == line[0]:
+                """
                 print("name: {}".format(new_spell.name))
                 print("msg: {}".format(new_spell.msg))
                 print("hp_change: {}".format(new_spell.hp_change))
@@ -169,8 +171,7 @@ def load_spells(file_name):
                 print("area_type: {}".format(new_spell.area_type))
                 print("---------------------")
                 """
-                """
-                spells[new_spell.name] = new_spell
+                spells.append(new_spell)
                 new_spell = model.spells.Spell()
                 continue
             result = re_name.match(line)

@@ -11,6 +11,7 @@ import re
 
 re_hit = re.compile("hit (?P<who>\w+)")
 re_make_tile = re.compile("make tile \(([-0-9]+), ([-0-9]+)\) ?(\d+x\d+)?")
+re_cast_spell = re.compile("cast (.+) at (\w+)")
 
 def find_entity_in_tile(target_name, entities):
     the_entity = None
@@ -56,6 +57,20 @@ def handle_user_input(world, bob, msg):
         if bob.state == "login":
             control.socks.login(world, bob, msg)
         control.socks.send_msg(world, bob, "still in a special state")
+    elif re_cast_spell.match(msg):
+        #TODO: maybe change it so we pass the whole message to spell?
+        #   that way we can let some complicated spells handle stuff
+
+        # find the target
+        result = re_cast_spell.match(msg)
+        spell_name = result.group(1)
+        target_name = result.group(2)
+        
+        control.socks.send_msg(world, bob,
+            "casting spell: '{}' target: '{}'".format(spell_name,
+            target_name))
+        #TODO: cast the spell
+
     elif re_hit.match(msg):
         result = re_hit.match(msg)
         target_name = result.group("who")
@@ -64,7 +79,7 @@ def handle_user_input(world, bob, msg):
         attack_roll = control.roll.roll(2, 6, 1)
         control.socks.send_msg(world, bob,
             "Attack roll: {}".format(attack_roll))
-        dmg_roll = control.roll.roll(1, 6, 2)
+        dmg_roll = -control.roll.roll(1, 6, 2)
         control.socks.send_msg(world, bob, "Dmg roll: {}".format(dmg_roll))
 
         # find the target nearby

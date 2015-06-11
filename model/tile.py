@@ -69,7 +69,7 @@ class World:
         self.passwds = {}        # key is name, passwd is value
 
         self.tiles = {}
-        self.entities = []
+        self.entities = {}
         self.spells = {}
 
         # these max uids are the current highest uid
@@ -80,3 +80,6 @@ class World:
     def get_new_tile_uid(self):
         self.max_tile_uid += 1
         return self.max_tile_uid
+
+    def find_entity(self, name):
+        return self.entities.get(name.lower())
