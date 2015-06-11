@@ -91,7 +91,10 @@ if __name__ == "__main__":
 
     #control.sqldb.rebuild_entities_table(world.entities)
 
-    control.db.load_spells("spells.txt")
+    world.spells = control.db.load_spells("spells.txt")
+    bob = world.entities[0]
+    tim = world.entities[1]
+    control.entities.cast_spell(world, world.entities[0], world.entities[1], "resurrection")
 
     # enter main loop of the game
     #control.socks.server_loop(world)

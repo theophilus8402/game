@@ -1,7 +1,7 @@
 name: resurrection
 msg: You waggle your fingers near your temples and accidentally resurrect {target}!
-change_hp: 4
-mp_cost: 8
+hp_change: 4
+mp_change: -8
 recipient_status_effect: 
 status_effect_duration: 
 cast_time: 3
@@ -12,8 +12,8 @@ area_type: circle
 -----------------------
 name: heal
 msg: You do a somber dance in {target}'s general direction, and he feels better!
-change_hp: 7
-mp_cost: 7
+hp_change: 7
+mp_change: -7
 recipient_status_effect: 
 status_effect_duration: 
 cast_time: 2

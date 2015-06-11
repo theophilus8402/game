@@ -13,6 +13,8 @@ class Entity:
         self.cur_loc = (0, 0)
         self.cur_hp = 0
         self.max_hp = 10
+        self.cur_mp = 0
+        self.max_mp = 10
         self.vision_range = 5
 
         # stuff not stored in db
@@ -68,6 +70,7 @@ class World:
 
         self.tiles = {}
         self.entities = []
+        self.spells = {}
 
         # these max uids are the current highest uid
         # so, to create a new uid, return max_uid++

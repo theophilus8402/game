@@ -2,13 +2,15 @@ uid: 0
 name: Bob
 symbol: @
 cur_loc: (0, 1)
-hp: 0/10
+hp: 10/10
+mp: -47/10
 vision_range: 5
 ----------------------------
 uid: 1
 name: Tim
 symbol: T
 cur_loc: (5, 3)
-hp: 0/10
+hp: 49/10
+mp: 10/10
 vision_range: 5
 ----------------------------
