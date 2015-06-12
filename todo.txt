@@ -1,13 +1,11 @@
 !!!Two Weeks!!!
-* get the different entities loaded/saved:
-    x basic
-    x weapon
-    x armour
-    x living
-    * player
+x move tile stuff from controls/db/db.py to controls/db/tiles.py and get
+    x rid of control/db/db.py
 * get different entities integrated into the game
-    * saved/loaded
-    * showing on the map
+    * might not be saving mana properly
+    x clean up the transition, so get rid of my old entities
+    x write the entities to different files based on type
+    x store the entities in different dictionaries based on type
 * get basic entities to:
     * change hp
     * die
@@ -33,6 +31,28 @@
     * make items drop
     * make it so the dead person can't really do anything
 * maybe move some functions that involve entities into control/entities.py
+
+
+8/6
+x move tile stuff from controls/db/db.py to controls/db/tiles.py and get
+    x rid of control/db/db.py
+* get different entities integrated into the game
+    x clean up the transition, so get rid of my old entities
+    x write the entities to different files based on type
+    x store the entities in different dictionaries based on type
+
+
+7/30
+x get the different entities loaded/saved:
+    x basic
+    x weapon
+    x armour
+    x living
+    x player
+* get different entities integrated into the game
+    x saved/loaded
+    x showing on the map
+
 
 
 7/15

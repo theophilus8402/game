@@ -5,8 +5,9 @@ import model.msgs
 import control.spells
 import control.move
 import control.sqldb
-import control.db.db
+import control.db.spell
 import control.db.entity
+import control.db.tile
 import control.uinput
 import control.socks
 import control.admin
@@ -47,6 +48,12 @@ def create_temp_guy(name, sym, coord, hp, max_hp):
     return bob
 
 
+def map_entities(world, entities):
+    for entity_name in entities.keys():
+        entity = entities[entity_name]
+        world.tiles[entity.cur_loc].entities.append(entity)
+
+
 if __name__ == "__main__":
 
     """
@@ -60,38 +67,23 @@ if __name__ == "__main__":
     """
 
     """
-    #SQL stuff
-    world = control.sqldb.load_world()
-    world.entities = control.sqldb.load_entities(world)
-    control.sqldb.rebuild_entities_table(world.entities)
-    empty the tables:
-    control.db.clean_tables()
-
-    # add the temp guys
-    control.db.add_entity(bob)
-    control.db.add_entity(tim)
-
-    control.sqldb.save_world(world)
-    control.db.drop_tables()
-    control.db.setup_tables()
-    """
-
-    """
     Now loading the world!
     """
     world = model.tile.World()
-    world.tiles, world.max_tile_uid = control.db.db.load_tiles("tiles.txt")
-    #world.entities = control.db.load_entities("entities.txt")
-    temp_ents = control.db.db.load_entities("entities.txt")
-    bob = temp_ents["bob"]
-    world.entities = control.db.entity.load_entities("2pent.txt")
-    world.entities[bob.name] = bob
+    world.tiles, world.max_tile_uid = control.db.tile.load_tiles("tiles.txt")
+    world.basic_ents = control.db.entity.load_entities("basic_ents.txt")
+    world.weapon_ents = control.db.entity.load_entities("weapon_ents.txt")
+    world.armour_ents = control.db.entity.load_entities("armour_ents.txt")
+    world.living_ents = control.db.entity.load_entities("living_ents.txt")
+
     # TODO: I should figure out a better way to set the dead room
     world.dead_room = world.tiles[(5, 3)]
+
     # put the entities on the map
-    for entity_name in world.entities.keys():
-        entity = world.entities[entity_name]
-        world.tiles[entity.cur_loc].entities.append(entity)
+    map_entities(world, world.basic_ents)
+    map_entities(world, world.weapon_ents)
+    map_entities(world, world.living_ents)
+    map_entities(world, world.armour_ents)
 
     passwds = {}
     passwds["bob"] = "bob123"
@@ -99,7 +91,7 @@ if __name__ == "__main__":
     world.passwds = passwds
 
     # initialize spells
-    simple_spells = control.db.db.load_spells("spells.txt")
+    simple_spells = control.db.spell.load_spells("spells.txt")
     world.spells = control.spells.initialize_spells(simple_spells)
 
     #FOR TESTING
@@ -129,8 +121,10 @@ if __name__ == "__main__":
     # enter main loop of the game
     control.socks.server_loop(world)
 
-    #control.db.save_entities(world.entities, "entities.txt")
-    #control.db.save_tiles(world.tiles, "tiles2.txt")
+    control.db.entity.save_entities(world.basic_ents, "basic_ents.txt")
+    control.db.entity.save_entities(world.weapon_ents, "weapon_ents.txt")
+    control.db.entity.save_entities(world.armour_ents, "armour_ents.txt")
+    control.db.entity.save_entities(world.living_ents, "living_ents.txt")
 
     """
     # commands I've tested:

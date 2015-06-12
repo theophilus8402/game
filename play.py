@@ -18,8 +18,8 @@ if __name__ == "__main__":
     shoe.weight = 1
     shoe.volume = .5
     shoe.friction = .1
-    temp_entities = {}
-    temp_entities[shoe.name] = shoe
+    basic_entities = {}
+    basic_entities[shoe.name] = shoe
 
     sword = model.entity.Weapon()
     sword.uid = 21
@@ -46,7 +46,8 @@ if __name__ == "__main__":
     sword.size = "medium"
     sword.reach = False
     sword.two_handed = False
-    temp_entities[sword.name] = sword
+    weapon_entities = {}
+    weapon_entities[sword.name] = sword
 
     plate = model.entity.Armour()
     plate.uid = 23
@@ -68,7 +69,8 @@ if __name__ == "__main__":
     plate.speed = (30, 20)
     plate.shield = False
     plate.armour_type = "heavy"
-    temp_entities[plate.name] = plate
+    armour_entities = {}
+    armour_entities[plate.name] = plate
 
     dog = model.entity.Living()
     dog.uid = 44
@@ -86,7 +88,8 @@ if __name__ == "__main__":
     dog.max_mp = 0
     #dog.status_msgs = []
     dog.status_msgs = ["dumb", "hungry", "lost balance"]
-    temp_entities[dog.name] = dog
+    living_entities = {}
+    living_entities[dog.name] = dog
 
     bob = model.entity.Player()
     bob.uid = 1
@@ -105,10 +108,13 @@ if __name__ == "__main__":
     bob.vision_range = 6
     #bob.status_msgs = []
     bob.status_msgs = ["lost balance"]
-    temp_entities[bob.name] = bob
+    living_entities[bob.name] = bob
 
-    entities = control.db.entity.load_entities("pent.txt")
-    control.db.entity.save_all_entities(temp_entities, "2pent.txt")
+    #entities = control.db.entity.load_entities("pent.txt")
+    control.db.entity.save_entities(basic_entities, "basic_ents.txt")
+    control.db.entity.save_entities(weapon_entities, "weapon_ents.txt")
+    control.db.entity.save_entities(armour_entities, "armour_ents.txt")
+    control.db.entity.save_entities(living_entities, "living_ents.txt")
 
     """
     can_move, reason = dog.can_move()

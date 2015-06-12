@@ -55,7 +55,7 @@ def save_living(entity, file_handle):
     file_handle.write("vision_range: {}\n".format(entity.vision_range))
  
 
-def save_all_entities(entities, file_name):
+def save_entities(entities, file_name):
     with open(file_name, "w") as f:
         for entity_name in entities:
             entity = entities[entity_name]
@@ -72,40 +72,21 @@ def save_all_entities(entities, file_name):
                 # but, of course this might change
             f.write("-------------------\n")
 
-"""
-Future saving entity stuff:
-            f.write("mp: {}/{}\n".format(entity.cur_mp, entity.max_mp))
-            f.write("vision_range: {}\n".format(entity.vision_range))
-
-Future loading entity stuff
-    re_mp = re.compile("mp: ([-0-9]+)/([-0-9]+)")
-    re_vision_range = re.compile("vision_range: (\d+)")
-
-            result = re_mp.match(line)
-            if result:
-                new_ent.cur_mp = int(result.group(1))
-                new_ent.max_mp = int(result.group(2))
-                continue
-            result = re_vision_range.match(line)
-            if result:
-                new_ent.vision_range = int(result.group(1))
-                continue
-"""
 
 def load_entities(file_name):
 
     # basic entity
-    re_type = re.compile("type: (\w+)")
     re_uid = re.compile("uid: (\d+)")
     re_name = re.compile("name: (\w+)")
-    re_symbol = re.compile("symbol: (.)")
+    re_type = re.compile("type: (\w+)")
+    re_symbol = re.compile("symbol: (.+)")
     re_cur_loc = re.compile("cur_loc: \(([-0-9]+), ([-0-9]+)\)")
     re_hp = re.compile("hp: ([-0-9]+)/([-0-9]+)")
     re_short_desc = re.compile("short_desc: (.+)")
     re_long_desc = re.compile("long_desc: (.+)")
-    re_weight = re.compile("weight: ([.0-9]+)")
-    re_volume = re.compile("volume: ([.0-9]+)")
-    re_friction = re.compile("friction: ([.0-9]+)")
+    re_weight = re.compile("weight: (\d+)")
+    re_volume = re.compile("volume: (\d+)")
+    re_friction = re.compile("friction: (\d+)")
     # weapon
     re_die_to_roll = re.compile("die_to_roll: (\d+)")
     re_dmg_modifier = re.compile("dmg_modifier: (\d+)")

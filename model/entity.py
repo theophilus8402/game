@@ -40,6 +40,9 @@ class Entity:
         # stuff not stored in db
         self.world = None
 
+    def send_msg(self, msg):
+        print(msg)
+
     #def change_hp(self):
     #def die(self):
 
@@ -48,6 +51,7 @@ class Entity:
 class Weapon(Entity):
 
     def __init__(self):
+        Entity.__init__(self)
         self.type = "weapon"      # the different entity classes
         # weapon dmg (2d6)
         self.die_to_roll = 0
@@ -72,6 +76,7 @@ class Weapon(Entity):
 class Armour(Entity):
 
     def __init__(self):
+        Entity.__init__(self)
         self.type = "armour"      # the different entity classes
         self.base_cost = 0
         self.armour_bonus = 0       # 1,2...
@@ -86,6 +91,7 @@ class Armour(Entity):
 class Living(Entity):
 
     def __init__(self):
+        Entity.__init__(self)
         self.type = "living"      # the different entity classes
         self.cur_mp = 0
         self.max_mp = 10
@@ -101,10 +107,15 @@ class Living(Entity):
                 can_move = False
                 reason = bstate
         return (can_move, reason)
+
+    def change_mp(self, mp_delta):
+        self.cur_mp += mp_delta
+        if self.cur_mp > self.max_mp:
+            self.cur_mp = self.max_mp
+
 """
     def die(self):
     def move(self):
-    def change_mp(self):
 """
 
 
@@ -112,6 +123,7 @@ class Living(Entity):
 class Player(Living):
 
     def __init__(self):
+        Living.__init__(self)
         self.type = "player"        # the different entity classes
         self.sock = None
         self.msg_queue = queue.Queue()

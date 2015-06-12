@@ -74,9 +74,24 @@ class Tile:
     If there are no entities, the default_symbol will be returned.
     """
     def get_symbol(self):
-        symbol = self.default_symbol
+        symbol = None
+        living_symbol = None
         if len(self.entities) > 0:
             symbol = self.entities[0].symbol
+            # look through all the entities
+            for ent in self.entities:
+                # if there's a player, use that symbol first
+                if ent.type == "player":
+                    symbol = ent.symbol
+                    break
+                # if there's a living creature, use that
+                if (ent.type == "living") and not living_symbol:
+                    living_symbol = ent.symbol
+        if not symbol:
+            if living_symbol:
+                symbol = living_symbol
+            else:
+                symbol = self.default_symbol
         return symbol
 
 
@@ -110,4 +125,12 @@ class World:
         return self.max_tile_uid
 
     def find_entity(self, name):
-        return self.entities.get(name.lower())
+        name = name.lower()
+        entity = self.living_ents.get(name)
+        if not entity:
+            entity = self.weapon_ents.get(name)
+        if not entity:
+            entity = self.armour_ents.get(name)
+        if not entity:
+            entity = self.basic_ents.get(name)
+        return entity

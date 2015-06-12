@@ -75,7 +75,7 @@ def handle_user_input(world, bob, msg):
             bob.send_msg("What spell is that???")
             pass
         try:
-            target = world.entities[target_name]
+            target = world.living_ents[target_name]
         except:
             bob.send_msg("Who???")
             pass
