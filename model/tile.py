@@ -23,8 +23,7 @@ class Entity:
         self.sock = None
         self.msg_queue = queue.Queue()
         # the following two items are set so that user can login
-        self.special_state = True
-        self.state = "login"
+        self.special_state = "login"
         self.status_msgs = []
         """
         short_desc = ""

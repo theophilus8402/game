@@ -21,5 +21,98 @@ if __name__ == "__main__":
     temp_entities = {}
     temp_entities[shoe.name] = shoe
 
+    sword = model.entity.Weapon()
+    sword.uid = 21
+    sword.name = "sword"
+    sword.symbol = "-"
+    sword.cur_loc = (1, 4)
+    sword.cur_hp = 13
+    sword.max_hp = 13
+    sword.short_desc = "This is a shiny sword."
+    sword.long_desc = "This is a really shiny sword. It is not floppy."
+    sword.weight = 6
+    sword.volume = 1
+    sword.friction = .3
+    sword.die_to_roll = 2
+    sword.dmg_modifier = 3
+    sword.critical_range = 19
+    sword.critical_dmg = 3
+    sword.range_increment = 0
+    sword.base_cost = 10
+    sword.weapon_category = "martial"
+    sword.melee = True
+    sword.weapon_type = "sword"
+    sword.dmg_type = "cutting"
+    sword.size = "medium"
+    sword.reach = False
+    sword.two_handed = False
+    temp_entities[sword.name] = sword
+
+    plate = model.entity.Armour()
+    plate.uid = 23
+    plate.name = "plate"
+    plate.symbol = "&"
+    plate.cur_loc = (-1, -1)
+    plate.cur_hp = 20
+    plate.max_hp = 20
+    plate.short_desc = "This is a spiffy suite of plate mail armour."
+    plate.long_desc = "This is a really spiffy suite of plate mail armour."
+    plate.weight = 19
+    plate.volume = 6
+    plate.friction = 1
+    plate.base_cost = 90
+    plate.armour_bonus = 5
+    plate.max_dex_bonus = 2
+    plate.armour_check_penalty = 15
+    plate.arcane_spell_fail = 25
+    plate.speed = (30, 20)
+    plate.shield = False
+    plate.armour_type = "heavy"
+    temp_entities[plate.name] = plate
+
+    dog = model.entity.Living()
+    dog.uid = 44
+    dog.name = "dog"
+    dog.symbol = "d"
+    dog.cur_loc = (-1, 2)
+    dog.cur_hp = 7
+    dog.max_hp = 7
+    dog.short_desc = "This dog is annoying."
+    dog.long_desc = "This is a mangy mut."
+    dog.weight = 41
+    dog.volume = 4
+    dog.friction = 5
+    dog.cur_mp = 0
+    dog.max_mp = 0
+    #dog.status_msgs = []
+    dog.status_msgs = ["dumb", "hungry", "lost balance"]
+    temp_entities[dog.name] = dog
+
+    bob = model.entity.Player()
+    bob.uid = 1
+    bob.name = "bob"
+    bob.symbol = "B"
+    bob.cur_loc = (1, 2)
+    bob.cur_hp = 10
+    bob.max_hp = 10
+    bob.short_desc = "This is Bob."
+    bob.long_desc = "This is Bob. He's rugged looking."
+    bob.weight = 192
+    bob.volume = 12
+    bob.friction = 10
+    bob.cur_mp = 10
+    bob.max_mp = 10
+    #bob.status_msgs = []
+    bob.status_msgs = ["lost balance"]
+    temp_entities[bob.name] = bob
+
     entities = control.db.entity.load_entities("pent.txt")
-    control.db.entity.save_all_entities(entities, "2pent.txt")
+    control.db.entity.save_all_entities(temp_entities, "2pent.txt")
+
+    """
+    can_move, reason = dog.can_move()
+    if can_move:
+        print("The doggie can move!")
+    else:
+        print("Drat! He can't move: {}".format(reason))
+    """

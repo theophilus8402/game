@@ -5,7 +5,8 @@ import model.msgs
 import control.spells
 import control.move
 import control.sqldb
-import control.db
+import control.db.db
+import control.db.entity
 import control.uinput
 import control.socks
 import control.admin
@@ -79,8 +80,12 @@ if __name__ == "__main__":
     Now loading the world!
     """
     world = model.tile.World()
-    world.tiles, world.max_tile_uid = control.db.load_tiles("tiles.txt")
-    world.entities = control.db.load_entities("entities.txt")
+    world.tiles, world.max_tile_uid = control.db.db.load_tiles("tiles.txt")
+    #world.entities = control.db.load_entities("entities.txt")
+    temp_ents = control.db.db.load_entities("entities.txt")
+    bob = temp_ents["bob"]
+    world.entities = control.db.entity.load_entities("2pent.txt")
+    world.entities[bob.name] = bob
     # TODO: I should figure out a better way to set the dead room
     world.dead_room = world.tiles[(5, 3)]
     # put the entities on the map
@@ -94,10 +99,11 @@ if __name__ == "__main__":
     world.passwds = passwds
 
     # initialize spells
-    simple_spells = control.db.load_spells("spells.txt")
+    simple_spells = control.db.db.load_spells("spells.txt")
     world.spells = control.spells.initialize_spells(simple_spells)
 
     #FOR TESTING
+    """
     bob = world.entities["bob"]
     tim = world.entities["tim"]
     bob.special_state = None
@@ -118,12 +124,13 @@ if __name__ == "__main__":
         n+=1
         if n>20:
             bob.status_msgs.remove("meditating")
+    """
 
     # enter main loop of the game
-    #control.socks.server_loop(world)
+    control.socks.server_loop(world)
 
-    control.db.save_entities(world.entities, "entities.txt")
-    control.db.save_tiles(world.tiles, "tiles2.txt")
+    #control.db.save_entities(world.entities, "entities.txt")
+    #control.db.save_tiles(world.tiles, "tiles2.txt")
 
     """
     # commands I've tested:

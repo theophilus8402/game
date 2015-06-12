@@ -17,9 +17,7 @@ Types of Entities:
 """
 
 
-"""
-Most basic class:
-"""
+# Most basic class:
 class Entity:
 
     def __init__(self):
@@ -42,11 +40,11 @@ class Entity:
         # stuff not stored in db
         self.world = None
 
-    #def change_hp():
+    #def change_hp(self):
+    #def die(self):
 
 
-"""
-Basic weapon:
+# Basic weapon:
 class Weapon(Entity):
 
     def __init__(self):
@@ -70,7 +68,7 @@ class Weapon(Entity):
                                     #   being wielded by a gnome
 
 
-Basic armour:
+# Basic armour:
 class Armour(Entity):
 
     def __init__(self):
@@ -80,34 +78,43 @@ class Armour(Entity):
         self.max_dex_bonus = 8      # goes down from there
         self.armour_check_penalty = 0
         self.arcane_spell_fail = 5  # 5%, 10%...
-        self.speed = 30/20          # different races have different speeds
+        self.speed = (30, 20)       # different races have different speeds
         self.shield = False         # armour or shield
         self.armour_type = ""       # light, medium, heavy
 
-Basic living:
+# Basic living:
 class Living(Entity):
 
     def __init__(self):
         self.type = "living"      # the different entity classes
         self.cur_mp = 0
         self.max_mp = 10
+        self.status_msgs = []
 
-    def move():
+    def can_move(self):
+        can_move = True
+        reason = None
+        bad_statusi = ["lost balance", "paralyzed"]
+        for bstate in bad_statusi:
+            if bstate in self.status_msgs:
+                can_move = False
+                reason = bstate
+        return (can_move, reason)
+"""
+    def die(self):
+    def move(self):
+    def change_mp(self):
+"""
 
-    def change_mp():
 
-
-Advanced Player:
+# Advanced Player:
 class Player(Living):
 
     def __init__(self):
-        self.type = "player"      # the different entity classes
+        self.type = "player"        # the different entity classes
         self.sock = None
         self.msg_queue = queue.Queue()
-        # the following two items are set so that user can login
-        self.special_state = True
-        self.state = "login"
-        self.status_msgs = []
+        self.special_state = "login"    # this is to help with login process
 
     # msg should always be a string with no '\n'
     def send_msg(self, msg):
@@ -129,4 +136,3 @@ class Player(Living):
         else:
             print(msg)
         return True
-"""

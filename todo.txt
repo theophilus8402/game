@@ -1,5 +1,19 @@
 !!!Two Weeks!!!
-* rename most files so that are singular
+* get the different entities loaded/saved:
+    x basic
+    x weapon
+    x armour
+    x living
+    * player
+* get different entities integrated into the game
+    * saved/loaded
+    * showing on the map
+* get basic entities to:
+    * change hp
+    * die
+* rename most files so that they are singular
+* continue to work on the different classes: basic, weapon, armour, living..
+    * move to a different thingie
 * figure out msgs
     * meditate
         target, regain_mana(), time due, time submitted

@@ -53,7 +53,8 @@ def handle_user_input(world, bob, msg):
         control.socks.actually_send_msgs(world, bob)
         control.socks.remove_connection(world, bob.sock)
     elif bob.special_state:
-        if bob.state == "login":
+        print("Here's bob's special_state: {}".format(bob.special_state))
+        if bob.special_state == "login":
             control.socks.login(world, bob, msg)
         bob.send_msg("still in a special state")
     elif re_cast_spell.match(msg):

@@ -57,11 +57,11 @@ def transfer_bobs(world, temp_entity, entity):
 
 def login(world, bob, msg=None):
 
-    if (bob.state == "login") and (not msg):
+    if (bob.special_state == "login") and (not msg):
         # send: who are you?
         if bob.name is None:
             bob.send_msg("What is your name? ")
-    elif bob.state == "login":
+    elif bob.special_state == "login":
         # get: name
         if not bob.name:
             bob.send_msg("Ah, so your name is {}?".format(msg))
@@ -81,16 +81,15 @@ def login(world, bob, msg=None):
                 entities_bob = world.find_entity(bob.name)
                 if entities_bob:
                     bob = transfer_bobs(world, bob, entities_bob)
-                    bob.special_state = False
-                    bob.state = None
+                    bob.special_state = None
                     control.mymap.display_map(world, bob)
                 else:
-                    print("Eeep!  I couldn't find: {}".format(bob.name))
+                    bob.send_msg("Eeep!  I couldn't find: {}".format(bob.name))
                     bob.name = None
                     login(world, bob)
             else:
                 bob.send_msg("Sorry! Wrong password!")
-    # if we got here when bob.state was not login, do nothing
+    # if we got here when bob.special_state was not login, do nothing
     return True
 
 
@@ -106,8 +105,7 @@ def server_loop(world):
 
     server_guy = model.tile.Entity()
     server_guy.name = "server"
-    server_guy.special_state = False    # server doesn't need to login
-    server_guy.state = None
+    server_guy.special_state = None    # server doesn't need to login
     add_connection(world, server, server_guy)
 
 
