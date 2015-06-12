@@ -2,30 +2,42 @@ import model.spells
 import control.socks
 import control.entities
 
-def show_entity_info(world, entity):
-    control.socks.send_msg(world, entity,
-        "Name: {} hp: {}/{} mp: {}/{}".format(
+def show_entity_info(entity):
+    entity.send_msg("Name: {} hp: {}/{} mp: {}/{}".format(
         entity.name, entity.cur_hp, entity.max_hp, entity.cur_mp,
         entity.max_mp))
 
 
-def show_spell_info(world, entity, spell):
-    control.socks.send_msg(world, entity,
-        "Spell name: {} change_hp: {} change_mp: {}".format(
+def show_spell_info(entity, spell):
+    entity.send_msg("Spell name: {} change_hp: {} change_mp: {}".format(
         spell.name, spell.hp_change, spell.mp_change))
 
 
 def cast_simple(spell, world, caster, target):
-    show_entity_info(world, caster)
-    show_entity_info(world, target)
+    show_entity_info(caster)
+    show_entity_info(target)
+    show_spell_info(caster, spell)
 
-    show_spell_info(world, caster, spell)
-    control.entities.change_hp_entity(world, caster, target, spell.hp_change)
-    caster.cur_mp = caster.cur_mp + spell.mp_change
-    control.socks.send_msg(world, caster, spell.msg.format(target=target.name))
+    can_cast = True
 
-    show_entity_info(world, caster)
-    show_entity_info(world, target)
+    """
+    check requirements
+    """
+    # make sure caster has enough mana
+    if ((caster.cur_mp + spell.mp_change) < 0):
+        can_cast = False
+        caster.send_msg("You don't have enough mana!")
+
+    """
+    cast spell
+    """
+    if can_cast:
+        control.entities.change_hp_entity(world, caster, target, spell.hp_change)
+        caster.change_mp(spell.mp_change)
+        caster.send_msg(spell.msg.format(target=target.name))
+
+        show_entity_info(caster)
+        show_entity_info(target)
 
 
 spells = {}
@@ -44,23 +56,38 @@ resurrection.tile_effect = None
 resurrection.radius = 1
 resurrection.area_type = "circle"
 def cast_resurrection(spell, world, caster, target):
-    show_entity_info(world, caster)
-    show_entity_info(world, target)
-    show_spell_info(world, caster, spell)
+    show_entity_info(caster)
+    show_entity_info(target)
+    show_spell_info(caster, spell)
 
-    control.entities.change_hp_entity(world, caster, target, spell.hp_change)
-    caster.cur_mp = caster.cur_mp + spell.mp_change
-    control.socks.send_msg(world, caster, spell.msg.format(target=target.name))
+    can_cast = True
 
-    # move him back to the realm of the living
-    #possible_coord_changes = [(0, 1), (1, 1), (1, 0), (1, -1), 
-    #TODO: make it more centered on where the caster or the body is
-    control.move.move(world, target, target.cur_loc, (1, 1))
+    """
+    check requirements:
+    """
+    # make sure the caster has enough mp
+    if (caster.cur_mp + spell.mp_change) < 0:
+        can_cast = False
+        caster.send_msg("You don't have enough mana!")
+    #TODO: check to make sure he's dead
 
-    #TODO: change target's status effect so he is no longer dead
+    """
+    cast spell
+    """
+    if can_cast:
+        control.entities.change_hp_entity(world, caster, target, spell.hp_change)
+        caster.change_mp(spell.mp_change)
+        caster.send_msg(spell.msg.format(target=target.name))
 
-    show_entity_info(world, caster)
-    show_entity_info(world, target)
+        # move him back to the realm of the living
+        #possible_coord_changes = [(0, 1), (1, 1), (1, 0), (1, -1), 
+        #TODO: make it more centered on where the caster or the body is
+        control.move.move(world, target, target.cur_loc, (1, 1))
+
+        #TODO: change target's status effect so he is no longer dead
+
+        show_entity_info(caster)
+        show_entity_info(target)
 resurrection.cast = cast_resurrection
 spells["resurrection"] = resurrection
 

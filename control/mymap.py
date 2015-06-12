@@ -32,7 +32,7 @@ def display_map(world, bob, center=None, dimension=None):
                 row.append(" ")
         # turn the row into a string and append it to the list
         if len(row) > 0: map_rows.append("".join(row))
-    control.socks.send_msg(world, bob, "\n".join(map_rows))
+    bob.send_msg("\n".join(map_rows))
     return True
 
 

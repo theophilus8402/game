@@ -296,7 +296,7 @@ uid: 49
 entities: 
 ground: 
 coord: (0, -2)
-default_symbol: x
+default_symbol: .
 ----------------------------
 uid: 38
 entities: 

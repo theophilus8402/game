@@ -3,6 +3,7 @@
 import queue
 import sys
 
+
 class Entity:
 
     def __init__(self):
@@ -18,11 +19,13 @@ class Entity:
         self.vision_range = 5
 
         # stuff not stored in db
+        self.world = None
         self.sock = None
         self.msg_queue = queue.Queue()
         # the following two items are set so that user can login
         self.special_state = True
         self.state = "login"
+        self.status_msgs = []
         """
         short_desc = ""
         long_desc = ""
@@ -30,6 +33,32 @@ class Entity:
         mobile = True
         weight = 0
         """
+
+    def change_mp(self, num):
+        self.cur_mp += num
+        if self.cur_mp > self.max_mp:
+            self.cur_mp = self.max_mp
+
+    # msg should always be a string with no '\n'
+    def send_msg(self, msg):
+        # I'm adding the ability to send msg to the local screen
+        # this should help with testing.  I shouldn't need it in the future
+        # so, I can get rid of this feature later and just have it send
+        # stuff via a socket.
+        if self.sock:
+            bmsg = b''
+            try:
+                # make sure msg is a bytearray
+                # will error if msg is already a bytearray
+                bmsg = bytearray("{}\n".format(msg), "utf-8")
+            except:
+                bmsg = msg + b'\n'
+            self.msg_queue.put(bmsg)
+            if self.sock not in self.world.outputs:
+                self.world.outputs.append(self.sock)
+        else:
+            print(msg)
+        return True
 
 
 class Tile:

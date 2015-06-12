@@ -10,7 +10,6 @@ import control.mymap
 
 # http://pymotw.com/2/select/
 
-
 # sends all messages in bob's msg_queue
 def actually_send_msgs(world, bob):
     s = bob.sock
@@ -18,35 +17,13 @@ def actually_send_msgs(world, bob):
         try:
             next_msg = bob.msg_queue.get_nowait()
         except queue.Empty:
-            #print("Output queue for {} is empty.".format(s.getpeername()))
             if s in world.outputs:
                 world.outputs.remove(s)
             break
         else:
-            print("Sending {}... to {}".format(next_msg, s.getpeername()))
+            print("Sending \"{}\"... to {}".format(
+                next_msg.decode("utf-8").strip(), s.getpeername()))
             s.send(next_msg)
-    return True
-
-
-# msg should always be a string with no '\n'
-def send_msg(world, bob, msg):
-    # I'm adding the ability to send msg to the local screen
-    # this should help with testing.  I shouldn't need it in the future
-    # so, I can get rid of this feature later and just have it send
-    # stuff via a socket.
-    if bob.sock:
-        bmsg = b''
-        try:
-            # make sure msg is a bytearray
-            # will error if msg is already a bytearray
-            bmsg = bytearray("{}\n".format(msg), "utf-8")
-        except:
-            bmsg = msg + b'\n'
-        bob.msg_queue.put(bmsg)
-        if bob.sock not in world.outputs:
-            world.outputs.append(bob.sock)
-    else:
-        print(msg)
     return True
 
 
@@ -73,6 +50,8 @@ def transfer_bobs(world, temp_entity, entity):
     # change world.sock_peeps from temp_entity to entity
     world.sock_peeps[temp_entity.sock] = entity
 
+    entity.world = world
+
     return entity
 
 
@@ -81,24 +60,23 @@ def login(world, bob, msg=None):
     if (bob.state == "login") and (not msg):
         # send: who are you?
         if bob.name is None:
-            send_msg(world, bob, "What is your name? ")
+            bob.send_msg("What is your name? ")
     elif bob.state == "login":
         # get: name
         if not bob.name:
-            send_msg(world, bob, "Ah, so your name is {}?".format(msg))
+            bob.send_msg("Ah, so your name is {}?".format(msg))
             if msg in world.passwds.keys():
                 # assign his name
                 bob.name = msg
                 # send: what's your password?
-                send_msg(world, bob, "Please enter your password: ")
+                bob.send_msg("Please enter your password: ")
             else:
-                send_msg(world, bob,
-                    "Sorry! You don't exist! Gimme a new name: ")
+                bob.send_msg("Sorry! You don't exist! Gimme a new name: ")
         else:
             # get: passwd
             # check password
             if world.passwds[bob.name] == msg:
-                send_msg(world, bob, "Hey! Your password is correct!")
+                bob.send_msg("Hey! Your password is correct!")
                 # return the actual bob entity
                 entities_bob = world.find_entity(bob.name)
                 if entities_bob:
@@ -111,7 +89,7 @@ def login(world, bob, msg=None):
                     bob.name = None
                     login(world, bob)
             else:
-                send_msg(world, bob, "Sorry! Wrong password!")
+                bob.send_msg("Sorry! Wrong password!")
     # if we got here when bob.state was not login, do nothing
     return True
 
@@ -148,13 +126,14 @@ def server_loop(world):
                 print("New connection from {}".format(client_addr))
                 connection.setblocking(0)
                 bob = model.tile.Entity()
+                bob.world = world
                 add_connection(world, connection, bob)
                 login(world, bob)
             elif s is sys.stdin:
                 # stdin input!
                 data = s.readline().strip()
                 if data:
-                    print("Recieved from stdin: {}".format(data))
+                    #print("Recieved from stdin: {}".format(data))
                     if data == "exit":
                         continue_loop = False
                         server.close()
@@ -162,15 +141,12 @@ def server_loop(world):
                 # someone sent me something!
                 data = s.recv(1024)
                 if data:
-                    print("Recieved: {} from {}".format(data,
-                        s.getpeername()))
+                    #print("Recieved: {} from {}".format(data,
+                    #    s.getpeername()))
                     bob = world.sock_peeps[s]
                     msg = data.decode("utf-8").strip()
-                    send_msg(world, bob, msg)
-                    if s not in world.outputs:
-                        world.outputs.append(s)
+                    #bob.send_msg(msg)
                     # handle it
-                    #handle_input(world, bob, msg)
                     control.uinput.handle_user_input(world, bob, msg)
                 else:
                     # data is empty means the client closed the connection

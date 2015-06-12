@@ -1,30 +1,50 @@
 !!!Two Weeks!!!
-* change from a db to flat text file... I know it's not ideal
-    * but I think I'm getting too hung up on the db thing
-    * I'm almost done.  Just need to finish writing the lil world stuff
-x make it so I can make tiles easily
-    x got mostly working
-    x need to make it so I can give multiple coords at the same time
+* rename most files so that are singular
+* figure out msgs
+    * meditate
+        target, regain_mana(), time due, time submitted
+    * status removals...
+        target, remove_status("lost balance"), time due, time submitted
+        target, remove_status("lost eq"), time due, time submitted
+        target, remove_status("burning"), time due, time submitted
+        target, remove_status("stunned"), time due, time submitted
+        target, remove_status("deaf"), time due, time submitted
 * figure out what I want to do about testing stuff...
 * make spells
-    * make a resurrection spell
-    * make a heal spell
-    * finish loading spells from a text file via control/db.py
-    * make it so I can actually cast the spell
     * need to figure out how to apply known spells to an entity
-    * make a separate instance of resurrection spell
     * maybe change control.socks.send_msg such that it's built into the ent
 * handle someone dying
-    x mebbe make another room to put them in
-    x put the dead person in there
-    * make a resurrection spell
-    * make a heal spell
+    * set a flag on the person stating they are dead
     * make a corpse
     * make items drop
     * make it so the dead person can't really do anything
 * maybe move some functions that involve entities into control/entities.py
 
 
+7/15
+    x actually got spells to cast in game and checking for enough mana
+    * need to flesh out resurrection more
+        * need a dead body
+        * need a dead flag on the character
+    * need a way to refresh mana (i.e. meditate...)
+
+
+x make it so I can make tiles easily
+    x got mostly working
+    x need to make it so I can give multiple coords at the same time
+x change from a db to flat text file... I know it's not ideal
+    x but I think I'm getting too hung up on the db thing
+    x I'm almost done.  Just need to finish writing the lil world stuff
+
+* make spells
+    x make a resurrection spell
+    x make a heal spell
+    x finish loading spells from a text file via control/db.py
+    x make it so I can actually cast the spell
+    x make a separate instance of resurrection spell
+* handle someone dying
+    x mebbe make another room to put them in
+    x put the dead person in there
 
 Due 12/7/14:
 x able to move a character around on the map

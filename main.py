@@ -1,6 +1,7 @@
 #!/usr/bin/python3.4
 
 import model.tile
+import model.msgs
 import control.spells
 import control.move
 import control.sqldb
@@ -58,24 +59,26 @@ if __name__ == "__main__":
     """
 
     """
+    #SQL stuff
+    world = control.sqldb.load_world()
+    world.entities = control.sqldb.load_entities(world)
+    control.sqldb.rebuild_entities_table(world.entities)
     empty the tables:
     control.db.clean_tables()
 
     # add the temp guys
     control.db.add_entity(bob)
     control.db.add_entity(tim)
-    """
 
-    """
-    #give em bob as the player:
-    bob = entities[0]
+    control.sqldb.save_world(world)
+    control.db.drop_tables()
+    control.db.setup_tables()
     """
 
     """
     Now loading the world!
     """
-    world = control.sqldb.load_world()
-    #world.entities = control.sqldb.load_entities(world)
+    world = model.tile.World()
     world.tiles, world.max_tile_uid = control.db.load_tiles("tiles.txt")
     world.entities = control.db.load_entities("entities.txt")
     # TODO: I should figure out a better way to set the dead room
@@ -90,29 +93,44 @@ if __name__ == "__main__":
     passwds["tim"] = "tim123"
     world.passwds = passwds
 
-    #control.sqldb.rebuild_entities_table(world.entities)
-
+    # initialize spells
     simple_spells = control.db.load_spells("spells.txt")
     world.spells = control.spells.initialize_spells(simple_spells)
+
+    #FOR TESTING
     bob = world.entities["bob"]
     tim = world.entities["tim"]
     bob.special_state = None
-    res_spell = world.spells["resurrection"]
-    res_spell.cast(res_spell, world, bob, tim)
-    #control.uinput.handle_user_input(world, bob, "cast heal at tim")
-    #control.entities.cast_spell(world, world.entities[0], world.entities[1], "resurrection")
+    from datetime import datetime, timedelta
+    td = timedelta(seconds=3.5)
+    msg = model.msgs.Msgs(bob, td, "meditate", True)
+    import time
+    n = 0
+    bob.status_msgs.append("meditating")
+    while True:
+        time.sleep(1)
+        if msg.check():
+            recurring = msg.execute()
+            if recurring:
+                continue
+            else:
+                break
+        n+=1
+        if n>20:
+            bob.status_msgs.remove("meditating")
 
     # enter main loop of the game
     #control.socks.server_loop(world)
-    #control.admin.make_tile(world, world.entities[0], (3, 0), "2x1")
-    #control.mymap.display_map(world, world.entities[0])
 
     control.db.save_entities(world.entities, "entities.txt")
     control.db.save_tiles(world.tiles, "tiles2.txt")
-    #control.sqldb.save_world(world)
-
 
     """
-    control.db.drop_tables()
-    control.db.setup_tables()
+    # commands I've tested:
+    #res_spell = world.spells["resurrection"]
+    #res_spell.cast(res_spell, world, bob, tim)
+    #control.uinput.handle_user_input(world, bob, "cast heal at tim")
+    #control.entities.cast_spell(world, world.entities[0], world.entities[1], "resurrection")
+    #control.admin.make_tile(world, world.entities[0], (3, 0), "2x1")
+    #control.mymap.display_map(world, world.entities[0])
     """

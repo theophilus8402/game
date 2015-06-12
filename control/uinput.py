@@ -49,49 +49,59 @@ def handle_user_input(world, bob, msg):
 
     if msg == "exit":
         should_exit = True
-        control.socks.send_msg(world, bob,
-            "Well, we'll miss you!  Goodbye!")
+        bob.send_msg("Well, we'll miss you!  Goodbye!")
         control.socks.actually_send_msgs(world, bob)
         control.socks.remove_connection(world, bob.sock)
     elif bob.special_state:
         if bob.state == "login":
             control.socks.login(world, bob, msg)
-        control.socks.send_msg(world, bob, "still in a special state")
+        bob.send_msg("still in a special state")
     elif re_cast_spell.match(msg):
         #TODO: maybe change it so we pass the whole message to spell?
         #   that way we can let some complicated spells handle stuff
 
-        # find the target
+        # get names
         result = re_cast_spell.match(msg)
         spell_name = result.group(1)
         target_name = result.group(2)
+
+        # verify info
+        spell = None
+        target = None
+        try:
+            spell = world.spells[spell_name]
+        except:
+            bob.send_msg("What spell is that???")
+            pass
+        try:
+            target = world.entities[target_name]
+        except:
+            bob.send_msg("Who???")
+            pass
+
+        # cast the spell
+        if spell and target:
+            spell.cast(spell, world, bob, target)
         
-        control.socks.send_msg(world, bob,
-            "casting spell: '{}' target: '{}'".format(spell_name,
-            target_name))
-        #TODO: cast the spell
 
     elif re_hit.match(msg):
         result = re_hit.match(msg)
         target_name = result.group("who")
-        control.socks.send_msg(world, bob,
-            "You want to hit {}?!".format(target_name))
+        bob.send_msg("You want to hit {}?!".format(target_name))
         attack_roll = control.roll.roll(2, 6, 1)
-        control.socks.send_msg(world, bob,
-            "Attack roll: {}".format(attack_roll))
+        bob.send_msg("Attack roll: {}".format(attack_roll))
         dmg_roll = -control.roll.roll(1, 6, 2)
-        control.socks.send_msg(world, bob, "Dmg roll: {}".format(dmg_roll))
+        bob.send_msg("Dmg roll: {}".format(dmg_roll))
 
         # find the target nearby
         target_entity = find_target_nearby(world, bob, target_name)
         if target_entity:
-            control.socks.send_msg(world, bob,
-                "Found him at {}".format(target_entity.cur_loc))
+            bob.send_msg("Found him at {}".format(target_entity.cur_loc))
             # apply dmg
             control.entities.change_hp_entity(world, bob, target_entity,
                 dmg_roll)
         else:
-            control.socks.send_msg(world, bob, "Couldn't find him...")
+            bob.send_msg("Couldn't find him...")
     elif re_make_tile.match(msg):
         result = re_make_tile.match(msg)
         x = int(result.group(1))
@@ -105,8 +115,7 @@ def handle_user_input(world, bob, msg):
         try:
             control.move.move(world, bob, (x,y), (x,y+1))
             control.mymap.display_map(world, bob)
-            control.socks.send_msg(world, bob,
-                "Now at: {}".format(bob.cur_loc))
+            bob.send_msg("Now at: {}".format(bob.cur_loc))
         except:
             pass
     elif msg == "e":
@@ -114,8 +123,7 @@ def handle_user_input(world, bob, msg):
         try:
             control.move.move(world, bob, (x,y), (x+1,y))
             control.mymap.display_map(world, bob)
-            control.socks.send_msg(world, bob,
-                "Now at: {}".format(bob.cur_loc))
+            bob.send_msg("Now at: {}".format(bob.cur_loc))
         except:
             pass
     elif msg == "s":
@@ -123,8 +131,7 @@ def handle_user_input(world, bob, msg):
         try:
             control.move.move(world, bob, (x,y), (x,y-1))
             control.mymap.display_map(world, bob)
-            control.socks.send_msg(world, bob,
-                "Now at: {}".format(bob.cur_loc))
+            bob.send_msg("Now at: {}".format(bob.cur_loc))
         except:
             pass
     elif msg == "w":
@@ -132,13 +139,12 @@ def handle_user_input(world, bob, msg):
         try:
             control.move.move(world, bob, (x,y), (x-1,y))
             control.mymap.display_map(world, bob)
-            control.socks.send_msg(world, bob,
-                "Now at: {}".format(bob.cur_loc))
+            bob.send_msg("Now at: {}".format(bob.cur_loc))
         except:
             pass
     elif msg == curses.KEY_UP:
-        control.socks.send_msg(world, bob, "handle_user_input... up")
+        bob.send_msg("handle_user_input... up")
     else:
-        control.socks.send_msg(world, bob, "Huh?  {}".format(msg))
+        bob.send_msg("Huh?  {}".format(msg))
  
     return should_exit
