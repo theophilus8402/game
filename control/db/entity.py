@@ -52,6 +52,7 @@ def save_living(entity, file_handle):
     # not writing the type because the save_entity func will do it for us
     file_handle.write("mp: {}/{}\n".format(entity.cur_hp, entity.max_hp))
     file_handle.write("status_msgs: {}\n".format(",".join(entity.status_msgs)))
+    file_handle.write("vision_range: {}\n".format(entity.vision_range))
  
 
 def save_all_entities(entities, file_name):
@@ -130,6 +131,7 @@ def load_entities(file_name):
     # living
     re_mp = re.compile("mp: ([-0-9]+)/([-0-9]+)")
     re_status_msgs = re.compile("status_msgs: (.*)")
+    re_vision_range = re.compile("vision_range: (\d+)")
 
     types_of_entities = {
         "entity": model.entity.Entity,
@@ -289,6 +291,10 @@ def load_entities(file_name):
             result = re_status_msgs.match(line)
             if result:
                 new_ent.status_msgs = result.group(1).split(",")
+                continue
+            result = re_vision_range.match(line)
+            if result:
+                new_ent.vision_range = int(result.group(1))
                 continue
             # player doesn't have anything extra over living for now
     return entities

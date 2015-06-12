@@ -90,6 +90,7 @@ class Living(Entity):
         self.cur_mp = 0
         self.max_mp = 10
         self.status_msgs = []
+        self.vision_range = 5
 
     def can_move(self):
         can_move = True

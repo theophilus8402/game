@@ -25,7 +25,7 @@ if __name__ == "__main__":
     sword.uid = 21
     sword.name = "sword"
     sword.symbol = "-"
-    sword.cur_loc = (1, 4)
+    sword.cur_loc = (1, 3)
     sword.cur_hp = 13
     sword.max_hp = 13
     sword.short_desc = "This is a shiny sword."
@@ -102,6 +102,7 @@ if __name__ == "__main__":
     bob.friction = 10
     bob.cur_mp = 10
     bob.max_mp = 10
+    bob.vision_range = 6
     #bob.status_msgs = []
     bob.status_msgs = ["lost balance"]
     temp_entities[bob.name] = bob
