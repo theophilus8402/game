@@ -18,9 +18,9 @@ def show_spell_info(entity, spell):
 
 
 def cast_simple(spell, world, caster, target):
-    show_entity_info(caster)
-    show_entity_info(target)
-    show_spell_info(caster, spell)
+    #show_entity_info(caster)
+    #show_entity_info(target)
+    #show_spell_info(caster, spell)
 
     can_cast = True
 
@@ -32,8 +32,12 @@ def cast_simple(spell, world, caster, target):
         can_cast = False
         caster.send_msg("You don't have enough mana!")
     # check the requirements of the spell
-    if "living" in spell.requirements:
-        can_cast = (target.type == "living") or (target.type == "player")
+    if can_cast and ("living" in spell.requirements):
+        is_living = (target.type == "living") or (target.type == "player")
+        if not is_living:
+            caster.send_msg(
+                "You can't cast {} at an inanimate object!".format(
+                spell.name))
 
     """
     cast spell
@@ -76,12 +80,23 @@ def cast_resurrection(spell, world, caster, target):
     if (caster.cur_mp + spell.mp_change) < 0:
         can_cast = False
         caster.send_msg("You don't have enough mana!")
-    #TODO: check to make sure he's dead
+    # check to see if target is an inanimate object
+    if can_cast and \
+        not ((target.type == "living") or (target.type == "player")):
+        can_cast = False
+        caster.send_msg("You can't cast that on an inanimate objects!")
+    # check to see if target is alive
+    if can_cast and ("dead" not in target.status_msgs):
+        can_cast = False
+        caster.send_msg("You silly! {} is still alive!".format(target.name))
+    #TODO: make sure target is nearby or you have the corpse... or whatever
 
     """
     cast spell
     """
     if can_cast:
+        target.cur_hp = 0   # this is to make sure the target isn't
+                            #   too dead (if you will)
         target.change_hp(caster, spell.hp_change)
         caster.change_mp(spell.mp_change)
         caster.send_msg(spell.msg.format(target=target.name))
@@ -91,7 +106,8 @@ def cast_resurrection(spell, world, caster, target):
         #TODO: make it more centered on where the caster or the body is
         control.move.move(world, target, target.cur_loc, (1, 1))
 
-        #TODO: change target's status effect so he is no longer dead
+        # change target's status effect so he is no longer dead
+        target.remove_status("dead")
 
         show_entity_info(caster)
         show_entity_info(target)

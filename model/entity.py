@@ -131,6 +131,23 @@ class Living(Entity):
     def remove_status(self, status_msg):
         self.status_msgs.remove(status_msg)
 
+    """
+    This function can be used to heal or dmg a target.
+    hp_change can be positive to heal someone or negative to hurt someone
+    If the dst_entity dies, we will give exp to the src_entity and kill
+    the dst_entity.
+    """
+    def change_hp(self, src_entity, hp_change):
+        self.cur_hp = self.cur_hp + hp_change
+        if self.cur_hp <= 0:
+            src_entity.send_msg("You killed {}!".format(self.name))
+            self.send_msg("Oh no! You died!")
+            self.die()
+
+    def die(self):
+        self.add_status("dead")
+
+
 """
     def die(self):
     def move(self):
@@ -179,10 +196,13 @@ def transfer_living_to_player(life, plife):
     # when a player disconnects from the game and then reconnects,
     #   their entity is a Player object. If that's the case, delete
     #   the player specific entires in the object and then transfer that
+    """
+    # this shouldn't happen any more...
     if life.type == "player":
         del(life.sock)
         del(life.msg_queue)
         del(life.special_state)
+    """
 
     # copy over all the appropriate information from life to plife
     list_to_transfer = [entry for entry in dir(life)
@@ -190,14 +210,14 @@ def transfer_living_to_player(life, plife):
         if ((not entry.startswith("_")) and
             # make sure the variable isn't a function
             (not callable(life.__getattribute__(entry))))]
-    print("Before transfer:")
+    #print("Before transfer:")
     for entry in list_to_transfer:
-        print("{} : {}".format(entry, plife.__getattribute__(entry)))
+    #    print("{} : {}".format(entry, plife.__getattribute__(entry)))
         plife.__setattr__(entry, life.__getattribute__(entry))
     plife.type = "player"
-    print("After transfer:")
-    for entry in list_to_transfer:
-        print("{} : {}".format(entry, plife.__getattribute__(entry)))
+    #print("After transfer:")
+    #for entry in list_to_transfer:
+    #    print("{} : {}".format(entry, plife.__getattribute__(entry)))
 
     # tell world to point to the player object now
     plife.world.living_ents[life.name] = plife
@@ -207,3 +227,35 @@ def transfer_living_to_player(life, plife):
         tile.entities.remove(life)
     # add the plife to the tile
     tile.entities.append(plife)
+
+
+"""
+I'll need to make sure I keep this up-to-date, which will suck, but
+I don't know a better way to transfer info between objects.
+"""
+def transfer_player_to_living(plife, life):
+
+    del(plife.sock)
+    del(plife.msg_queue)
+    del(plife.special_state)
+    plife.type = "living"
+
+    # generate a list of variables to copy over
+    list_to_transfer = [entry for entry in dir(life)
+        # make sure the variable name doesn't start with "__"
+        if ((not entry.startswith("_")) and
+            # make sure the variable isn't a function
+            (not callable(life.__getattribute__(entry))))]
+    # copy the information from plife to life
+    for entry in list_to_transfer:
+        life.__setattr__(entry, plife.__getattribute__(entry))
+
+    # tell world to point to the player object now
+    life.world.living_ents[life.name] = life
+    # check to see if the plife object is already on a tile then remove it
+    tile = life.world.tiles[life.cur_loc]
+    if plife in tile.entities:
+        tile.entities.remove(plife)
+    # add the life to the tile
+    tile.entities.append(life)
+    #TODO: there might be more places where I'll have to make the transfer

@@ -36,7 +36,11 @@ def add_connection(world, sock, bob):
 
 
 def remove_connection(world, sock):
+    plife = world.sock_peeps[sock]
+    life = model.entity.Living()
+    model.entity.transfer_player_to_living(plife, life)
     del world.sock_peeps[sock]
+    del plife
     if sock in world.outputs:
         world.outputs.remove(sock)
     sock.close()
@@ -69,11 +73,11 @@ def login(world, bob, msg=None):
                 living_bob = world.find_entity(bob.name)
                 if living_bob:
                     living_bob.world = world
-                    print("{}'s type: {} socket: {}".format(bob.name,
-                        bob.type, bob.sock))
+                    #print("{}'s type: {} socket: {}".format(bob.name,
+                        #bob.type, bob.sock))
                     model.entity.transfer_living_to_player(living_bob, bob)
-                    print("{}'s type: {} socket: {}".format(bob.name,
-                        bob.type, bob.sock))
+                    #print("{}'s type: {} socket: {}".format(bob.name,
+                        #bob.type, bob.sock))
                     bob.special_state = None
                     control.mymap.display_map(world, bob)
                 else:

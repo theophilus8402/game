@@ -15,6 +15,11 @@ if __name__ == '__main__':
     #loader.discover("test")
     #loader.loadTestsFromModule("test.testRoll")
 
+    """
     suite = unittest.TestLoader().discover('test', top_level_dir='.')
     #suite = unittest.TestLoader().loadTestsFromModule("test")
+    unittest.TextTestRunner(verbosity=2).run(suite)
+    """
+
+    suite = unittest.TestLoader().discover('test', top_level_dir='.')
     unittest.TextTestRunner(verbosity=2).run(suite)
