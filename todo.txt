@@ -1,19 +1,23 @@
 !!!Two Weeks!!!
-x move tile stuff from controls/db/db.py to controls/db/tiles.py and get
-    x rid of control/db/db.py
-* get different entities integrated into the game
-    * might not be saving mana properly
-    x clean up the transition, so get rid of my old entities
-    x write the entities to different files based on type
-    x store the entities in different dictionaries based on type
+* change it so that when saving/loading player entities, they actually
+    get saved as "living" entities, and then upgrade them to player when
+    someone logs on as the player
+    * this should help with testing (not having to spin up the whole game)
+    * this should also help with being able to play as a dog or whatever
+* get uid's working better
+    * have something keep track of uid's?
+* change heal and resurrection so that they can only work on living beings
+    * maybe the living "requirement"
 * get basic entities to:
     * change hp
     * die
-* rename most files so that they are singular
 * continue to work on the different classes: basic, weapon, armour, living..
     * move to a different thingie
 * figure out msgs
-    * meditate
+    * integrate msgs into the game
+        * player can time meditate to start it
+        * player can move to break the meditation
+    x meditate
         target, regain_mana(), time due, time submitted
     * status removals...
         target, remove_status("lost balance"), time due, time submitted
@@ -24,7 +28,6 @@ x move tile stuff from controls/db/db.py to controls/db/tiles.py and get
 * figure out what I want to do about testing stuff...
 * make spells
     * need to figure out how to apply known spells to an entity
-    * maybe change control.socks.send_msg such that it's built into the ent
 * handle someone dying
     * set a flag on the person stating they are dead
     * make a corpse
@@ -32,8 +35,18 @@ x move tile stuff from controls/db/db.py to controls/db/tiles.py and get
     * make it so the dead person can't really do anything
 * maybe move some functions that involve entities into control/entities.py
 
-
 8/6
+* figure out msgs
+    x add to the world object the ability to add msgs
+        x world.msgs = []
+        x world.add_msg()
+        x world.run_msgs()
+x rename most files so that they are singular
+x get different entities integrated into the game
+    x might not be saving mana properly
+
+
+8/5
 x move tile stuff from controls/db/db.py to controls/db/tiles.py and get
     x rid of control/db/db.py
 * get different entities integrated into the game

@@ -1,0 +1,30 @@
+type: player
+uid: 1
+name: bob
+symbol: B
+cur_loc: (4, 2)
+hp: 17/10
+short_desc: This is Bob.
+long_desc: This is Bob. He's rugged looking.
+weight: 192.0
+volume: 12.0
+friction: 10.0
+mp: 10/10
+status_msgs: lost balance
+vision_range: 6
+-------------------
+type: living
+uid: 44
+name: dog
+symbol: d
+cur_loc: (-1, 2)
+hp: 4/7
+short_desc: This dog is annoying.
+long_desc: This is a mangy mut.
+weight: 41.0
+volume: 4.0
+friction: 5.0
+mp: 7/7
+status_msgs: dumb,hungry,lost balance
+vision_range: 5
+-------------------

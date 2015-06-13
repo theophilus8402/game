@@ -1,0 +1,25 @@
+type: weapon
+uid: 21
+name: sword
+symbol: -
+cur_loc: (1, 3)
+hp: 13/13
+short_desc: This is a shiny sword.
+long_desc: This is a really shiny sword. It is not floppy.
+weight: 6.0
+volume: 1.0
+friction: 0.0
+die_to_roll: 2
+dmg_modifier: 3
+critical_range: 19
+critical_dmg: 3
+range_increment: 0
+base_cost: 10
+weapon_category: martial
+melee: True
+weapon_type: sword
+dmg_type: cutting
+size: medium
+reach: False
+two_handed: False
+-------------------

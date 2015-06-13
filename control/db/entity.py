@@ -50,7 +50,7 @@ def save_armour(entity, file_handle):
 
 def save_living(entity, file_handle):
     # not writing the type because the save_entity func will do it for us
-    file_handle.write("mp: {}/{}\n".format(entity.cur_hp, entity.max_hp))
+    file_handle.write("mp: {}/{}\n".format(entity.cur_mp, entity.max_mp))
     file_handle.write("status_msgs: {}\n".format(",".join(entity.status_msgs)))
     file_handle.write("vision_range: {}\n".format(entity.vision_range))
  

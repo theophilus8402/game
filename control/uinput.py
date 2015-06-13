@@ -5,7 +5,7 @@ import control.roll
 import control.admin
 import control.socks
 import control.mymap
-import control.entities
+import control.entity
 import curses
 import re
 
@@ -99,7 +99,7 @@ def handle_user_input(world, bob, msg):
         if target_entity:
             bob.send_msg("Found him at {}".format(target_entity.cur_loc))
             # apply dmg
-            control.entities.change_hp_entity(world, bob, target_entity,
+            control.entity.change_hp_entity(world, bob, target_entity,
                 dmg_roll)
         else:
             bob.send_msg("Couldn't find him...")

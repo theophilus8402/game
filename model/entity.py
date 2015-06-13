@@ -1,7 +1,6 @@
 #!/usr/bin/python3.4
 
 import queue
-import sys
 
 """
 Types of Entities:
@@ -112,6 +111,12 @@ class Living(Entity):
         self.cur_mp += mp_delta
         if self.cur_mp > self.max_mp:
             self.cur_mp = self.max_mp
+
+    def add_status(self, status_msg):
+        self.status_msgs.append(status_msg)
+
+    def remove_status(self, status_msg):
+        self.status_msgs.remove(status_msg)
 
 """
     def die(self):

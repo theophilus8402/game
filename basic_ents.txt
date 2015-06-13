@@ -1,0 +1,12 @@
+type: entity
+uid: 20
+name: shoe
+symbol: ;
+cur_loc: (1, -2)
+hp: 10/10
+short_desc: This is an old shoe.
+long_desc: This is a really old shoe. It's floppy.
+weight: 1.0
+volume: 0.0
+friction: 0.0
+-------------------
