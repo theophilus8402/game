@@ -109,6 +109,16 @@ class Living(Entity):
         self.max_mp = 10
         self.status_msgs = []
         self.vision_range = 5
+        # new
+        self.level = 0
+        self.hit_dice = "2d4"
+        self.race = "creature"
+        self.str = 0
+        self.dex = 0
+        self.wis = 0
+        self.con = 0
+        self.int = 0
+        self.cha = 0
 
     def can_move(self):
         can_move = True
@@ -148,6 +158,18 @@ class Living(Entity):
         self.add_status("dead")
 
 
+
+class Humanoid(Living):
+
+    def __init__(self):
+        Living.__init__(self)
+        # self.class = "ranger"
+        # self.proficiency_bonus = 2 ?
+        # self.armour = plate
+        # self.helm = helmet
+        # self.left_hand = shield
+        # self.right_hand = sword
+
 """
     def die(self):
     def move(self):
@@ -155,10 +177,10 @@ class Living(Entity):
 
 
 # Advanced Player:
-class Player(Living):
+class Player(Humanoid):
 
     def __init__(self):
-        Living.__init__(self)
+        Humanoid.__init__(self)
         self.type = "player"        # the different entity classes
         self.sock = None
         self.msg_queue = queue.Queue()

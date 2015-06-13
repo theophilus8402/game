@@ -53,6 +53,12 @@ def save_living(entity, file_handle):
     file_handle.write("mp: {}/{}\n".format(entity.cur_mp, entity.max_mp))
     file_handle.write("status_msgs: {}\n".format(",".join(entity.status_msgs)))
     file_handle.write("vision_range: {}\n".format(entity.vision_range))
+    file_handle.write("level: {}\n".format(entity.level))
+    file_handle.write("hit_dice: {}\n".format(entity.hit_dice))
+    file_handle.write("race: {}\n".format(entity.race))
+    file_handle.write("str: {} dex: {} wis: {} con: {} int: {} cha: {}\n"\
+        .format(entity.str, entity.dex, entity.wis, entity.con, entity.int,
+        entity.cha))
  
 
 def save_entities(entities, file_name):
@@ -119,6 +125,11 @@ def load_entities(file_name):
     re_mp = re.compile("mp: ([-0-9]+)/([-0-9]+)")
     re_status_msgs = re.compile("status_msgs: (.*)")
     re_vision_range = re.compile("vision_range: (\d+)")
+    re_level = re.compile("level: (\d+)")
+    re_hit_dice = re.compile("hit_dice: (.*)")
+    re_race = re.compile("race: (.*)")
+    re_ability_scores = re.compile(
+        "str: (\d+) dex: (\d+) wis: (\d+) con: (\d+) int: (\d+) cha: (\d+)")
 
     types_of_entities = {
         "entity": model.entity.Entity,
@@ -285,6 +296,27 @@ def load_entities(file_name):
             result = re_vision_range.match(line)
             if result:
                 new_ent.vision_range = int(result.group(1))
+                continue
+            result = re_level.match(line)
+            if result:
+                new_ent.level = int(result.group(1))
+                continue
+            result = re_hit_dice.match(line)
+            if result:
+                new_ent.hit_dice = result.group(1)
+                continue
+            result = re_race.match(line)
+            if result:
+                new_ent.race = result.group(1)
+                continue
+            result = re_ability_scores.match(line)
+            if result:
+                new_ent.str = int(result.group(1))
+                new_ent.dex = int(result.group(2))
+                new_ent.wis = int(result.group(3))
+                new_ent.con = int(result.group(4))
+                new_ent.int = int(result.group(5))
+                new_ent.cha = int(result.group(6))
                 continue
             # player doesn't have anything extra over living for now
     return (entities, max_uid)

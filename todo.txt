@@ -1,3 +1,20 @@
+* character info:
+    * race      < living (this will be the "type" dog, human, elf, bear...)
+        * store and read
+    * level     < living
+        * store and read
+    * hit dice  < living
+        * store and read
+    * ability scores: str, dex, wis, con, int, cha      < living
+        * store and read
+    * class     < humanoid
+    * proficiency bonus     < humanoid
+    * equipment: armour, helm, weapon/shield        < humanoid
+    * display the info (like the user types "score")
+    * write up a test function for it
+        x test humanoid
+        * (still have to add more stuff for humanoid)
+    
 * get entities to die properly
     * give experience to the attacker (for living targets only)
     * make items drop

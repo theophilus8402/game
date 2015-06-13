@@ -123,7 +123,7 @@ if __name__ == "__main__":
     """
 
     # enter main loop of the game
-    control.socks.server_loop(world)
+    #control.socks.server_loop(world)
 
     control.db.entity.save_entities(world.basic_ents, "basic_ents.txt")
     control.db.entity.save_entities(world.weapon_ents, "weapon_ents.txt")
