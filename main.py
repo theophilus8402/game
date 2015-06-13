@@ -70,11 +70,17 @@ if __name__ == "__main__":
     Now loading the world!
     """
     world = model.tile.World()
-    world.tiles, world.max_tile_uid = control.db.tile.load_tiles("tiles.txt")
-    world.basic_ents = control.db.entity.load_entities("basic_ents.txt")
-    world.weapon_ents = control.db.entity.load_entities("weapon_ents.txt")
-    world.armour_ents = control.db.entity.load_entities("armour_ents.txt")
-    world.living_ents = control.db.entity.load_entities("living_ents.txt")
+    world.tiles, world.max_tile_uid = control.db.tile.load_tiles(
+        "tiles.txt")
+    world.basic_ents, basic_uid = control.db.entity.load_entities(
+        "basic_ents.txt")
+    world.weapon_ents, weapon_uid = control.db.entity.load_entities(
+        "weapon_ents.txt")
+    world.armour_ents, armour_uid = control.db.entity.load_entities(
+        "armour_ents.txt")
+    world.living_ents, living_uid = control.db.entity.load_entities(
+        "living_ents.txt")
+    world.max_ent_uid = max(basic_uid, weapon_uid, armour_uid, living_uid)
 
     # TODO: I should figure out a better way to set the dead room
     world.dead_room = world.tiles[(5, 3)]

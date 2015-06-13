@@ -1,20 +1,23 @@
-!!!Two Weeks!!!
 * get entities to die properly
     * give experience to the attacker (for living targets only)
     * make items drop
     * create a corpse/broken item
     * make it so the dead person can't really do anything
-* get uid's working better
-    * have something keep track of uid's?
 * implement error messages "properly"
     * have something do checks and then return a number for the error
     * then the control/display system will display the error
         * this can give us flexibility to do visual stuff in the future
 * implement move for living entities (i.e. bob.move() instead of move(bob)
-* make spells
+* spells
     * need to figure out how to apply known spells to an entity
 * maybe move some functions that involve entities into control/entities.py
 * implement more tests, and clean up the tests directory
+
+
+8/22
+x get uid's working better
+    x create world.get_new_ent_uid()
+    x test world.get_new_ent_uid()
 
 
 8/21

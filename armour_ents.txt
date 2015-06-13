@@ -1,5 +1,5 @@
 type: armour
-uid: 23
+uid: 3
 name: plate
 symbol: &
 cur_loc: (-1, -1)

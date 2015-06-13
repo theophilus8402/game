@@ -129,6 +129,7 @@ def load_entities(file_name):
     }
 
     entities = {}
+    max_uid = 0
 
     with open(file_name, "r") as f:
 
@@ -147,6 +148,8 @@ def load_entities(file_name):
             result = re_uid.match(line)
             if result:
                 new_ent.uid = int(result.group(1))
+                if new_ent.uid > max_uid:
+                    max_uid = new_ent.uid
                 continue
             result = re_name.match(line)
             if result:
@@ -284,7 +287,7 @@ def load_entities(file_name):
                 new_ent.vision_range = int(result.group(1))
                 continue
             # player doesn't have anything extra over living for now
-    return entities
+    return (entities, max_uid)
 
 
 if __name__ == '__main__':

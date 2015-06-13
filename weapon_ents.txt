@@ -1,5 +1,5 @@
 type: weapon
-uid: 21
+uid: 4
 name: sword
 symbol: -
 cur_loc: (1, 3)

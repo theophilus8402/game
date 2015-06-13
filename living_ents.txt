@@ -1,20 +1,5 @@
 type: living
-uid: 1
-name: bob
-symbol: B
-cur_loc: (3, 1)
-hp: 17/10
-short_desc: This is Bob.
-long_desc: This is Bob. He's rugged looking.
-weight: 192.0
-volume: 0.0
-friction: 12.0
-mp: 6/10
-status_msgs: lost balance
-vision_range: 6
--------------------
-type: living
-uid: 44
+uid: 5
 name: dog
 symbol: d
 cur_loc: (1, 1)
@@ -27,4 +12,19 @@ friction: 5.0
 mp: 7/7
 status_msgs: dumb,hungry,lost balance,dead
 vision_range: 5
+-------------------
+type: living
+uid: 1
+name: bob
+symbol: B
+cur_loc: (-1, -2)
+hp: 17/10
+short_desc: This is Bob.
+long_desc: This is Bob. He's rugged looking.
+weight: 192.0
+volume: 0.0
+friction: 12.0
+mp: 6/10
+status_msgs: lost balance
+vision_range: 6
 -------------------

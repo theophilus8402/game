@@ -66,7 +66,7 @@ class World:
         # these max uids are the current highest uid
         # so, to create a new uid, return max_uid++
         self.max_tile_uid = 0
-        self.max_entity_uid = 0
+        self.max_ent_uid = 0
 
         self.msgs = []
 
@@ -86,6 +86,10 @@ class World:
     def get_new_tile_uid(self):
         self.max_tile_uid += 1
         return self.max_tile_uid
+
+    def get_new_ent_uid(self):
+        self.max_ent_uid += 1
+        return self.max_ent_uid
 
     def find_entity(self, name):
         name = name.lower()

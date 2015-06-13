@@ -1,5 +1,5 @@
 type: entity
-uid: 20
+uid: 2
 name: shoe
 symbol: ;
 cur_loc: (1, -2)
