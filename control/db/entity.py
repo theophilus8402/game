@@ -59,6 +59,12 @@ def save_entities(entities, file_name):
     with open(file_name, "w") as f:
         for entity_name in entities:
             entity = entities[entity_name]
+            # we are changing the type from player to living to better
+            #   enable us to log in as anyone (a player or a dog...)
+            if entity.type == "player":
+                entity.type = "living"
+
+            # now, save the data!!
             save_entity(entity, f)
             if entity.type == "armour":
                 save_armour(entity, f)

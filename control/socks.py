@@ -4,7 +4,7 @@ import socket
 import select
 import queue
 import sys
-import model.tile
+import model.entity
 import control.uinput
 import control.mymap
 
@@ -43,18 +43,6 @@ def remove_connection(world, sock):
     return True
 
 
-def transfer_bobs(world, temp_entity, entity):
-    # temp_entity is the entity that has the sock
-    entity.sock = temp_entity.sock
-
-    # change world.sock_peeps from temp_entity to entity
-    world.sock_peeps[temp_entity.sock] = entity
-
-    entity.world = world
-
-    return entity
-
-
 def login(world, bob, msg=None):
 
     if (bob.special_state == "login") and (not msg):
@@ -78,13 +66,18 @@ def login(world, bob, msg=None):
             if world.passwds[bob.name] == msg:
                 bob.send_msg("Hey! Your password is correct!")
                 # return the actual bob entity
-                entities_bob = world.find_entity(bob.name)
-                if entities_bob:
-                    bob = transfer_bobs(world, bob, entities_bob)
+                living_bob = world.find_entity(bob.name)
+                if living_bob:
+                    living_bob.world = world
+                    print("{}'s type: {} socket: {}".format(bob.name,
+                        bob.type, bob.sock))
+                    model.entity.transfer_living_to_player(living_bob, bob)
+                    print("{}'s type: {} socket: {}".format(bob.name,
+                        bob.type, bob.sock))
                     bob.special_state = None
                     control.mymap.display_map(world, bob)
                 else:
-                    bob.send_msg("Eeep!  I couldn't find: {}".format(bob.name))
+                    bob.send_msg("I couldn't find: {}".format(bob.name))
                     bob.name = None
                     login(world, bob)
             else:
@@ -103,7 +96,7 @@ def server_loop(world):
     server.listen(5)
     conn_count = 0
 
-    server_guy = model.tile.Entity()
+    server_guy = model.entity.Entity()
     server_guy.name = "server"
     server_guy.special_state = None    # server doesn't need to login
     add_connection(world, server, server_guy)
@@ -116,14 +109,14 @@ def server_loop(world):
             world.sock_peeps.keys(), world.outputs,
             world.sock_peeps.keys(), timeout)
 
+        # check for inputs
         for s in readable:
-
             if s is server:
                 # a readable server socket means it's ready to accept a conn
                 connection, client_addr = s.accept()
                 print("New connection from {}".format(client_addr))
                 connection.setblocking(0)
-                bob = model.tile.Entity()
+                bob = model.entity.Player()
                 bob.world = world
                 add_connection(world, connection, bob)
                 login(world, bob)
@@ -151,21 +144,27 @@ def server_loop(world):
                     print("Closing {}...".format(s.getpeername()))
                     remove_connection(world, s)
 
+        # send msgs
         for s in writable:
             actually_send_msgs(world, world.sock_peeps[s])
 
+        # look for some exceptions
         for s in exceptional:
             print("Handling exceptional condition for {}".format(
                 s.getpeername()))
             remove_connection(world, s)
+
+        # handle msgs
+        world.run_msgs()
+            
     return True
 
 
 if __name__ == "__main__":
 
     """
-    import model.tile
-    bob = model.tile.Entity()
+    import model.entity
+    bob = model.entity.Player()
     """
 
     world = World()

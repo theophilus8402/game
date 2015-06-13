@@ -96,7 +96,6 @@ if __name__ == "__main__":
 
     #FOR TESTING
     """
-    """
     bob = world.living_ents["bob"]
     bob.special_state = None
     from datetime import datetime, timedelta
@@ -115,9 +114,10 @@ if __name__ == "__main__":
         if n>10:
             bob.remove_status("meditating")
             break
+    """
 
     # enter main loop of the game
-    #control.socks.server_loop(world)
+    control.socks.server_loop(world)
 
     control.db.entity.save_entities(world.basic_ents, "basic_ents.txt")
     control.db.entity.save_entities(world.weapon_ents, "weapon_ents.txt")

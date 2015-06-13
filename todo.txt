@@ -1,30 +1,16 @@
 !!!Two Weeks!!!
-* change it so that when saving/loading player entities, they actually
-    get saved as "living" entities, and then upgrade them to player when
-    someone logs on as the player
-    * this should help with testing (not having to spin up the whole game)
-    * this should also help with being able to play as a dog or whatever
+* clean up a lot of the useless/troubleshooting msgs
 * get uid's working better
     * have something keep track of uid's?
-* change heal and resurrection so that they can only work on living beings
-    * maybe the living "requirement"
 * get basic entities to:
     * change hp
-    * die
-* continue to work on the different classes: basic, weapon, armour, living..
-    * move to a different thingie
-* figure out msgs
-    * integrate msgs into the game
-        * player can time meditate to start it
-        * player can move to break the meditation
-    x meditate
-        target, regain_mana(), time due, time submitted
-    * status removals...
-        target, remove_status("lost balance"), time due, time submitted
-        target, remove_status("lost eq"), time due, time submitted
-        target, remove_status("burning"), time due, time submitted
-        target, remove_status("stunned"), time due, time submitted
-        target, remove_status("deaf"), time due, time submitted
+    * die/break
+* get living entities to die properly
+* implement error messages "properly"
+    * have something do checks and then return a number for the error
+    * then the control/display system will display the error
+        * this can give us flexibility to do visual stuff in the future
+* implement move for living entities (i.e. bob.move() instead of move(bob)
 * figure out what I want to do about testing stuff...
 * make spells
     * need to figure out how to apply known spells to an entity
@@ -34,6 +20,38 @@
     * make items drop
     * make it so the dead person can't really do anything
 * maybe move some functions that involve entities into control/entities.py
+
+
+8/18
+x fix meditate so it displays the regaining mana msg to the user
+x change the cast spell so that it looks for any entity instead of living
+x change heal and resurrection so that they can only work on living beings
+    x maybe the living "requirement"
+
+
+8/15
+* figure out msgs
+    x integrate msgs into the game
+        x player can time meditate to start it
+        x player can move to break the meditation
+        x get world.run_msgs() into the game loop somewhere
+    x meditate
+        target, regain_mana(), time due, time submitted
+    x status removals...
+        target, remove_status("lost balance"), time due, time submitted
+        target, remove_status("lost eq"), time due, time submitted
+        target, remove_status("burning"), time due, time submitted
+        target, remove_status("stunned"), time due, time submitted
+        target, remove_status("deaf"), time due, time submitted
+x fix it so that when I kill someone it says the correct name of the victim
+* change it so that when saving/loading player entities, they actually
+    get saved as "living" entities, and then upgrade them to player when
+    someone logs on as the player
+    x I've created model.entity.transfer_living_to_player
+        x need to integrate this with control.socks.login
+    * this should help with testing (not having to spin up the whole game)
+    * this should also help with being able to play as a dog or whatever
+
 
 8/6
 * figure out msgs

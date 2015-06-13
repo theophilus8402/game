@@ -3,7 +3,7 @@ uid: 23
 name: plate
 symbol: &
 cur_loc: (-1, -1)
-hp: 20/20
+hp: 0/20
 short_desc: This is a spiffy suite of plate mail armour.
 long_desc: This is a really spiffy suite of plate mail armour.
 weight: 19.0

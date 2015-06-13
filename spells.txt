@@ -5,7 +5,19 @@ mp_change: -2
 recipient_status_effect: 
 status_effect_duration: 
 cast_time: 2
-requirements: "legs,move"
+requirements: "legs,living,move"
+tile_effect: 
+radius: 1
+area_type: circle
+-----------------------
+name: firebolt
+msg: You sneeze at {target} and a ball of fire hurtles toward him!
+hp_change: -5
+mp_change: -2
+recipient_status_effect: 
+status_effect_duration: 
+cast_time: 2
+requirements: "nose"
 tile_effect: 
 radius: 1
 area_type: circle

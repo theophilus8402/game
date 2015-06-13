@@ -21,13 +21,14 @@ class Msgs():
     def execute(self):
         if self.status == "meditate":
             if "meditating" in self.target.status_msgs:
-                print("{} regains some more mp...".format(self.target.name))
+                self.target.send_msg("{} regains some more mp...".format(
+                    self.target.name))
                 self.target.change_mp(4)
             else:
                 self.recurring=False # makes sure msg will get deleted
         else:
             #TODO: implement this
-            print("Removing {} from {}...".format(
+            self.target.send_msg("Removing {} from {}...".format(
                 self.status, self.target.name))
 
         if self.recurring:

@@ -6,8 +6,10 @@ import control.admin
 import control.socks
 import control.mymap
 import control.entity
-import curses
+import model.msg
 import re
+from datetime import datetime, timedelta
+
 
 re_hit = re.compile("hit (?P<who>\w+)")
 re_make_tile = re.compile("make tile \(([-0-9]+), ([-0-9]+)\) ?(\d+x\d+)?")
@@ -75,7 +77,7 @@ def handle_user_input(world, bob, msg):
             bob.send_msg("What spell is that???")
             pass
         try:
-            target = world.living_ents[target_name]
+            target = world.find_entity(target_name)
         except:
             bob.send_msg("Who???")
             pass
@@ -99,8 +101,7 @@ def handle_user_input(world, bob, msg):
         if target_entity:
             bob.send_msg("Found him at {}".format(target_entity.cur_loc))
             # apply dmg
-            control.entity.change_hp_entity(world, bob, target_entity,
-                dmg_roll)
+            target_entity.change_hp(bob, dmg_roll)
         else:
             bob.send_msg("Couldn't find him...")
     elif re_make_tile.match(msg):
@@ -111,12 +112,20 @@ def handle_user_input(world, bob, msg):
         dimensions = result.group(3)
         #dimensions = None
         control.admin.make_tile(world, bob, coord, dimensions)
+    # meditate
+    elif msg == "meditate":
+        td = timedelta(seconds=3)
+        msg = model.msg.Msgs(bob, td, "meditate", True)
+        world.add_msg(msg)
+        bob.add_status("meditating")
     elif msg == "n":
         x, y = bob.cur_loc
         try:
             control.move.move(world, bob, (x,y), (x,y+1))
             control.mymap.display_map(world, bob)
             bob.send_msg("Now at: {}".format(bob.cur_loc))
+            # need this at the end, if it fails, the try block is gonna stop
+            bob.remove_status("meditating")
         except:
             pass
     elif msg == "e":
@@ -125,6 +134,7 @@ def handle_user_input(world, bob, msg):
             control.move.move(world, bob, (x,y), (x+1,y))
             control.mymap.display_map(world, bob)
             bob.send_msg("Now at: {}".format(bob.cur_loc))
+            bob.remove_status("meditating")
         except:
             pass
     elif msg == "s":
@@ -133,6 +143,7 @@ def handle_user_input(world, bob, msg):
             control.move.move(world, bob, (x,y), (x,y-1))
             control.mymap.display_map(world, bob)
             bob.send_msg("Now at: {}".format(bob.cur_loc))
+            bob.remove_status("meditating")
         except:
             pass
     elif msg == "w":
@@ -141,10 +152,9 @@ def handle_user_input(world, bob, msg):
             control.move.move(world, bob, (x,y), (x-1,y))
             control.mymap.display_map(world, bob)
             bob.send_msg("Now at: {}".format(bob.cur_loc))
+            bob.remove_status("meditating")
         except:
             pass
-    elif msg == curses.KEY_UP:
-        bob.send_msg("handle_user_input... up")
     else:
         bob.send_msg("Huh?  {}".format(msg))
  

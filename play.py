@@ -1,6 +1,7 @@
 #!/usr/bin/python3.4
 
 import model.entity
+import model.tile
 import control.db.entity
 
 if __name__ == "__main__":
@@ -110,13 +111,25 @@ if __name__ == "__main__":
     bob.status_msgs = ["lost balance"]
     living_entities[bob.name] = bob
 
+    pdog = model.entity.Player()
+    dog.world = model.tile.World()
+    dog.world.living_ents[dog.name] = dog
+    dog.world.tiles[dog.cur_loc] = model.tile.Tile()
+    pdog.socket = "a socket"
+    print("prior to transfer ents: {}".format(dog.world.living_ents))
+    model.entity.transfer_living_to_player(dog, pdog)
+    del(dog)
+    print("after transfer ents: {}".format(pdog.world.living_ents))
+    print("{} {} {} {} {} {}".format(pdog.uid, pdog.name, pdog.symbol,
+        pdog.short_desc, pdog.status_msgs, pdog.vision_range))
+
+    """
     #entities = control.db.entity.load_entities("pent.txt")
     control.db.entity.save_entities(basic_entities, "basic_ents.txt")
     control.db.entity.save_entities(weapon_entities, "weapon_ents.txt")
     control.db.entity.save_entities(armour_entities, "armour_ents.txt")
     control.db.entity.save_entities(living_entities, "living_ents.txt")
 
-    """
     can_move, reason = dog.can_move()
     if can_move:
         print("The doggie can move!")

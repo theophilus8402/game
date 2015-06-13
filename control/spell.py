@@ -3,9 +3,13 @@ import control.socks
 import control.entity
 
 def show_entity_info(entity):
-    entity.send_msg("Name: {} hp: {}/{} mp: {}/{}".format(
-        entity.name, entity.cur_hp, entity.max_hp, entity.cur_mp,
-        entity.max_mp))
+    if (entity.type == "living") or (entity.type == "player"):
+        entity.send_msg("Name: {} hp: {}/{} mp: {}/{}".format(
+            entity.name, entity.cur_hp, entity.max_hp, entity.cur_mp,
+            entity.max_mp))
+    else:
+        entity.send_msg("Name: {} hp: {}/{}".format(entity.name,
+            entity.cur_hp, entity.max_hp))
 
 
 def show_spell_info(entity, spell):
@@ -27,12 +31,15 @@ def cast_simple(spell, world, caster, target):
     if ((caster.cur_mp + spell.mp_change) < 0):
         can_cast = False
         caster.send_msg("You don't have enough mana!")
+    # check the requirements of the spell
+    if "living" in spell.requirements:
+        can_cast = (target.type == "living") or (target.type == "player")
 
     """
     cast spell
     """
     if can_cast:
-        control.entity.change_hp_entity(world, caster, target, spell.hp_change)
+        target.change_hp(caster, spell.hp_change)
         caster.change_mp(spell.mp_change)
         caster.send_msg(spell.msg.format(target=target.name))
 
@@ -75,7 +82,7 @@ def cast_resurrection(spell, world, caster, target):
     cast spell
     """
     if can_cast:
-        control.entity.change_hp_entity(world, caster, target, spell.hp_change)
+        target.change_hp(caster, spell.hp_change)
         caster.change_mp(spell.mp_change)
         caster.send_msg(spell.msg.format(target=target.name))
 

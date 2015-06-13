@@ -14,15 +14,15 @@ This function can be used to heal or dmg a target.
 hp_change can be positive to heal someone or negative to hurt someone
 If the dst_entity dies, we will give exp to the src_entity and kill
 the dst_entity.
-"""
 def change_hp_entity(world, src_entity, dst_entity, hp_change):
     
     #show_entity_info(world, dst_entity)
     dst_entity.cur_hp = dst_entity.cur_hp + hp_change
     #show_entity_info(world, dst_entity)
     if dst_entity.cur_hp <= 0:
-        src_entity.send_msg("You killed {}!".format(src_entity.name))
+        src_entity.send_msg("You killed {}!".format(dst_entity.name))
         control.mymap.kill_creature(world, src_entity, dst_entity)
+"""
 
 
 def show_spell_info(world, entity, spell):
@@ -39,7 +39,7 @@ def cast_spell(world, src_entity, dst_entity, spell_name):
         spell = world.spells[spell_name]
 
         show_spell_info(world, src_entity, spell)
-        change_hp_entity(world, src_entity, dst_entity, spell.hp_change)
+        dst_entity.change_hp(src_entity, spell.hp_change)
         src_entity.cur_mp  = src_entity.cur_mp + spell.mp_change
         src_entity.send_msg(spell.msg.format(target=dst_entity.name))
 
