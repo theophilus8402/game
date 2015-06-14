@@ -111,9 +111,14 @@ def save_living(entity, file_handle):
     file_handle.write("level: {}\n".format(entity.level))
     file_handle.write("hit_dice: {}\n".format(entity.hit_dice))
     file_handle.write("race: {}\n".format(entity.race))
+    ent_str, mod = entity.attrib["str"]
+    ent_dex, mod = entity.attrib["dex"]
+    ent_wis, mod = entity.attrib["wis"]
+    ent_con, mod = entity.attrib["con"]
+    ent_int, mod = entity.attrib["int"]
+    ent_cha, mod = entity.attrib["cha"]
     file_handle.write("str: {} dex: {} wis: {} con: {} int: {} cha: {}\n"\
-        .format(entity.str, entity.dex, entity.wis, entity.con, entity.int,
-        entity.cha))
+        .format(ent_str, ent_dex, ent_wis, ent_con, ent_int, ent_cha))
     file_handle.write("ac: {}\n".format(entity.ac))
     file_handle.write("fortitude: {} reflex: {} will: {}\n".format(
         entity.fortitude, entity.reflex, entity.will))
@@ -320,12 +325,12 @@ def check_living(new_ent, line):
         return line_matched
     result = re_ability_scores.match(line)
     if result:
-        new_ent.str = int(result.group(1))
-        new_ent.dex = int(result.group(2))
-        new_ent.wis = int(result.group(3))
-        new_ent.con = int(result.group(4))
-        new_ent.int = int(result.group(5))
-        new_ent.cha = int(result.group(6))
+        new_ent.set_attrib("str", int(result.group(1)))
+        new_ent.set_attrib("dex", int(result.group(2)))
+        new_ent.set_attrib("wis", int(result.group(3)))
+        new_ent.set_attrib("con", int(result.group(4)))
+        new_ent.set_attrib("int", int(result.group(5)))
+        new_ent.set_attrib("cha", int(result.group(6)))
         return line_matched
     result = re_ac.match(line)
     if result:

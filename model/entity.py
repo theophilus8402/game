@@ -1,7 +1,8 @@
 #!/usr/bin/python3.4
 
+import math
 import queue
-import control.mymap
+import control.roll
 
 """
 Types of Entities:
@@ -176,6 +177,10 @@ class Living(Entity):
         self.exp = 0
         self.money = 10
 
+    def set_attrib(self, name, value):
+        mod = math.floor((value-10)/2)
+        self.attrib[name] = (value, mod)
+
     def can_move(self):
         can_move = True
         reason = None
@@ -200,18 +205,27 @@ class Living(Entity):
     def attack_roll(self, melee=True, target_size="medium", range_pen=0):
         # d20 + attack_bonus
         sizes = {"tiny": 2, "small": 1, "medium": 0, "large": -1,
-            "huge": -2, "gargantuan": -4}}
+            "huge": -2, "gargantuan": -4}
         size_mod = sizes[target_size]
-        if melee: attribute = "str" else: attribute = "dex"
-        attrib, ability_mod = self.attrib[attribute]
-        attack_bonus = self.base_attack_bonus + ability_mod + size_mod
-        # attack_bonus (melee) = base_attack_bonus + str_mod + size_mod
+
         if melee:
-            attack_bonus = self.base_attack_bonus + str_mod + size_mod
+            attribute = "str"
+        else:
+            attribute = "dex"
+        attrib, ability_mod = self.attrib[attribute]
+
+        # attack_bonus (melee) = base_attack_bonus + str_mod + size_mod
+        attack_bonus = self.base_attack_bonus + ability_mod + size_mod
         # attack_bonus (ranged) = base_attack_bonus + dex_mod + size_mod
         #   + range_penalty
-        else:
-            attack_bonus = self.base_attack_bonus + str_mod + size_mod
+        if not melee:
+            attack_bonus += range_pen
+
+        d20 = control.roll.roll(1, 20)
+        att_roll = d20 + attack_bonus
+        print("attack_bonus = {} + {} = {}".format(d20, attack_bonus,
+            att_roll))
+        return att_roll
 
     """
     This function can be used to heal or dmg a target.

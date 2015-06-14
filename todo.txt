@@ -1,3 +1,16 @@
+* model/basics.py
+    * get_bab
+        x implement
+        * test
+        * integrate
+    * get_base_save_bonus
+        x implement
+        * test
+        * integrate
+    * check_level_up
+        x implement
+        * test
+        * integrate
 * character info:
     * actually implement: race, level, hit_dice, ability scores...
     * actually implement: ac, fortitude, reflex, will
@@ -28,6 +41,15 @@
     * need to figure out how to apply known spells to an entity
 * maybe move some functions that involve entities into control/entities.py
 * implement more tests, and clean up the tests directory
+
+9/17
+* model/basics.py
+    * get_bab
+        x implement
+    * get_base_save_bonus
+        x implement
+    * check_level_up
+        x implement
 
 
 8/31

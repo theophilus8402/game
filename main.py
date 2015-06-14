@@ -101,9 +101,10 @@ if __name__ == "__main__":
     world.spells = control.spell.initialize_spells(simple_spells)
 
     #FOR TESTING
-    """
     bob = world.living_ents["bob"]
     bob.special_state = None
+    print(bob.attack_roll(True, "small", 0))
+    """
     from datetime import datetime, timedelta
     td = timedelta(seconds=3.5)
     msg = model.msg.Msgs(bob, td, "meditate", True)

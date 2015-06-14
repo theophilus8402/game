@@ -7,7 +7,7 @@ import random
 2d6+3
 Roll two die 1-6 then add 3.
 """
-def roll(num_die, sides, modifier):
+def roll(num_die, sides, modifier=0):
     total = 0
     for i in range(num_die):
         total = total+random.randint(1,sides)
