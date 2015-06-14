@@ -3,6 +3,61 @@
 import re
 import model.entity
 
+# basic entity
+re_uid = re.compile("uid: (\d+)")
+re_name = re.compile("name: (\w+)")
+re_type = re.compile("type: (\w+)")
+re_symbol = re.compile("symbol: (.+)")
+re_cur_loc = re.compile("cur_loc: \(([-0-9]+), ([-0-9]+)\)")
+re_hp = re.compile("hp: ([-0-9]+)/([-0-9]+)")
+re_short_desc = re.compile("short_desc: (.+)")
+re_long_desc = re.compile("long_desc: (.+)")
+re_weight = re.compile("weight: (\d+)")
+re_volume = re.compile("volume: (\d+)")
+re_friction = re.compile("friction: (\d+)")
+# weapon
+re_die_to_roll = re.compile("die_to_roll: (\d+)")
+re_dmg_modifier = re.compile("dmg_modifier: (\d+)")
+re_critical_dmg = re.compile("critical_dmg: (\d+)")
+re_critical_range = re.compile("critical_range: (\d+)")
+re_range_increment = re.compile("range_increment: (\d+)")
+re_base_cost = re.compile("base_cost: (\d+)")
+re_weapon_category = re.compile("weapon_category: (\w+)")
+re_melee = re.compile("melee: (\w+)")
+re_weapon_type = re.compile("weapon_type: (\w+)")
+re_dmg_type = re.compile("dmg_type: (.+)")
+re_size = re.compile("size: (\w+)")
+re_reach = re.compile("reach: (\w+)")
+re_two_handed = re.compile("two_handed: (\w+)")
+# armour
+re_armour_bonus = re.compile("armour_bonus: (\d+)")
+re_max_dex_bonus = re.compile("max_dex_bonus: (\d+)")
+re_armour_check_penalty = re.compile("armour_check_penalty: (\d+)")
+re_arcane_spell_fail = re.compile("arcane_spell_fail: (\d+)")
+re_speed = re.compile("speed: \((\d+), (\d+)\)")
+re_shield = re.compile("shield: (\w+)")
+re_armour_type = re.compile("armour_type: (\w+)")
+# living
+re_mp = re.compile("mp: ([-0-9]+)/([-0-9]+)")
+re_status_msgs = re.compile("status_msgs: (.*)")
+re_vision_range = re.compile("vision_range: (\d+)")
+re_level = re.compile("level: (\d+)")
+re_hit_dice = re.compile("hit_dice: (.*)")
+re_race = re.compile("race: (.*)")
+re_ability_scores = re.compile(
+    "str: (\d+) dex: (\d+) wis: (\d+) con: (\d+) int: (\d+) cha: (\d+)")
+re_ac = re.compile("ac: (\d+)")
+re_saving_throws = re.compile("fortitude: (\d+) reflex: (\d+) will: (\d+)")
+
+types_of_entities = {
+    "entity": model.entity.Entity,
+    "weapon": model.entity.Weapon,
+    "armour": model.entity.Armour,
+    "living": model.entity.Living,
+    "player": model.entity.Player,
+}
+
+
 def save_entity(entity, file_handle):
     file_handle.write("type: {}\n".format(entity.type))
     file_handle.write("uid: {}\n".format(entity.uid))
@@ -59,6 +114,9 @@ def save_living(entity, file_handle):
     file_handle.write("str: {} dex: {} wis: {} con: {} int: {} cha: {}\n"\
         .format(entity.str, entity.dex, entity.wis, entity.con, entity.int,
         entity.cha))
+    file_handle.write("ac: {}\n".format(entity.ac))
+    file_handle.write("fortitude: {} reflex: {} will: {}\n".format(
+        entity.fortitude, entity.reflex, entity.will))
  
 
 def save_entities(entities, file_name):
@@ -85,59 +143,206 @@ def save_entities(entities, file_name):
             f.write("-------------------\n")
 
 
+def check_basic(max_uid, new_ent, line):
+    line_matched = True
+
+    result = re_uid.match(line)
+    if result:
+        new_ent.uid = int(result.group(1))
+        if new_ent.uid > max_uid:
+            max_uid = new_ent.uid
+        return max_uid, line_matched
+    result = re_name.match(line)
+    if result:
+        new_ent.name = result.group(1)
+        return max_uid, line_matched
+    result = re_symbol.match(line)
+    if result:
+        new_ent.symbol = result.group(1)
+        return max_uid, line_matched
+    result = re_cur_loc.match(line)
+    if result:
+        new_ent.cur_loc = (int(result.group(1)), int(result.group(2)))
+        return max_uid, line_matched
+    result = re_hp.match(line)
+    if result:
+        new_ent.cur_hp = int(result.group(1))
+        new_ent.max_hp = int(result.group(2))
+        return max_uid, line_matched
+    result = re_short_desc.match(line)
+    if result:
+        new_ent.short_desc = result.group(1)
+        return max_uid, line_matched
+    result = re_long_desc.match(line)
+    if result:
+        new_ent.long_desc = result.group(1)
+        return max_uid, line_matched
+    result = re_weight.match(line)
+    if result:
+        new_ent.weight = float(result.group(1))
+        return max_uid, line_matched
+    result = re_volume.match(line)
+    if result:
+        new_ent.volume = float(result.group(1))
+        return max_uid, line_matched
+    result = re_friction.match(line)
+    if result:
+        new_ent.friction = float(result.group(1))
+        return max_uid, line_matched
+    line_matched = False
+    return max_uid, line_matched
+
+
+def check_weapon(new_ent, line):
+    line_matched = True
+
+    result = re_die_to_roll.match(line)
+    if result:
+        new_ent.die_to_roll = int(result.group(1))
+        return line_matched
+    result = re_dmg_modifier.match(line)
+    if result:
+        new_ent.dmg_modifier = int(result.group(1))
+        return line_matched
+    result = re_critical_range.match(line)
+    if result:
+        new_ent.critical_range = int(result.group(1))
+        return line_matched
+    result = re_critical_dmg.match(line)
+    if result:
+        new_ent.critical_dmg = int(result.group(1))
+        return line_matched
+    result = re_range_increment.match(line)
+    if result:
+        new_ent.range_increment = int(result.group(1))
+        return line_matched
+    result = re_base_cost.match(line)
+    if result:
+        new_ent.base_cost = int(result.group(1))
+        return line_matched
+    result = re_weapon_category.match(line)
+    if result:
+        new_ent.weapon_category = result.group(1)
+        return line_matched
+    result = re_melee.match(line)
+    if result:
+        new_ent.melee = result.group(1)
+        return line_matched
+    result = re_weapon_type.match(line)
+    if result:
+        new_ent.weapon_type = result.group(1)
+        return line_matched
+    result = re_dmg_type.match(line)
+    if result:
+        new_ent.dmg_type = result.group(1)
+        return line_matched
+    result = re_size.match(line)
+    if result:
+        new_ent.size = result.group(1)
+        return line_matched
+    result = re_reach.match(line)
+    if result:
+        new_ent.reach = result.group(1)
+        return line_matched
+    result = re_two_handed.match(line)
+    if result:
+        new_ent.two_handed = result.group(1)
+        return line_matched
+
+    line_matched = False
+    return line_matched
+
+
+def check_armour(new_ent, line):
+    line_matched = True
+
+    result = re_armour_bonus.match(line)
+    if result:
+        new_ent.armour_bonus = int(result.group(1))
+        return line_matched
+    result = re_max_dex_bonus.match(line)
+    if result:
+        new_ent.max_dex_bonus = int(result.group(1))
+        return line_matched
+    result = re_armour_check_penalty.match(line)
+    if result:
+        new_ent.armour_check_penalty = int(result.group(1))
+        return line_matched
+    result = re_arcane_spell_fail.match(line)
+    if result:
+        new_ent.armour_spell_fail = int(result.group(1))
+        return line_matched
+    result = re_speed.match(line)
+    if result:
+        new_ent.speed = (
+            int(result.group(1)), int(result.group(2)))
+        return line_matched
+    result = re_shield.match(line)
+    if result:
+        new_ent.shield = result.group(1)
+        return line_matched
+    result = re_armour_type.match(line)
+    if result:
+        new_ent.armour_type = result.group(1)
+        return line_matched
+
+    line_matched = False
+    return line_matched
+
+
+def check_living(new_ent, line):
+    line_matched = True
+
+    result = re_mp.match(line)
+    if result:
+        new_ent.cur_mp = int(result.group(1))
+        new_ent.max_mp = int(result.group(2))
+        return line_matched
+    result = re_status_msgs.match(line)
+    if result:
+        new_ent.status_msgs = result.group(1).split(",")
+        return line_matched
+    result = re_vision_range.match(line)
+    if result:
+        new_ent.vision_range = int(result.group(1))
+        return line_matched
+    result = re_level.match(line)
+    if result:
+        new_ent.level = int(result.group(1))
+        return line_matched
+    result = re_hit_dice.match(line)
+    if result:
+        new_ent.hit_dice = result.group(1)
+        return line_matched
+    result = re_race.match(line)
+    if result:
+        new_ent.race = result.group(1)
+        return line_matched
+    result = re_ability_scores.match(line)
+    if result:
+        new_ent.str = int(result.group(1))
+        new_ent.dex = int(result.group(2))
+        new_ent.wis = int(result.group(3))
+        new_ent.con = int(result.group(4))
+        new_ent.int = int(result.group(5))
+        new_ent.cha = int(result.group(6))
+        return line_matched
+    result = re_ac.match(line)
+    if result:
+        new_ent.ac = int(result.group(1))
+        return line_matched
+    result = re_saving_throws.match(line)
+    if result:
+        new_ent.fortitude = int(result.group(1))
+        new_ent.reflex = int(result.group(2))
+        new_ent.will = int(result.group(3))
+        return line_matched
+
+    line_matched = False
+    return line_matched
+
+
 def load_entities(file_name):
-
-    # basic entity
-    re_uid = re.compile("uid: (\d+)")
-    re_name = re.compile("name: (\w+)")
-    re_type = re.compile("type: (\w+)")
-    re_symbol = re.compile("symbol: (.+)")
-    re_cur_loc = re.compile("cur_loc: \(([-0-9]+), ([-0-9]+)\)")
-    re_hp = re.compile("hp: ([-0-9]+)/([-0-9]+)")
-    re_short_desc = re.compile("short_desc: (.+)")
-    re_long_desc = re.compile("long_desc: (.+)")
-    re_weight = re.compile("weight: (\d+)")
-    re_volume = re.compile("volume: (\d+)")
-    re_friction = re.compile("friction: (\d+)")
-    # weapon
-    re_die_to_roll = re.compile("die_to_roll: (\d+)")
-    re_dmg_modifier = re.compile("dmg_modifier: (\d+)")
-    re_critical_dmg = re.compile("critical_dmg: (\d+)")
-    re_critical_range = re.compile("critical_range: (\d+)")
-    re_range_increment = re.compile("range_increment: (\d+)")
-    re_base_cost = re.compile("base_cost: (\d+)")
-    re_weapon_category = re.compile("weapon_category: (\w+)")
-    re_melee = re.compile("melee: (\w+)")
-    re_weapon_type = re.compile("weapon_type: (\w+)")
-    re_dmg_type = re.compile("dmg_type: (.+)")
-    re_size = re.compile("size: (\w+)")
-    re_reach = re.compile("reach: (\w+)")
-    re_two_handed = re.compile("two_handed: (\w+)")
-    # armour
-    re_armour_bonus = re.compile("armour_bonus: (\d+)")
-    re_max_dex_bonus = re.compile("max_dex_bonus: (\d+)")
-    re_armour_check_penalty = re.compile("armour_check_penalty: (\d+)")
-    re_arcane_spell_fail = re.compile("arcane_spell_fail: (\d+)")
-    re_speed = re.compile("speed: \((\d+), (\d+)\)")
-    re_shield = re.compile("shield: (\w+)")
-    re_armour_type = re.compile("armour_type: (\w+)")
-    # living
-    re_mp = re.compile("mp: ([-0-9]+)/([-0-9]+)")
-    re_status_msgs = re.compile("status_msgs: (.*)")
-    re_vision_range = re.compile("vision_range: (\d+)")
-    re_level = re.compile("level: (\d+)")
-    re_hit_dice = re.compile("hit_dice: (.*)")
-    re_race = re.compile("race: (.*)")
-    re_ability_scores = re.compile(
-        "str: (\d+) dex: (\d+) wis: (\d+) con: (\d+) int: (\d+) cha: (\d+)")
-
-    types_of_entities = {
-        "entity": model.entity.Entity,
-        "weapon": model.entity.Weapon,
-        "armour": model.entity.Armour,
-        "living": model.entity.Living,
-        "player": model.entity.Player,
-    }
 
     entities = {}
     max_uid = 0
@@ -156,167 +361,20 @@ def load_entities(file_name):
                 entities[new_ent.name.lower()] = new_ent
                 continue
             # basic
-            result = re_uid.match(line)
-            if result:
-                new_ent.uid = int(result.group(1))
-                if new_ent.uid > max_uid:
-                    max_uid = new_ent.uid
-                continue
-            result = re_name.match(line)
-            if result:
-                new_ent.name = result.group(1)
-                continue
-            result = re_symbol.match(line)
-            if result:
-                new_ent.symbol = result.group(1)
-                continue
-            result = re_cur_loc.match(line)
-            if result:
-                new_ent.cur_loc = (
-                    int(result.group(1)), int(result.group(2)))
-                continue
-            result = re_hp.match(line)
-            if result:
-                new_ent.cur_hp = int(result.group(1))
-                new_ent.max_hp = int(result.group(2))
-                continue
-            result = re_short_desc.match(line)
-            if result:
-                new_ent.short_desc = result.group(1)
-                continue
-            result = re_long_desc.match(line)
-            if result:
-                new_ent.long_desc = result.group(1)
-                continue
-            result = re_weight.match(line)
-            if result:
-                new_ent.weight = float(result.group(1))
-                continue
-            result = re_volume.match(line)
-            if result:
-                new_ent.volume = float(result.group(1))
-                continue
-            result = re_friction.match(line)
-            if result:
-                new_ent.friction = float(result.group(1))
+            max_uid, line_matched = check_basic(max_uid, new_ent, line)
+            if line_matched:
                 continue
             # weapon
-            result = re_die_to_roll.match(line)
-            if result:
-                new_ent.die_to_roll = int(result.group(1))
-                continue
-            result = re_dmg_modifier.match(line)
-            if result:
-                new_ent.dmg_modifier = int(result.group(1))
-                continue
-            result = re_critical_range.match(line)
-            if result:
-                new_ent.critical_range = int(result.group(1))
-                continue
-            result = re_critical_dmg.match(line)
-            if result:
-                new_ent.critical_dmg = int(result.group(1))
-                continue
-            result = re_range_increment.match(line)
-            if result:
-                new_ent.range_increment = int(result.group(1))
-                continue
-            result = re_base_cost.match(line)
-            if result:
-                new_ent.base_cost = int(result.group(1))
-                continue
-            result = re_weapon_category.match(line)
-            if result:
-                new_ent.weapon_category = result.group(1)
-                continue
-            result = re_melee.match(line)
-            if result:
-                new_ent.melee = result.group(1)
-                continue
-            result = re_weapon_type.match(line)
-            if result:
-                new_ent.weapon_type = result.group(1)
-                continue
-            result = re_dmg_type.match(line)
-            if result:
-                new_ent.dmg_type = result.group(1)
-                continue
-            result = re_size.match(line)
-            if result:
-                new_ent.size = result.group(1)
-                continue
-            result = re_reach.match(line)
-            if result:
-                new_ent.reach = result.group(1)
-                continue
-            result = re_two_handed.match(line)
-            if result:
-                new_ent.two_handed = result.group(1)
+            line_matched = check_weapon(new_ent, line)
+            if line_matched:
                 continue
             # armour
-            result = re_armour_bonus.match(line)
-            if result:
-                new_ent.armour_bonus = int(result.group(1))
-                continue
-            result = re_max_dex_bonus.match(line)
-            if result:
-                new_ent.max_dex_bonus = int(result.group(1))
-                continue
-            result = re_armour_check_penalty.match(line)
-            if result:
-                new_ent.armour_check_penalty = int(result.group(1))
-                continue
-            result = re_arcane_spell_fail.match(line)
-            if result:
-                new_ent.armour_spell_fail = int(result.group(1))
-                continue
-            result = re_speed.match(line)
-            if result:
-                new_ent.speed = (
-                    int(result.group(1)), int(result.group(2)))
-                continue
-            result = re_shield.match(line)
-            if result:
-                new_ent.shield = result.group(1)
-                continue
-            result = re_armour_type.match(line)
-            if result:
-                new_ent.armour_type = result.group(1)
+            line_matched = check_armour(new_ent, line)
+            if line_matched:
                 continue
             # living
-            result = re_mp.match(line)
-            if result:
-                new_ent.cur_mp = int(result.group(1))
-                new_ent.max_mp = int(result.group(2))
-                continue
-            result = re_status_msgs.match(line)
-            if result:
-                new_ent.status_msgs = result.group(1).split(",")
-                continue
-            result = re_vision_range.match(line)
-            if result:
-                new_ent.vision_range = int(result.group(1))
-                continue
-            result = re_level.match(line)
-            if result:
-                new_ent.level = int(result.group(1))
-                continue
-            result = re_hit_dice.match(line)
-            if result:
-                new_ent.hit_dice = result.group(1)
-                continue
-            result = re_race.match(line)
-            if result:
-                new_ent.race = result.group(1)
-                continue
-            result = re_ability_scores.match(line)
-            if result:
-                new_ent.str = int(result.group(1))
-                new_ent.dex = int(result.group(2))
-                new_ent.wis = int(result.group(3))
-                new_ent.con = int(result.group(4))
-                new_ent.int = int(result.group(5))
-                new_ent.cha = int(result.group(6))
+            line_matched = check_living(new_ent, line)
+            if line_matched:
                 continue
             # player doesn't have anything extra over living for now
     return (entities, max_uid)

@@ -109,16 +109,72 @@ class Living(Entity):
         self.max_mp = 10
         self.status_msgs = []
         self.vision_range = 5
-        # new
         self.level = 0
         self.hit_dice = "2d4"
         self.race = "creature"
-        self.str = 0
-        self.dex = 0
-        self.wis = 0
-        self.con = 0
-        self.int = 0
-        self.cha = 0
+        # new
+        self.attrib = {
+            "str": (10, 0),
+            "dex": (10, 0),
+            "con": (10, 0),
+            "int": (10, 0),
+            "wis": (10, 0),
+            "cha": (10, 0) }
+        self.ac = {
+            "total": 0,
+            "base": 0,
+            "misc": 0 }
+        self.fortitude = {
+            "total": 0,
+            "base": 0,
+            "magic": 0,
+            "tmp": 0 }
+        self.reflex = {
+            "total": 0,
+            "base": 0,
+            "magic": 0,
+            "tmp": 0 }
+        self.will = {
+            "total": 0,
+            "base": 0,
+            "magic": 0,
+            "tmp": 0 }
+        self.pclass = "fighter"
+        self.alignment = "neutral good"
+        self.diety = "none"
+        self.size = "medium"
+        self.age = 21
+        self.gender = "male"
+        self.height = "6'2\""
+        self.subdual_msg = 0
+        self.arcane_spell_failure = 0
+        self.armour_check_penalty = -4
+        self.speed = 20
+        self.base_attack_bonus = 1
+        self.melee_attack_bonus = {
+            "total": 3,
+            "misc": 0,
+            "tmp": 0 }
+        self.ranged_attack_bonus = {
+            "total": 2,
+            "misc": 0,
+            "tmp": 0 }
+        self.eq = {
+            "left_hand": "",
+            "right_hand": "",
+            "armour": "",
+            "helm": "" }
+        self.skills = []
+        self.spells = []
+        self.feats = []
+        self.ammunition = []
+        self.inventory = []
+        self.lift = {
+            "over_head": 200,
+            "off_ground": 600,
+            "push_drag": 1000 }
+        self.exp = 0
+        self.money = 10
 
     def can_move(self):
         can_move = True
@@ -140,6 +196,22 @@ class Living(Entity):
 
     def remove_status(self, status_msg):
         self.status_msgs.remove(status_msg)
+
+    def attack_roll(self, melee=True, target_size="medium", range_pen=0):
+        # d20 + attack_bonus
+        sizes = {"tiny": 2, "small": 1, "medium": 0, "large": -1,
+            "huge": -2, "gargantuan": -4}}
+        size_mod = sizes[target_size]
+        if melee: attribute = "str" else: attribute = "dex"
+        attrib, ability_mod = self.attrib[attribute]
+        attack_bonus = self.base_attack_bonus + ability_mod + size_mod
+        # attack_bonus (melee) = base_attack_bonus + str_mod + size_mod
+        if melee:
+            attack_bonus = self.base_attack_bonus + str_mod + size_mod
+        # attack_bonus (ranged) = base_attack_bonus + dex_mod + size_mod
+        #   + range_penalty
+        else:
+            attack_bonus = self.base_attack_bonus + str_mod + size_mod
 
     """
     This function can be used to heal or dmg a target.

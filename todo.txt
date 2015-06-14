@@ -1,20 +1,19 @@
 * character info:
-    * race      < living (this will be the "type" dog, human, elf, bear...)
-        * store and read
-    * level     < living
-        * store and read
-    * hit dice  < living
-        * store and read
-    * ability scores: str, dex, wis, con, int, cha      < living
-        * store and read
-    * class     < humanoid
+    * actually implement: race, level, hit_dice, ability scores...
+    * actually implement: ac, fortitude, reflex, will
+    * size: read/write      < living
+    * implement attack roll:
+        d20 + attack_bonus
+        attack_bonus (melee) = base_attack_bonus + str_modifier + size_mod
+        attack_bonus (ranged) = base_attack_bonus + dex_mod + size_mod +
+            range_penalty
+    * class     < err... that's class dependent
     * proficiency bonus     < humanoid
     * equipment: armour, helm, weapon/shield        < humanoid
     * display the info (like the user types "score")
     * write up a test function for it
         x test humanoid
         * (still have to add more stuff for humanoid)
-    
 * get entities to die properly
     * give experience to the attacker (for living targets only)
     * make items drop
@@ -29,6 +28,23 @@
     * need to figure out how to apply known spells to an entity
 * maybe move some functions that involve entities into control/entities.py
 * implement more tests, and clean up the tests directory
+
+
+8/31
+    x ac, fortitude, reflex, will
+        x read/write
+
+
+8/29
+* character info:
+    x race      < living (this will be the "type" dog, human, elf, bear...)
+        x store and read
+    x level     < living
+        x store and read
+    x hit dice  < living
+        x store and read
+    x ability scores: str, dex, wis, con, int, cha      < living
+        x store and read
 
 
 8/22

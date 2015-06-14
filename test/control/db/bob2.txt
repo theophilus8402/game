@@ -16,4 +16,6 @@ level: 2
 hit_dice: 2d4
 race: human
 str: 15 dex: 14 wis: 12 con: 13 int: 14 cha: 11
+ac: 16
+fortitude: 13 reflex: 14 will: 15
 -------------------

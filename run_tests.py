@@ -1,25 +1,20 @@
 #!/usr/bin/python3.4
 
-#import control.roll
 import unittest
-#import test.testRoll
-
-#roll(num_die, sides, modifier)
-#class test.roll.TestSequenceFunctions(unittest.TestCase)
+import argparse
 
 if __name__ == '__main__':
-    #stuff = test.roll.TestSequenceFunctions()
-    #unittest.main()
 
-    #loader = unittest.TestLoader()
-    #loader.discover("test")
-    #loader.loadTestsFromModule("test.testRoll")
+    parser = argparse.ArgumentParser("Unit tests.")
+    parser.add_argument("-m", default="all", help="module")
+    args = parser.parse_args()
+    #print(args.m)
 
-    """
-    suite = unittest.TestLoader().discover('test', top_level_dir='.')
-    #suite = unittest.TestLoader().loadTestsFromModule("test")
-    unittest.TextTestRunner(verbosity=2).run(suite)
-    """
-
-    suite = unittest.TestLoader().discover('test', top_level_dir='.')
+    mods = {
+        "db": "test/control/db",
+        "control": "test/control",
+        "model": "test/model",
+        "all": "test",
+    }
+    suite = unittest.TestLoader().discover(mods[args.m], top_level_dir='.')
     unittest.TextTestRunner(verbosity=2).run(suite)

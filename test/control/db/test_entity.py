@@ -37,6 +37,10 @@ class entity_humanoid(unittest.TestCase):
         self.assertEqual(self.bob.con, 13)
         self.assertEqual(self.bob.int, 14)
         self.assertEqual(self.bob.cha, 11)
+        self.assertEqual(self.bob.ac, 16)
+        self.assertEqual(self.bob.fortitude, 13)
+        self.assertEqual(self.bob.reflex, 14)
+        self.assertEqual(self.bob.will, 15)
 
     def determine_hash(self, file_name):
         m = hashlib.md5()
