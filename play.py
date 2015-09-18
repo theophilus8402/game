@@ -40,6 +40,7 @@ def make_sword():
     sword.critical_range = 19
     sword.critical_dmg = 3
     sword.range_increment = 0
+    sword.attack_bonus = 1
     sword.base_cost = 10
     sword.weapon_category = "martial"
     sword.melee = True
@@ -134,6 +135,13 @@ if __name__ == "__main__":
     plate = make_plate()
     dog = make_dog()
     bob = make_bob()
+    bob.wield("left", sword)
 
     for bab in bob.base_attack_bonus:
         bob.attack_roll(bab, melee=True)
+
+    bob.unwield("left")
+
+    for bab in bob.base_attack_bonus:
+        bob.attack_roll(bab, melee=True)
+

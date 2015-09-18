@@ -9,14 +9,9 @@
     * hit dice
     * check for new spells/ability point
     * check for new feats/skill points/base attack bonus/base saving throws
-* attack roll   (*** currently working on this ***)
-    * attack roll
-        size_mod(of attacker)
-    * AC
-        size_mod(of target)
-    * equipment bonuses (*** need to work on this ***)
-    * multiple attacks
-    * saving rolls
+* AC: size_mod(of target)
+    * need to do AC bonus from shield
+* saving rolls
 * moving
     * take into account how far the user can move
     * check to make sure the entity has not impairemen
@@ -64,6 +59,12 @@
     * need to figure out how to apply known spells to an entity
 * maybe move some functions that involve entities into control/entities.py
 * implement more tests, and clean up the tests directory
+
+
+9/19
+x attack roll
+    x attack roll
+    x equipment bonuses
 
 
 9/18

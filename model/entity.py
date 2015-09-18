@@ -153,20 +153,18 @@ class Living(Entity):
         self.arcane_spell_failure = 0
         self.armour_check_penalty = -4
         self.speed = 20
-        self.base_attack_bonus = 1
-        self.melee_attack_bonus = {
+        self.attack_bonus = {
             "total": 3,
-            "misc": 0,
-            "tmp": 0 }
-        self.ranged_attack_bonus = {
-            "total": 2,
-            "misc": 0,
-            "tmp": 0 }
+            "base": None,
+            "misc": (0, None),  # first num will be the total, then []
+                                #   of things that give the att bonus
+            }
         self.eq = {
-            "left_hand": "",
-            "right_hand": "",
-            "armour": "",
-            "helm": "" }
+            "left_hand": None,
+            "right_hand": None,
+            "armour": None,
+            "helm": None,
+            }
         self.skills = []
         self.spells = []
         self.feats = []
@@ -214,9 +212,11 @@ class Living(Entity):
         attrib, ability_mod = self.attrib[attribute]
 
         size_mod = model.util.size_modifiers[self.size]
+        misc_attack_bonus, misc_list = self.attack_bonus["misc"]
 
         # attack_bonus (melee) = base_attack_bonus + str_mod + size_mod
-        attack_bonus = base_attack_bonus + ability_mod + size_mod
+        attack_bonus = base_attack_bonus + ability_mod + size_mod \
+            + misc_attack_bonus
         # attack_bonus (ranged) = base_attack_bonus + dex_mod + size_mod
         #   + range_penalty
         if not melee:
@@ -233,8 +233,27 @@ class Living(Entity):
         if self.eq.get(hand) is None:
             # there's nothing in that hand, so we can go ahead and wield it
             self.eq[hand] = item
-            # TODO: add the weapons attack bonus to the wielder's misc list
             # need to check if the item even has an attack bonus
+            if hasattr(item, "attack_bonus"):
+                total, misc_list = self.attack_bonus["misc"]
+                total += item.attack_bonus
+                if misc_list is None:
+                    misc_list = []
+                misc_list.append(item)
+                self.attack_bonus["misc"] = (total, misc_list)
+            #TODO: handle AC bonuses and other stuff
+        #TODO: gotta figure out two-handed weapons
+
+    def unwield(self, hand):
+        hand = "{}_hand".format(hand)
+        if self.eq.get(hand) is not None:
+            item = self.eq[hand]
+            self.eq[hand] = None
+            if hasattr(item, "attack_bonus"):
+                misc_attack_bonus, misc_list = self.attack_bonus["misc"]
+                misc_attack_bonus -= item.attack_bonus
+                misc_list.remove(item)
+                self.attack_bonus["misc"] = (misc_attack_bonus, misc_list)
 
     """
     This function can be used to heal or dmg a target.
