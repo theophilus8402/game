@@ -121,3 +121,40 @@ def check_level_up(cur_level, current_xp):
     """
     return current_xp >= level_xps[cur_level + 1]
 
+def get_class_skill_max_ranks(level):
+    class_skill_max_ranks = [0]
+    class_skill_max_ranks.extend([n for n in range(4, 24)])
+    if level >= len(class_skill_max_ranks):
+        # we've gone over our level limit, so we're going to return
+        #   the highest number
+        level = len(class_skill_max_ranks) - 1
+    return class_skill_max_ranks[level]
+
+def get_cross_class_skill_max_ranks(level):
+    cross_max_ranks = [0]
+    cross_max_ranks.extend([n/2 for n in range(4, 24, 1)])
+    if level >= len(cross_max_ranks):
+        # we've gone over our level limit, so we're going to return
+        #   the highest number
+        level = len(cross_max_ranks) - 1
+    return cross_max_ranks[level]
+
+def check_new_feat_for_level(level):
+    new_feat_per_level = {
+        1: True,
+        3: True,
+        6: True,
+        9: True,
+        12: True,
+        15: True,
+        18: True,
+    }
+    return getattr(new_feat_per_leve, level, False)
+
+def check_for_new_attrib(level):
+    if level == 0:
+        level = 1
+    return (level % 4) == 0
+
+size_modifiers = {"colossal": -8, "gargantuan": -4, "huge": -2, "large": -1,
+            "medium": 0, "small": 1, "tiny": 2, "diminutive": 4, "fine": 8}

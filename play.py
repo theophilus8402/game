@@ -2,10 +2,10 @@
 
 import model.entity
 import model.tile
+import model.util
 import control.db.entity
 
-if __name__ == "__main__":
-
+def make_shoe():
     shoe = model.entity.Entity()
     shoe.type = "entity"
     shoe.uid = 20
@@ -19,9 +19,10 @@ if __name__ == "__main__":
     shoe.weight = 1
     shoe.volume = .5
     shoe.friction = .1
-    basic_entities = {}
-    basic_entities[shoe.name] = shoe
+    return shoe
 
+
+def make_sword():
     sword = model.entity.Weapon()
     sword.uid = 21
     sword.name = "sword"
@@ -47,9 +48,10 @@ if __name__ == "__main__":
     sword.size = "medium"
     sword.reach = False
     sword.two_handed = False
-    weapon_entities = {}
-    weapon_entities[sword.name] = sword
+    return sword
 
+
+def make_plate():
     plate = model.entity.Armour()
     plate.uid = 23
     plate.name = "plate"
@@ -70,9 +72,10 @@ if __name__ == "__main__":
     plate.speed = (30, 20)
     plate.shield = False
     plate.armour_type = "heavy"
-    armour_entities = {}
-    armour_entities[plate.name] = plate
+    return plate
 
+
+def make_dog():
     dog = model.entity.Living()
     dog.uid = 44
     dog.name = "dog"
@@ -89,10 +92,11 @@ if __name__ == "__main__":
     dog.max_mp = 0
     #dog.status_msgs = []
     dog.status_msgs = ["dumb", "hungry", "lost balance"]
-    living_entities = {}
-    living_entities[dog.name] = dog
+    return dog
 
-    bob = model.entity.Player()
+
+def make_bob():
+    bob = model.entity.Humanoid()
     bob.uid = 1
     bob.name = "bob"
     bob.symbol = "B"
@@ -109,30 +113,27 @@ if __name__ == "__main__":
     bob.vision_range = 6
     #bob.status_msgs = []
     bob.status_msgs = ["lost balance"]
-    living_entities[bob.name] = bob
 
-    pdog = model.entity.Player()
-    dog.world = model.tile.World()
-    dog.world.living_ents[dog.name] = dog
-    dog.world.tiles[dog.cur_loc] = model.tile.Tile()
-    pdog.socket = "a socket"
-    print("prior to transfer ents: {}".format(dog.world.living_ents))
-    model.entity.transfer_living_to_player(dog, pdog)
-    del(dog)
-    print("after transfer ents: {}".format(pdog.world.living_ents))
-    print("{} {} {} {} {} {}".format(pdog.uid, pdog.name, pdog.symbol,
-        pdog.short_desc, pdog.status_msgs, pdog.vision_range))
+    bob.pclass = "fighter"
+    bob.level = 10
+    bob.set_attrib("str", 14)
+    bob.set_attrib("dex", 15)
+    bob.set_attrib("con", 13)
+    bob.set_attrib("int", 11)
+    bob.set_attrib("wis", 11)
+    bob.set_attrib("cha", 10)
+    bob.base_attack_bonus = model.util.get_bab(bob.pclass, bob.level)
+    bob.size = "small"
+    return bob
 
-    """
-    #entities = control.db.entity.load_entities("pent.txt")
-    control.db.entity.save_entities(basic_entities, "basic_ents.txt")
-    control.db.entity.save_entities(weapon_entities, "weapon_ents.txt")
-    control.db.entity.save_entities(armour_entities, "armour_ents.txt")
-    control.db.entity.save_entities(living_entities, "living_ents.txt")
 
-    can_move, reason = dog.can_move()
-    if can_move:
-        print("The doggie can move!")
-    else:
-        print("Drat! He can't move: {}".format(reason))
-    """
+if __name__ == "__main__":
+
+    shoe = make_shoe()
+    sword = make_sword()
+    plate = make_plate()
+    dog = make_dog()
+    bob = make_bob()
+
+    for bab in bob.base_attack_bonus:
+        bob.attack_roll(bab, melee=True)

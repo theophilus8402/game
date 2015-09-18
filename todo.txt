@@ -1,16 +1,39 @@
 * model/basics.py
     * get_bab
-        x implement
-        * test
         * integrate
     * get_base_save_bonus
-        x implement
-        * test
         * integrate
     * check_level_up
-        x implement
-        * test
         * integrate
+* level up
+    * hit dice
+    * check for new spells/ability point
+    * check for new feats/skill points/base attack bonus/base saving throws
+* attack roll   (*** currently working on this ***)
+    * attack roll
+        size_mod(of attacker)
+    * AC
+        size_mod(of target)
+    * equipment bonuses (*** need to work on this ***)
+    * multiple attacks
+    * saving rolls
+* moving
+    * take into account how far the user can move
+    * check to make sure the entity has not impairemen
+        * model.living.can_move([possible impediments?])
+    * model.basic.move -> change it's location in it's info and in the
+        world's info
+    * control.living_move (checks to make sure the ent can move)
+    * control.pushed_move (checks if ent can be pushed)
+    * control.magic_move (different types of magical movement?)
+    * control.forced_move (this is like a "god" moving the object)
+* dmg
+* equiping equipment    (*** working on this as well as part of attack_roll)
+    * model.entity.humanoid.wield(hand, weapon/shield)
+    * model.entity.humanoid.wear(armour/helm/ring/amulet/earing)
+        * these update apropriate info in different places
+    * model.entity.humanoid.unwield(hand)
+    * model.entity.humanoid.remove(armour/helm/ring/amulet/earing)
 * character info:
     * actually implement: race, level, hit_dice, ability scores...
     * actually implement: ac, fortitude, reflex, will
@@ -41,6 +64,17 @@
     * need to figure out how to apply known spells to an entity
 * maybe move some functions that involve entities into control/entities.py
 * implement more tests, and clean up the tests directory
+
+
+9/18
+* model/basics.py
+    * get_bab
+        x test
+    * get_base_save_bonus
+        x test
+    * check_level_up
+        x test
+
 
 9/17
 * model/basics.py

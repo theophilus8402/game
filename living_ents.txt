@@ -16,8 +16,8 @@ level: 2
 hit_dice: 2d4
 race: human
 str: 15 dex: 14 wis: 12 con: 13 int: 14 cha: 11
-ac: {'total': 0, 'misc': 0, 'base': 0}
-fortitude: {'total': 0, 'tmp': 0, 'magic': 0, 'base': 0} reflex: {'total': 0, 'tmp': 0, 'magic': 0, 'base': 0} will: {'total': 0, 'tmp': 0, 'magic': 0, 'base': 0}
+ac: {'total': 0, 'base': 0, 'misc': 0}
+fortitude: {'total': 0, 'base': 0, 'magic': 0, 'tmp': 0} reflex: {'total': 0, 'base': 0, 'magic': 0, 'tmp': 0} will: {'total': 0, 'base': 0, 'magic': 0, 'tmp': 0}
 -------------------
 type: living
 uid: 5
@@ -37,6 +37,6 @@ level: 1
 hit_dice: 2d4
 race: creature
 str: 10 dex: 14 wis: 8 con: 11 int: 6 cha: 12
-ac: {'total': 0, 'misc': 0, 'base': 0}
-fortitude: {'total': 0, 'tmp': 0, 'magic': 0, 'base': 0} reflex: {'total': 0, 'tmp': 0, 'magic': 0, 'base': 0} will: {'total': 0, 'tmp': 0, 'magic': 0, 'base': 0}
+ac: {'total': 0, 'base': 0, 'misc': 0}
+fortitude: {'total': 0, 'base': 0, 'magic': 0, 'tmp': 0} reflex: {'total': 0, 'base': 0, 'magic': 0, 'tmp': 0} will: {'total': 0, 'base': 0, 'magic': 0, 'tmp': 0}
 -------------------

@@ -3,6 +3,7 @@
 import math
 import queue
 import control.roll
+import model.util
 
 """
 Types of Entities:
@@ -69,6 +70,7 @@ class Weapon(Entity):
         # weapon dmg (2d6)
         self.die_to_roll = 0
         self.dmg_modifier = 0
+        self.attack_bonus = 0
         self.critical_range = 20    # can be 19-20
         self.critical_dmg = 2       # x2
         self.range_increment = 0    # stuff for projectiles
@@ -106,6 +108,7 @@ class Living(Entity):
     def __init__(self):
         Entity.__init__(self)
         self.type = "living"      # the different entity classes
+        self.pclass = "fighter"
         self.cur_mp = 0
         self.max_mp = 10
         self.status_msgs = []
@@ -140,7 +143,6 @@ class Living(Entity):
             "base": 0,
             "magic": 0,
             "tmp": 0 }
-        self.pclass = "fighter"
         self.alignment = "neutral good"
         self.diety = "none"
         self.size = "medium"
@@ -202,11 +204,8 @@ class Living(Entity):
     def remove_status(self, status_msg):
         self.status_msgs.remove(status_msg)
 
-    def attack_roll(self, melee=True, target_size="medium", range_pen=0):
-        # d20 + attack_bonus
-        sizes = {"tiny": 2, "small": 1, "medium": 0, "large": -1,
-            "huge": -2, "gargantuan": -4}
-        size_mod = sizes[target_size]
+    def attack_roll(self, base_attack_bonus, melee=True, range_pen=0):
+        # att_roll = d20 + base_att_bonus + ability_mod + size_mod + misc
 
         if melee:
             attribute = "str"
@@ -214,8 +213,10 @@ class Living(Entity):
             attribute = "dex"
         attrib, ability_mod = self.attrib[attribute]
 
+        size_mod = model.util.size_modifiers[self.size]
+
         # attack_bonus (melee) = base_attack_bonus + str_mod + size_mod
-        attack_bonus = self.base_attack_bonus + ability_mod + size_mod
+        attack_bonus = base_attack_bonus + ability_mod + size_mod
         # attack_bonus (ranged) = base_attack_bonus + dex_mod + size_mod
         #   + range_penalty
         if not melee:
@@ -223,9 +224,17 @@ class Living(Entity):
 
         d20 = control.roll.roll(1, 20)
         att_roll = d20 + attack_bonus
-        print("attack_bonus = {} + {} = {}".format(d20, attack_bonus,
+        print("attack_roll = {} + {} = {}".format(d20, attack_bonus,
             att_roll))
         return att_roll
+
+    def wield(self, hand, item):
+        hand = "{}_hand".format(hand)
+        if self.eq.get(hand) is None:
+            # there's nothing in that hand, so we can go ahead and wield it
+            self.eq[hand] = item
+            # TODO: add the weapons attack bonus to the wielder's misc list
+            # need to check if the item even has an attack bonus
 
     """
     This function can be used to heal or dmg a target.
