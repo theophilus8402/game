@@ -1,17 +1,32 @@
-* picking up items and putting them in the inventory then wieldiing items only in your inventory
-    * model.tile.find_item("sword") - looks in the current tile for the "item" name
-    * model.entity.get_item(sword) - sword is an actual object, item must be in the current location, item will be put in inventory
-    * change model.entity.wield/unwield/wear/remove - make these functions make sure the item is in the inventory or will be put into the inventory
-* model/basics.py
-    * get_bab * integrate
-    * get_base_save_bonus * integrate
-    * check_level_up * integrate
+Working on:
+    model.tile.add_entity - need to test
+    model.tile.remove_entity - need to test
+    model.entity.entity.change_location
+        - finish implementing
+        - test
+    model.entity.living.get_item
+        - finish implementing
+        - test
+    model.entity.living.drop_item
+        - finish implementing
+        - test
+
+* picking up items and putting them in the inventory then wielding items
+    only in your inventory
+    * model.tile.find_item("sword")
+        - looks in the current tile for the "item" name
+    * model.entity.find_item("sword")
+        - looks in the entity's inventory for the "item" name
+    * model.entity.get_item(sword)
+        - sword is an actual object, item must be in the current location,
+            item will be put in inventory
+    * change model.entity.wield/unwield/wear/remove
+        - make these functions make sure the item is in the inventory or
+            will be put into the inventory
 * level up
     * hit dice
     * check for new spells/ability point
     * check for new feats/skill points/base attack bonus/base saving throws
-* AC: size_mod(of target)
-    * need to do AC bonus from shield
 * saving rolls
 * moving
     * take into account how far the user can move
@@ -24,42 +39,20 @@
     * control.magic_move (different types of magical movement?)
     * control.forced_move (this is like a "god" moving the object)
 * dmg
-* equiping equipment    (*** working on this as well as part of attack_roll)
-    * model.entity.humanoid.wield(hand, weapon/shield)
+x equiping equipment    (*** working on this as well as part of attack_roll)
     * model.entity.humanoid.wear(armour/helm/ring/amulet/earing)
         * these update apropriate info in different places
-    * model.entity.humanoid.unwield(hand)
     * model.entity.humanoid.remove(armour/helm/ring/amulet/earing)
-* character info:
-    * actually implement: race, level, hit_dice, ability scores...
-    * actually implement: ac, fortitude, reflex, will
-    * size: read/write      < living
-    * implement attack roll:
-        d20 + attack_bonus
-        attack_bonus (melee) = base_attack_bonus + str_modifier + size_mod
-        attack_bonus (ranged) = base_attack_bonus + dex_mod + size_mod +
-            range_penalty
-    * class     < err... that's class dependent
-    * proficiency bonus     < humanoid
-    * equipment: armour, helm, weapon/shield        < humanoid
-    * display the info (like the user types "score")
-    * write up a test function for it
-        x test humanoid
-        * (still have to add more stuff for humanoid)
 * get entities to die properly
     * give experience to the attacker (for living targets only)
     * make items drop
     * create a corpse/broken item
     * make it so the dead person can't really do anything
-* implement error messages "properly"
-    * have something do checks and then return a number for the error
-    * then the control/display system will display the error
-        * this can give us flexibility to do visual stuff in the future
-* implement move for living entities (i.e. bob.move() instead of move(bob)
 * spells
     * need to figure out how to apply known spells to an entity
 * maybe move some functions that involve entities into control/entities.py
 * implement more tests, and clean up the tests directory
+
 
 10/1
 x tested wield/unwield, add/remove armour bonus, add/remove attack bonus, die, change_hp
@@ -69,6 +62,13 @@ x tested wield/unwield, add/remove armour bonus, add/remove attack bonus, die, c
 x attack roll
     x attack roll
     x equipment bonuses
+x implement error messages "properly"
+    x have something do checks and then return a number for the error
+    x then the control/display system will display the error
+        x this can give us flexibility to do visual stuff in the future
+x equiping equipment    (*** working on this as well as part of attack_roll)
+    x model.entity.humanoid.wield(hand, weapon/shield)
+    x model.entity.humanoid.unwield(hand)
 
 
 9/18

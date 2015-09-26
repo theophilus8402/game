@@ -14,6 +14,22 @@ class Tile:
         self.coord = (0, 0)
         self.default_symbol = "."
 
+    def add_entity(self, entity):
+        # here, I can check to see if there's enough space for the entity
+        #   or other... stuff...
+        status = 0
+        self.entities.append(entity)
+        return status
+
+    def remove_entity(self, entity):
+        status = 0
+        # make sure the entity was there in the first place
+        if entity in self.entities:
+            self.entities.remove(entity)
+        else:
+            status = 6      # entity wasn't in tile.entities
+        return status
+
     """
     If there is an entity in the tile, it's symbol will be returned.
     If there are no entities, the default_symbol will be returned.

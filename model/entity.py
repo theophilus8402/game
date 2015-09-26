@@ -60,6 +60,25 @@ class Entity:
     def die(self):
         pass
 
+    def change_location(self, location_type, location):
+        """
+        location_type = "tile" or "entity"
+        location = tile or entity
+        This might help with giving an item to another entity...
+        """
+        status = 0
+        if location_type == "tile":
+            self.carried_by = None      # entity has been "dropped"
+            status = location.add_entity(self)   # add the item to the tile
+            self.cur_loc = location.coord
+        elif location_type == "entity":
+            pass
+        # take the item out of the current room
+        #   remove it out of the tile's list
+        #   remove the item's current location
+        #   maybe I have some indication of who's carrying the item???
+        #       item.carried_by = entity    (None when on the ground)
+
 
 # Basic weapon:
 class Weapon(Entity):
@@ -179,8 +198,41 @@ class Living(Entity):
             "over_head": 200,
             "off_ground": 600,
             "push_drag": 1000 }
+        self.carrying = 0   # how much weight we are carrying
+                            #   this will include items wielded and eq
+                            # this will only be modified when we pick
+                            #   stuff up or when we drop it
+                            # we may have to modify it when we cast a
+                            #   feather spell on something...
+        self.carry_max = 0
         self.exp = 0
         self.money = 10
+
+    def get_item(self, item):
+        # check the items current location to make sure it's in the same
+        #   room as the entity
+        # check the weight of the item to make sure we can carry it
+        #   self.carrying + item.weight <= self.carry_max
+        #       add the weight to self.carrying
+        # TODO: sometime in the future I may want to think about volume...
+        # put the item in our inventory
+        # take the item out of the current room
+        #   remove it out of the tile's list
+        #   remove the item's current location
+        #   maybe I have some indication of who's carrying the item???
+        #       item.carried_by = entity    (None when on the ground)
+        pass
+
+    def drop_item(self, item):
+        # check to make sure the item is in the inventory or being wielded
+        #   won't drop worn items... must remove them first
+        # "drop" the item
+        #   add the item to the tile's entity list
+        #   remove the weight from self.carrying
+        #   item.carried_by = None
+        #   set the item's current location
+        #   remove the item from our inventory/wielded stuff
+        pass
 
     def set_attrib(self, name, value):
         mod = math.floor((value-10)/2)
