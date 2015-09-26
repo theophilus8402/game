@@ -147,7 +147,7 @@ def make_bob():
     bob.set_attrib("int", 11)
     bob.set_attrib("wis", 11)
     bob.set_attrib("cha", 10)
-    bob.base_attack_bonus = model.util.get_bab(bob.pclass, bob.level)
+    bob.attack_bonus["base"] = model.util.get_bab(bob.pclass, bob.level)
     bob.size = "small"
     return bob
 
@@ -164,26 +164,29 @@ if __name__ == "__main__":
     print("Wield sword in right hand...")
     bob.wield("left", shield)
     print("Wield shield in left hand...")
+    print()
 
-    for bab in bob.base_attack_bonus:
-        att_bonus = bob.get_attack_bonus(bab, melee=True)
+    for att_bonus in bob.get_attack_bonus(melee=True):
         att_roll = control.roll.attack_roll(att_bonus)
         print("att_roll = {} + {} = {}".format(att_roll-att_bonus,
             att_bonus, att_roll))
+    print()
 
     from view.entity import info
     bob.calculate_ac()
     info.show_ac(bob)
 
+    print()
     bob.unwield("right")
     print("Unwielding right hand...")
-    bob.wield("left", shield)
+    bob.unwield("left")
     print("Unwielding shield in left hand...")
+    print()
 
     info.show_ac(bob)
+    print()
 
-    for bab in bob.base_attack_bonus:
-        att_bonus = bob.get_attack_bonus(bab, melee=True)
+    for att_bonus in bob.get_attack_bonus(melee=True):
         att_roll = control.roll.attack_roll(att_bonus)
         print("att_roll = {} + {} = {}".format(att_roll-att_bonus,
             att_bonus, att_roll))

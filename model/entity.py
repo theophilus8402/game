@@ -208,9 +208,12 @@ class Living(Entity):
     def remove_status(self, status_msg):
         self.status_msgs.remove(status_msg)
 
-    def get_attack_bonus(self, base_attack_bonus, melee=True, range_pen=0):
-        # att_bonus = base_att_bonus + ability_mod + size_mod + misc
-        # we'll do the d20 roll somehwere else
+    def get_attack_bonus(self, melee=True, range_pen=0):
+        """
+        att_bonus = base_att_bonus + ability_mod + size_mod + misc
+        we'll do the d20 roll somehwere else
+        This will return a list of attack bonuses
+        """
 
         if melee:
             attribute = "str"
@@ -221,17 +224,22 @@ class Living(Entity):
         size_mod = model.util.size_modifiers[self.size]
         misc_attack_bonus, misc_list = self.attack_bonus["misc"]
 
-        # attack_bonus (melee) = base_attack_bonus + str_mod + size_mod
-        attack_bonus = base_attack_bonus + ability_mod + size_mod \
-            + misc_attack_bonus
-        # attack_bonus (ranged) = base_attack_bonus + dex_mod + size_mod
-        #   + range_penalty
-        if not melee:
-            attack_bonus += range_pen
+        attack_bonus_list = []
+        for base_attack_bonus in self.attack_bonus["base"]:
+            # attack_bonus (melee) = base_attack_bonus + str_mod + size_mod
+            attack_bonus = base_attack_bonus + ability_mod + size_mod \
+                + misc_attack_bonus
+            # attack_bonus (ranged) = base_attack_bonus + dex_mod + size_mod
+            # + range_penalty
+            if not melee:
+                attack_bonus += range_pen
 
-        return attack_bonus
+            attack_bonus_list.append(attack_bonus)
+
+        return attack_bonus_list
 
     def wield(self, hand, item):
+        status = 0
         hand = "{}_hand".format(hand)
         if self.eq.get(hand) is None:
             # there's nothing in that hand, so we can go ahead and wield it
@@ -245,8 +253,10 @@ class Living(Entity):
                 # currently, I'm assuming shield are the only thing you
                 #   can wield that will give AC bonus
                 self.add_armour_bonus("shield", item.armour_bonus)
-            #TODO: handle AC bonuses and other stuff
+        else:
+            status = 4  # you already have something in that hand
         #TODO: gotta figure out two-handed weapons
+        return status
 
     def add_attack_bonus(self, item):
         total, misc_list = self.attack_bonus["misc"]
@@ -305,7 +315,7 @@ class Living(Entity):
             if bonus_type == "misc":
                 # misc (i.e. spells, rings/amulets...)
                 if item is None:
-                    status = 2
+                    status = 2      # no item given when trying to add a "misc" armour bonus
                 else:
                     misc_amt, misc_list = self.ac["misc"]
                     misc_amt -= amt
@@ -324,6 +334,7 @@ class Living(Entity):
         return status
 
     def unwield(self, hand):
+        status = 0
         hand = "{}_hand".format(hand)
         if self.eq.get(hand) is not None:
             item = self.eq[hand]
@@ -334,6 +345,9 @@ class Living(Entity):
                 # currently, I'm assuming shield are the only thing you
                 #   can wield that will give AC bonus
                 self.remove_armour_bonus("shield", item.armour_bonus, item)
+        else:
+            status = 5      # there's nothing in that hand
+        return status
                 
     """
     This function can be used to heal or dmg a target.
@@ -342,11 +356,17 @@ class Living(Entity):
     the dst_entity.
     """
     def change_hp(self, src_entity, hp_change):
+        status = 0
         self.cur_hp = self.cur_hp + hp_change
         if self.cur_hp <= 0:
-            src_entity.send_msg("You killed {}!".format(self.name))
-            self.send_msg("Oh no! You died!")
+            #src_entity.send_msg("You killed {}!".format(self.name))
+            #self.send_msg("Oh no! You died!")
+            #TODO: change it so we don't send the message here, we have
+            #   control/view send the message
+            status = 3  # means the target died
             self.die()
+            #TODO: give exp to the killer
+        return status
 
     def die(self):
         self.add_status("dead")

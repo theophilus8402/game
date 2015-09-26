@@ -1,3 +1,7 @@
+* picking up items and putting them in the inventory then wieldiing items only in your inventory
+    * model.tile.find_item("sword") - looks in the current tile for the "item" name
+    * model.entity.get_item(sword) - sword is an actual object, item must be in the current location, item will be put in inventory
+    * change model.entity.wield/unwield/wear/remove - make these functions make sure the item is in the inventory or will be put into the inventory
 * model/basics.py
     * get_bab * integrate
     * get_base_save_bonus * integrate
@@ -56,6 +60,9 @@
     * need to figure out how to apply known spells to an entity
 * maybe move some functions that involve entities into control/entities.py
 * implement more tests, and clean up the tests directory
+
+10/1
+x tested wield/unwield, add/remove armour bonus, add/remove attack bonus, die, change_hp
 
 
 9/19
