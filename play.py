@@ -52,6 +52,30 @@ def make_sword():
     return sword
 
 
+def make_shield():
+    shield = model.entity.Armour()
+    shield.uid = 24
+    shield.name = "shield"
+    shield.symbol = "o"
+    shield.cur_loc = (-2, -1)
+    shield.cur_hp = 20
+    shield.max_hp = 20
+    shield.short_desc = "This is a small, wooden shield."
+    shield.long_desc = "This is a nice, small, wooden shield."
+    shield.weight = 5
+    shield.volume = 3
+    shield.friction = 1
+    shield.base_cost = 3
+    shield.armour_bonus = 1
+    shield.max_dex_bonus = None
+    shield.armour_check_penalty = -1
+    shield.arcane_spell_fail = 5
+    shield.speed = None
+    shield.shield = True
+    shield.armour_type = "shield"
+    return shield
+
+
 def make_plate():
     plate = model.entity.Armour()
     plate.uid = 23
@@ -132,16 +156,35 @@ if __name__ == "__main__":
 
     shoe = make_shoe()
     sword = make_sword()
+    shield = make_shield()
     plate = make_plate()
     dog = make_dog()
     bob = make_bob()
-    bob.wield("left", sword)
+    bob.wield("right", sword)
+    print("Wield sword in right hand...")
+    bob.wield("left", shield)
+    print("Wield shield in left hand...")
 
     for bab in bob.base_attack_bonus:
-        bob.attack_roll(bab, melee=True)
+        att_bonus = bob.get_attack_bonus(bab, melee=True)
+        att_roll = control.roll.attack_roll(att_bonus)
+        print("att_roll = {} + {} = {}".format(att_roll-att_bonus,
+            att_bonus, att_roll))
 
-    bob.unwield("left")
+    from view.entity import info
+    bob.calculate_ac()
+    info.show_ac(bob)
+
+    bob.unwield("right")
+    print("Unwielding right hand...")
+    bob.wield("left", shield)
+    print("Unwielding shield in left hand...")
+
+    info.show_ac(bob)
 
     for bab in bob.base_attack_bonus:
-        bob.attack_roll(bab, melee=True)
+        att_bonus = bob.get_attack_bonus(bab, melee=True)
+        att_roll = control.roll.attack_roll(att_bonus)
+        print("att_roll = {} + {} = {}".format(att_roll-att_bonus,
+            att_bonus, att_roll))
 

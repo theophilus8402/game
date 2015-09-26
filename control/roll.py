@@ -14,6 +14,11 @@ def roll(num_die, sides, modifier=0):
     total = total+modifier
     return total
 
+def attack_roll(attack_bonus):
+    d20 = roll(1, 20)
+    att_roll = d20 + attack_bonus
+    return att_roll
+
 if __name__ == "__main__":
 
     """

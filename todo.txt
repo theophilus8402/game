@@ -1,10 +1,7 @@
 * model/basics.py
-    * get_bab
-        * integrate
-    * get_base_save_bonus
-        * integrate
-    * check_level_up
-        * integrate
+    * get_bab * integrate
+    * get_base_save_bonus * integrate
+    * check_level_up * integrate
 * level up
     * hit dice
     * check for new spells/ability point
@@ -14,7 +11,7 @@
 * saving rolls
 * moving
     * take into account how far the user can move
-    * check to make sure the entity has not impairemen
+    * check to make sure the entity has no impairement
         * model.living.can_move([possible impediments?])
     * model.basic.move -> change it's location in it's info and in the
         world's info
