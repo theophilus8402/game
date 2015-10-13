@@ -4,6 +4,23 @@ import model.entity
 import queue
 import sys
 
+def add_entity(tile, entity):
+    # here, I can check to see if there's enough space for the entity
+    #   or other... stuff...
+    status = 0
+    tile.entities.append(entity)
+    return status
+
+
+def remove_entity(tile, entity):
+    status = 0
+    # make sure the entity was there in the first place
+    if entity in tile.entities:
+        tile.entities.remove(entity)
+    else:
+        status = 6      # entity wasn't in tile.entities
+    return status
+
 
 class Tile:
 
@@ -13,22 +30,6 @@ class Tile:
         self.ground = ""    # muddy, water, rough
         self.coord = (0, 0)
         self.default_symbol = "."
-
-    def add_entity(self, entity):
-        # here, I can check to see if there's enough space for the entity
-        #   or other... stuff...
-        status = 0
-        self.entities.append(entity)
-        return status
-
-    def remove_entity(self, entity):
-        status = 0
-        # make sure the entity was there in the first place
-        if entity in self.entities:
-            self.entities.remove(entity)
-        else:
-            status = 6      # entity wasn't in tile.entities
-        return status
 
     """
     If there is an entity in the tile, it's symbol will be returned.
@@ -55,65 +56,3 @@ class Tile:
                 symbol = self.default_symbol
         return symbol
 
-
-class World:
-
-    def __init__(self):
-        stdin = model.entity.Entity()
-        stdin.name = "stdin"
-        stdin.sock = sys.stdin
-        stdin.special_state = False
-        stdin.state = None
-
-        # key is the socket, value is the Entity
-        self.sock_peeps = {}
-        self.sock_peeps[sys.stdin] = stdin
-
-        self.outputs = []
-        self.passwds = {}        # key is name, passwd is value
-
-        self.tiles = {}
-        self.basic_ents = {}
-        self.weapon_ents = {}
-        self.armour_ents = {}
-        self.living_ents = {}
-        self.spells = {}
-
-        # these max uids are the current highest uid
-        # so, to create a new uid, return max_uid++
-        self.max_tile_uid = 0
-        self.max_ent_uid = 0
-
-        self.msgs = []
-
-    def add_msg(self, msg):
-        self.msgs.append(msg)
-
-    def remove_msg(self, msg):
-        self.msgs.remove(msg)
-
-    def run_msgs(self):
-        for msg in self.msgs:
-            if msg.check():
-                recurring = msg.execute()
-                if not recurring:
-                    self.remove_msg(msg)
-
-    def get_new_tile_uid(self):
-        self.max_tile_uid += 1
-        return self.max_tile_uid
-
-    def get_new_ent_uid(self):
-        self.max_ent_uid += 1
-        return self.max_ent_uid
-
-    def find_entity(self, name):
-        name = name.lower()
-        entity = self.living_ents.get(name)
-        if not entity:
-            entity = self.weapon_ents.get(name)
-        if not entity:
-            entity = self.armour_ents.get(name)
-        if not entity:
-            entity = self.basic_ents.get(name)
-        return entity

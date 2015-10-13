@@ -22,7 +22,7 @@ Types of Entities:
 # Most basic class:
 class Entity:
 
-    def __init__(self):
+    def __init__(self, cur_hp=0):
         # stuff stored in db in order
         self.uid = 0 # TODO: implement this more
         self.name = None
@@ -35,8 +35,8 @@ class Entity:
         self.short_desc = ""
         self.long_desc = ""
         self.weight = 0
-        self.volume = 0          # this is how we will block movement
-                            # a 5ftx5ftx10ft room is a max 250ft^3
+        self.volume = 0  # this is how we will block movement
+                         # a 5ftx5ftx10ft room is a max 250ft^3
         self.friction = 0
 
         # stuff not stored in db
@@ -83,8 +83,8 @@ class Entity:
 # Basic weapon:
 class Weapon(Entity):
 
-    def __init__(self):
-        Entity.__init__(self)
+    def __init__(self, cur_hp=0):
+        super(Weapon, self).__init__(cur_hp=cur_hp)
         self.type = "weapon"      # the different entity classes
         # weapon dmg (2d6)
         self.die_to_roll = 0
@@ -136,6 +136,7 @@ class Living(Entity):
         self.hit_dice = "2d4"
         self.race = "creature"
         # new
+
         self.attrib = {
             "str": (10, 0),
             "dex": (10, 0),
@@ -235,7 +236,7 @@ class Living(Entity):
         pass
 
     def set_attrib(self, name, value):
-        mod = math.floor((value-10)/2)
+        mod = math.floor((value - 10) / 2)
         self.attrib[name] = (value, mod)
 
     def can_move(self):
@@ -262,6 +263,7 @@ class Living(Entity):
 
     def get_attack_bonus(self, melee=True, range_pen=0):
         """
+
         att_bonus = base_att_bonus + ability_mod + size_mod + misc
         we'll do the d20 roll somehwere else
         This will return a list of attack bonuses
@@ -279,8 +281,8 @@ class Living(Entity):
         attack_bonus_list = []
         for base_attack_bonus in self.attack_bonus["base"]:
             # attack_bonus (melee) = base_attack_bonus + str_mod + size_mod
-            attack_bonus = base_attack_bonus + ability_mod + size_mod \
-                + misc_attack_bonus
+            attack_bonus = (base_attack_bonus + ability_mod + size_mod 
+                + misc_attack_bonus)
             # attack_bonus (ranged) = base_attack_bonus + dex_mod + size_mod
             # + range_penalty
             if not melee:
@@ -411,8 +413,8 @@ class Living(Entity):
         status = 0
         self.cur_hp = self.cur_hp + hp_change
         if self.cur_hp <= 0:
-            #src_entity.send_msg("You killed {}!".format(self.name))
-            #self.send_msg("Oh no! You died!")
+            src_entity.send_msg("You killed {}!".format(self.name))
+            self.send_msg("Oh no! You died!")
             #TODO: change it so we don't send the message here, we have
             #   control/view send the message
             status = 3  # means the target died

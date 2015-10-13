@@ -1,6 +1,4 @@
 Working on:
-    model.tile.add_entity - need to test
-    model.tile.remove_entity - need to test
     model.entity.entity.change_location
         - finish implementing
         - test
@@ -10,6 +8,23 @@ Working on:
     model.entity.living.drop_item
         - finish implementing
         - test
+
+* eliminate dependencies between modules
+* clean up sockets
+* clean up tasks/main server loop
+* clean up comments
+* use super/get rid of calling init
+* finish/fix/move model.entity.entity.change_location
+
+* model.controller 
+    - this is where we will store all the actions
+    - maybe this is what we will actually make the world into
+        - world = model.controller.World()
+    * move:
+        model.entity.entity.change_location
+        model.entity.living.get_item
+        model.entity.living.drop_item
+        ...
 
 * picking up items and putting them in the inventory then wielding items
     only in your inventory
@@ -52,6 +67,15 @@ x equiping equipment    (*** working on this as well as part of attack_roll)
     * need to figure out how to apply known spells to an entity
 * maybe move some functions that involve entities into control/entities.py
 * implement more tests, and clean up the tests directory
+
+
+10/14
+* model.controller 
+    x move all current world functionality to model.controller.world
+    * move:
+        x model.tile.add_entity - need to test
+        x model.tile.remove_entity - need to test
+
 
 
 10/1

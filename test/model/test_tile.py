@@ -3,24 +3,37 @@
 import unittest
 import sys
 import model.tile
+import model.controller
+import play
 
-class world(unittest.TestCase):
+class tile(unittest.TestCase):
 
     def setUp(self):
-        self.world = model.tile.World()
+        self.world = model.controller.World()
         self.world.passwds["bob"] = "bob123"
-        self.bob = model.entity.Player()
+        self.bob = play.make_bob()
         self.bob.sock = sys.stdout
         self.bob.world = self.world
         self.tile = model.tile.Tile()
-        self.bob.cur_loc = (0, 0)
-        self.world.tiles[(0, 0)] = self.tile
         self.world.max_ent_uid = 5
 
-    def test_get_new_ent_uid(self):
-        self.assertEqual(self.world.get_new_ent_uid(), 6)
-        self.assertEqual(self.world.get_new_ent_uid(), 7)
-        #self.assertFalse(self.world is None)
+        self.sword = play.make_sword()
+
+    def test_addremove_entity(self):
+        model.tile.add_entity(self.tile, self.bob)
+        self.assertEqual(self.tile.entities, [self.bob])
+
+        model.tile.add_entity(self.tile, self.sword)
+        self.assertEqual(self.tile.entities, [self.bob, self.sword])
+
+        model.tile.remove_entity(self.tile, self.bob)
+        self.assertEqual(self.tile.entities, [self.sword])
+
+        self.assertEqual(model.tile.remove_entity(self.tile, self.sword), 0)
+        self.assertEqual(self.tile.entities, [])
+
+        self.assertEqual(model.tile.remove_entity(self.tile, self.sword), 6)
+        #self.assertTrue(False)
 
 
 if __name__ == '__main__':

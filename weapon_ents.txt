@@ -3,7 +3,7 @@ uid: 4
 name: sword
 symbol: -
 cur_loc: (1, 3)
-hp: 8/13
+hp: 0/13
 short_desc: This is a shiny sword.
 long_desc: This is a really shiny sword. It is not floppy.
 weight: 6.0

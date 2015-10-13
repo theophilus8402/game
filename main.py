@@ -1,6 +1,7 @@
 #!/usr/bin/python3.4
 
 import model.tile
+import model.controller
 import model.msg
 import control.spell
 import control.move
@@ -29,7 +30,7 @@ def create_temp_world():
     # create the temporary world (it is a 4x4 world)
     dim = 3
     uuid = 0
-    world = model.tile.World()
+    world = model.controller.World()
     for y in range(-dim, dim+1):
         for x in range(-dim, dim+1):
             world.tiles[(x,y)] = mtile(uuid, (x,y))
@@ -69,7 +70,7 @@ if __name__ == "__main__":
     """
     Now loading the world!
     """
-    world = model.tile.World()
+    world = model.controller.World()
     world.tiles, world.max_tile_uid = control.db.tile.load_tiles(
         "tiles.txt")
     world.basic_ents, basic_uid = control.db.entity.load_entities(
@@ -101,9 +102,9 @@ if __name__ == "__main__":
     world.spells = control.spell.initialize_spells(simple_spells)
 
     #FOR TESTING
-    bob = world.living_ents["bob"]
-    bob.special_state = None
-    print(bob.attack_roll(True, "small", 0))
+    #bob = world.living_ents["bob"]
+    #bob.special_state = None
+    #print(bob.attack_roll(True, "small", 0))
     """
     from datetime import datetime, timedelta
     td = timedelta(seconds=3.5)
@@ -124,7 +125,7 @@ if __name__ == "__main__":
     """
 
     # enter main loop of the game
-    #control.socks.server_loop(world)
+    control.socks.server_loop(world)
 
     control.db.entity.save_entities(world.basic_ents, "basic_ents.txt")
     control.db.entity.save_entities(world.weapon_ents, "weapon_ents.txt")
