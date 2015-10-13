@@ -1,0 +1,5 @@
+user: hit tim
+
+main_loop:
+    check for inputs:
+        world.socket_inputs[socket]

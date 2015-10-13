@@ -1,0 +1,8 @@
+
+class World():
+
+    self.actions = all the possible actions
+    self.action_msgs = a list of action msgs to handle
+    self.entities = this is a collection of entity dictionaries
+    self.tiles = a dictionary of all the tiles, I might break this up
+                    over multiple dictionaries by region

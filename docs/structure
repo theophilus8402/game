@@ -1,0 +1,46 @@
+
+model/              # different class structures
+    entity/         # class structures for entities in the game
+        base.py     # base entity structure, all entities should derive here
+        living.py
+        humanoid.py
+        fighter.py
+        weapon.py
+        armour.py
+        food.py
+        misc.py     # rope, lantern, ladder, shovel (any specialty items)
+    strings/        # trying jon's idea about keeping string literals apart
+        entity/
+            base.py
+            living.py
+            ...
+        spell.py
+        action_msg.py
+        tile.py
+    spell.py        # for spells
+    action_msg.py   # action messages
+    tile.py         # tile is what I'm calling each segment of land
+    world.py        # this will help contain all the information
+
+control/            # the brains of the operation
+
+view/               # display's information
+    text_based/
+        entity/
+        # shows all sorts of stuff like their score sheet, inventory, skills
+        map/
+    
+
+
+May keep "model" as just keeping data
+    * don't want to store functions in the basic structures because I'm
+        going to have a _lot_ of them, and each pointer to a function can
+        add up to big costs
+Model will not import anything from control or view
+May have control keep all/most of the functions
+Control will import things from both model and view
+View will not import anything from model or control
+
+      control
+     /      \
+  model     view

@@ -1,0 +1,64 @@
+check for inputs
+    sources of input:
+        users remotely logged in
+        me at system commandline
+        ai either remotely connected in or as part of the same process
+    what will this generate?
+        a list of msgs:
+            msg:
+                "hit bob"
+                "cast lightning at bob"
+                "n"
+                "ai plan next move" <- ai type stuff
+                "ai set priority gather food"
+            entity that created the msg
+            time msg was created
+            optional time that msg needs to be executed
+        NOTE: before adding the msg to the list, I can check the
+            entity's known skills list to see if he/she can do the it
+        Future: ponder Jon's handle a lil from each person at a time
+
+
+
+in main server loop:
+
+    while continue_loop:
+        readable, writable, exceptional = select.select(
+            world.socket_comms.keys(), world.outputs,
+            world.socket_comms.keys(), timeout)
+
+        misc_readable = get_misc_readable()
+        readable.extend(misc_readable)
+
+        new_action_msgs = get_new_action_msgs(world, readable)
+        world.action_msgs.extend(new_action_msgs)
+
+
+def get_misc_readable():
+    # we might change this in the future
+    misc_readable = world.ai_comms.keys()
+    misc_readable.extend(world.misc_comms.keys())
+    return misc_readable
+
+def get_action_msgs(world, readable_comms):
+
+    action_msgs
+    for connection in readable_comms:
+        msg_text = connection.recv()
+        entity = world.comms(connection)
+        new_action_msg = ActionMsg(msg_text, entity, delay=0 seconds)
+        action_msgs.append(new_action_msg)
+    return action_msgs
+
+    Question: What about getting comms from AI peeps and other odd sources?
+        At the get_inputs() stage, they should? look the same, but behind
+        scenes, connection.recv() for the AI will have that entity actually
+        compute AI type stuff then make some sort of decision.
+
+
+world.comms = a combination of world.socket_comms, ai_comms, and misc_comms
+world.socket_comms = any client socket connections
+world.ai_comms = ai stuff that's not socket related
+world.misc_comms = for now, might only be the server socket and the system
+                        command line interface
+

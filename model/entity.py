@@ -48,14 +48,12 @@ class Entity:
     """
     This function can be used to heal or dmg a target.
     hp_change can be positive to heal someone or negative to hurt someone
-    If the dst_entity dies, we will give exp to the src_entity and kill
-    the dst_entity.
+    the control module will handle what happens when the entities hp falls
+        below 0
     """
     def change_hp(self, src_entity, hp_change):
         self.cur_hp = self.cur_hp + hp_change
-        if self.cur_hp <= 0:
-            src_entity.send_msg("You broke {}!".format(self.name))
-            self.die()
+        return self.cur_hp
 
     def die(self):
         pass
@@ -263,7 +261,6 @@ class Living(Entity):
 
     def get_attack_bonus(self, melee=True, range_pen=0):
         """
-
         att_bonus = base_att_bonus + ability_mod + size_mod + misc
         we'll do the d20 roll somehwere else
         This will return a list of attack bonuses
@@ -403,25 +400,6 @@ class Living(Entity):
             status = 5      # there's nothing in that hand
         return status
                 
-    """
-    This function can be used to heal or dmg a target.
-    hp_change can be positive to heal someone or negative to hurt someone
-    If the dst_entity dies, we will give exp to the src_entity and kill
-    the dst_entity.
-    """
-    def change_hp(self, src_entity, hp_change):
-        status = 0
-        self.cur_hp = self.cur_hp + hp_change
-        if self.cur_hp <= 0:
-            src_entity.send_msg("You killed {}!".format(self.name))
-            self.send_msg("Oh no! You died!")
-            #TODO: change it so we don't send the message here, we have
-            #   control/view send the message
-            status = 3  # means the target died
-            self.die()
-            #TODO: give exp to the killer
-        return status
-
     def die(self):
         self.add_status("dead")
 

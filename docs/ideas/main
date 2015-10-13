@@ -1,0 +1,34 @@
+Time/Turn Based:
+    * because I want the ability to "pause" and be pretty strategic
+    * will give each turn a time limit (30 seconds?) then moves on
+    * can control multiple living entities (each one gets the time limit)
+    * can undo actions taken before the time limit takes place
+        * undo only affects the current entity
+    * must have an end_turn and next_entity action
+    * somehow must buffer actions
+        * show the guy moving around but don't finalize information
+            * guy.temp_loc = (x2, y2)
+            * guy.orig_loc = (x1, y1)
+            * guy.action_stack = [(move n), (move ne), (cast lightning)]
+    * time slicing by region
+        * in a region, order peeps by their initiative (every few rounds?)
+        * the regions will go in a specific order every time
+            * this "solves" the issue of peeps fighting across boarders of
+                boundaries
+        * if 5 actual peeps (one is stealthed and the others don't know)
+            and 6 ai entities in the region
+            * 30s per actual peep   (5x30 = 2.5 min)
+            * 15s per ai peep (hopefully no where near that long, 15x6=1.5)
+            * you tell the person at the end that they have to wait
+                about (5 x 30s) + (6 x 15s) = about 4min
+            * player might be able to see the entities on the screen
+                except for the hidden character, and guess that there's
+                someone else in the region based on time, so we can
+                give them an estimate
+
+
+Not too many people:
+    * if there were too many people in a turn-based game, it might get
+        crazy (maybe have to wait a _really_ long time for next turn)
+    * can have small instances/servers of the game for people to play in
+        small groups

@@ -3,7 +3,6 @@
 import model.entity
 import model.tile
 import model.util
-import control.db.entity
 
 def make_shoe():
     shoe = model.entity.Entity()

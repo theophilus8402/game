@@ -69,6 +69,11 @@ x equiping equipment    (*** working on this as well as part of attack_roll)
 * implement more tests, and clean up the tests directory
 
 
+
+10/29
+* did some more documentation
+
+
 10/14
 * model.controller 
     x move all current world functionality to model.controller.world

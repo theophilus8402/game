@@ -94,14 +94,13 @@ class util(unittest.TestCase):
         self.bob.change_hp(self.bob, 10)
         self.assertEqual(self.bob.cur_hp, 20)
 
-        self.assertFalse("dead" in self.bob.status_msgs)
         self.bob.change_hp(self.bob, -30)
         self.assertEqual(self.bob.cur_hp, -10)
-        self.assertTrue("dead" in self.bob.status_msgs)
 
     def test_die(self):
         #TODO: there might be more to do in the future
-        # But for now, all it's supposed to do is add "dead" to the status_msgs
+        # But for now, all it's supposed to do is add "dead" to the
+        #   status_msgs
         self.assertFalse("dead" in self.bob.status_msgs)
         self.bob.die()
         self.assertTrue("dead" in self.bob.status_msgs)
