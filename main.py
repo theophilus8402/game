@@ -16,7 +16,8 @@ import play
 CMDS_BASIC_MOVEMENT = {"n", "ne", "e", "se", "s", "sw", "w", "nw"}
 CMDS_BASIC_ATTACK = {"hit", "fhit", "cast"}
 CMDS_BASIC_HUMANOID = {"get", "eat", "drink", "wear", "wield", "remove",
-    "unwield", "look", "quit", "exit"}
+    "unwield", "l", "look", "quit", "exit"}
+CMDS_DEBUG = {"dist"}
 
 def get_input_from_players(world, readable):
     for s in readable:
@@ -31,6 +32,7 @@ def get_input_from_players(world, readable):
             else:
                 src_ent.comms.send("Huh? What is {}".format(command))
 
+
 def get_input_from_ai(world):
     for ai in world.ai_entities:
         data = ai.comms.recv()
@@ -43,6 +45,7 @@ def get_input_from_ai(world):
             else:
                 ai.comms.send("{} doesn't know how to {}...".format(
                     ai.name, command))
+
 
 def handle_action_msgs(world):
     continue_loop = True
@@ -61,7 +64,7 @@ def handle_action_msgs(world):
     return continue_loop
 
 
-def get_input_ai(world):
+def run_ai(world):
     ai_input_msgs = []
     tim = world.find_entity("tim")
     if tim:
@@ -70,7 +73,7 @@ def get_input_ai(world):
 
 
 def default_action(world, msg):
-    msg.src_entity.comms.send("Huh? What is \"{}\"?".format(msg.msg))
+    msg.src_entity.comms.send("Unknown world action: \"{}\"?".format(msg.msg))
 
 
 def move(world, msg):
@@ -87,6 +90,9 @@ if __name__ == "__main__":
     world.actions["e"] = move
     world.actions["s"] = move
     world.actions["w"] = move
+    world.actions["dist"] = control.entity.living.action_show_distance
+    world.actions["l"] = control.entity.living.action_look
+    world.actions["look"] = control.entity.living.action_look
     world.player_driven_comms = {}
     world.immediate_action_msgs = queue.Queue()
 
@@ -95,8 +101,10 @@ if __name__ == "__main__":
     world.player_driven_comms[bob.comms.input_handle] = bob
     bob.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
     bob.known_cmds = bob.known_cmds.union(CMDS_BASIC_HUMANOID)
+    bob.known_cmds = bob.known_cmds.union(CMDS_DEBUG)
     model.entity.living.remove_status_msg(bob, "paralyzed")
     play.put(world, bob, (1, 0))
+    print("cur_loc: {}".format(bob.cur_loc))
 
     tim = play.make_tim()
     Humanoid = model.entity.entity.Humanoid
@@ -107,8 +115,10 @@ if __name__ == "__main__":
     Humanoid.run = control.entity.ai.simple_run
     tim.known_cmds = ["n", "e", "s", "w", "hit"]
     tim.run_cmds = ["n", "e", "s", "w", "hit bob"]
+    """
     for i in range(5):
         print(tim.get_next_cmd())
+    """
     tim.comms = control.comm.AI_IO(ai_name=tim.name)
     tim.comms.send("Hey, Tim!")
     world.ai_entities = [tim]
@@ -130,8 +140,8 @@ if __name__ == "__main__":
             world.player_driven_comms, [], [], timeout)
 
         get_input_from_players(world, readable)
-        get_input_from_ai(world)
+        #get_input_from_ai(world)
 
-        get_input_ai(world)
+        #run_ai(world)
 
         continue_loop = handle_action_msgs(world)

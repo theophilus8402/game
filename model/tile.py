@@ -1,8 +1,11 @@
 #!/usr/bin/python3.4
 
-import model.entity
+import math
 import queue
 import sys
+
+import model.entity
+
 
 def add_entity(tile, entity):
     # here, I can check to see if there's enough space for the entity
@@ -22,6 +25,35 @@ def remove_entity(tile, entity):
     return status
 
 
+NORTH = "n"
+EAST = "e"
+SOUTH = "s"
+WEST = "w"
+NORTHEAST = "ne"
+SOUTHEAST = "se"
+SOUTHWEST = "sw"
+NORTHWEST = "nw"
+PHYSICAL = "physical"
+VISION = "vision"
+HEARING = "hearing"
+DEF_DST = 5
+DIAG_DST = math.sqrt(DEF_DST**2 + DEF_DST**2)
+
+
+def get_dist_nearby_tiles(tile1, direction, entity=None, distance_type=PHYSICAL,
+    move_type="walk", object_to_climb=None):
+
+    distance = 0
+
+    if move_type == "walk":  #figure out movement for walking
+        distance = tile1.distances[direction][distance_type]
+    elif move_type == "climb":
+        #figure something out for that
+        pass
+
+    return distance
+
+
 class Tile:
 
     def __init__(self):
@@ -30,6 +62,16 @@ class Tile:
         self.ground = ""    # muddy, water, rough
         self.coord = (0, 0)
         self.default_symbol = "."
+        self.distances = {
+            NORTH : {PHYSICAL : DEF_DST, VISION : DEF_DST, HEARING : DEF_DST},
+            EAST : {PHYSICAL : DEF_DST, VISION : DEF_DST, HEARING : DEF_DST},
+            SOUTH : {PHYSICAL : DEF_DST, VISION : DEF_DST, HEARING : DEF_DST},
+            WEST : {PHYSICAL : DEF_DST, VISION : DEF_DST, HEARING : DEF_DST},
+            NORTHEAST : {PHYSICAL : DIAG_DST, VISION : DIAG_DST, HEARING : DIAG_DST},
+            SOUTHEAST : {PHYSICAL : DIAG_DST, VISION : DIAG_DST, HEARING : DIAG_DST},
+            SOUTHWEST : {PHYSICAL : DIAG_DST, VISION : DIAG_DST, HEARING : DIAG_DST},
+            NORTHWEST : {PHYSICAL : DIAG_DST, VISION : DIAG_DST, HEARING : DIAG_DST},
+        }
 
     """
     If there is an entity in the tile, it's symbol will be returned.

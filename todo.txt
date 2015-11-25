@@ -1,3 +1,7 @@
+* n, s, e, w, ...
+    * get movement working
+
+
 * "hit tim"  action_hit(world, src_ent, dst_ent)
     * can hit
     * world.find(name, distance)
