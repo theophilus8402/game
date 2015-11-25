@@ -1,3 +1,4 @@
+from math import sqrt
 
 fighter_bab = [[0], [1], [2], [3], [4], [5], [6, 1], [7, 2], [8, 3], [9, 4],
     [10, 5], [11, 6, 1], [12, 7, 2], [13, 8, 3], [14, 9, 4], [15, 10, 5],
@@ -158,3 +159,9 @@ def check_for_new_attrib(level):
 
 size_modifiers = {"colossal": -8, "gargantuan": -4, "huge": -2, "large": -1,
             "medium": 0, "small": 1, "tiny": 2, "diminutive": 4, "fine": 8}
+
+def find_distance(coord1, coord2):
+    x1, y1 = coord1
+    x2, y2 = coord2
+    squared_distance = (x2 - x1)**2 + (y2 - y1)**2
+    return sqrt(squared_distance)

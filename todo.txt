@@ -1,3 +1,29 @@
+* "hit tim"  action_hit(world, src_ent, dst_ent)
+    * can hit
+    * world.find(name, distance)
+    * attack_roll
+    * dmg_roll
+    * take away turn action points
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Working on:
     model.entity.entity.change_location
         - finish implementing

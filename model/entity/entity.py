@@ -2,8 +2,10 @@
 
 import math
 import queue
-import control.roll
+import model.roll
 import model.util
+
+KILLED_TARGET = 7
 
 """
 Types of Entities:
@@ -17,6 +19,13 @@ Types of Entities:
         b) the player (these two guys differ significantly in how you
             display/handle information and actions available
 """
+
+def change_hp(dst_ent, hp_delta):
+    status = 0
+    dst_ent.cur_hp += hp_delta
+    if dst_ent.cur_hp <= 0:
+        status = KILLED_TARGET
+    return status
 
 
 # Most basic class:
@@ -128,7 +137,7 @@ class Living(Entity):
         self.pclass = "fighter"
         self.cur_mp = 0
         self.max_mp = 10
-        self.status_msgs = []
+        self.status_msgs = set()
         self.vision_range = 5
         self.level = 0
         self.hit_dice = "2d4"

@@ -1,11 +1,31 @@
 #!/usr/bin/python3.4
 
-import model.entity
+import model.entity.entity
+import model.entity.living
 import model.tile
 import model.util
 
+def mtile(uid, coord):
+    tile = model.tile.Tile()
+    tile.uid = uid
+    tile.coord = coord
+    return tile
+
+
+def make_world():
+    # create the temporary world (it is a 4x4 world)
+    dim = 4
+    uuid = 0
+    world = model.world.World()
+    for y in range(-dim, dim+1):
+        for x in range(-dim, dim+1):
+            world.tiles[(x,y)] = mtile(uuid, (x,y))
+            uuid = uuid+1
+    return world
+
+
 def make_shoe():
-    shoe = model.entity.Entity()
+    shoe = model.entity.entity.Entity()
     shoe.type = "entity"
     shoe.uid = 20
     shoe.name = "shoe"
@@ -22,7 +42,7 @@ def make_shoe():
 
 
 def make_sword():
-    sword = model.entity.Weapon()
+    sword = model.entity.entity.Weapon()
     sword.uid = 21
     sword.name = "sword"
     sword.symbol = "-"
@@ -52,7 +72,7 @@ def make_sword():
 
 
 def make_shield():
-    shield = model.entity.Armour()
+    shield = model.entity.entity.Armour()
     shield.uid = 24
     shield.name = "shield"
     shield.symbol = "o"
@@ -76,7 +96,7 @@ def make_shield():
 
 
 def make_plate():
-    plate = model.entity.Armour()
+    plate = model.entity.entity.Armour()
     plate.uid = 23
     plate.name = "plate"
     plate.symbol = "&"
@@ -100,7 +120,7 @@ def make_plate():
 
 
 def make_dog():
-    dog = model.entity.Living()
+    dog = model.entity.entity.Living()
     dog.uid = 44
     dog.name = "dog"
     dog.symbol = "d"
@@ -114,13 +134,14 @@ def make_dog():
     dog.friction = 5
     dog.cur_mp = 0
     dog.max_mp = 0
-    #dog.status_msgs = []
-    dog.status_msgs = ["dumb", "hungry", "lost balance"]
+    model.entity.living.add_status_msg(dog, "dumb")
+    model.entity.living.add_status_msg(dog, "hungry")
+    model.entity.living.add_status_msg(dog, "lost_balance")
     return dog
 
 
 def make_bob():
-    bob = model.entity.Humanoid()
+    bob = model.entity.entity.Humanoid()
     bob.uid = 1
     bob.name = "bob"
     bob.symbol = "B"
@@ -135,8 +156,7 @@ def make_bob():
     bob.cur_mp = 10
     bob.max_mp = 10
     bob.vision_range = 6
-    #bob.status_msgs = []
-    bob.status_msgs = ["lost balance"]
+    model.entity.living.add_status_msg(bob, "paralyzed")
 
     bob.pclass = "fighter"
     bob.level = 10
@@ -149,6 +169,44 @@ def make_bob():
     bob.attack_bonus["base"] = model.util.get_bab(bob.pclass, bob.level)
     bob.size = "small"
     return bob
+
+
+def make_tim():
+    tim = model.entity.entity.Humanoid()
+    tim.uid = 2
+    tim.name = "tim"
+    tim.symbol = "T"
+    tim.cur_loc = (2, 2)
+    tim.cur_hp = 10
+    tim.max_hp = 10
+    tim.short_desc = "This is Tim."
+    tim.long_desc = "This is Tim. He's not rugged looking."
+    tim.weight = 192
+    tim.volume = 12
+    tim.friction = 10
+    tim.cur_mp = 10
+    tim.max_mp = 10
+    tim.vision_range = 6
+    model.entity.living.add_status_msg(tim, "lost_balance")
+
+    tim.pclass = "fighter"
+    tim.level = 10
+    tim.set_attrib("str", 11)
+    tim.set_attrib("dex", 12)
+    tim.set_attrib("con", 10)
+    tim.set_attrib("int", 18)
+    tim.set_attrib("wis", 16)
+    tim.set_attrib("cha", 13)
+    tim.attack_bonus["base"] = model.util.get_bab(tim.pclass, tim.level)
+    tim.size = "small"
+    return tim
+
+
+def put(world, entity, coord):
+    if coord in world.tiles:
+        tile = world.tiles[coord]
+        tile.entities.append(entity)
+        entity.cur_loc = coord
 
 
 if __name__ == "__main__":

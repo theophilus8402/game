@@ -2,4 +2,36 @@ user: hit tim
 
 main_loop:
     check for inputs:
-        world.socket_inputs[socket]
+        world.socket_inputs[socket] will find it
+        find the command word (the first word in the line)
+        check to see if the entity knows the command word
+            if so, 
+                create the msg object
+                add the msg to world.immediate_actions
+            if no, send a msg to entity saying "huh?"
+
+    handle_msgs:
+        loop world.immediate_actions:  # finds "hit tim" msg
+            actions["hit"](msg) (msg contains "hit tim", and src entity...)
+
+
+action_hit(msg):
+    words = msg.text.split()
+    if len(words) != 2:
+        egads!
+    else:
+        dst_ent_name = words[1]
+    src_ent = msg.src_ent
+    dst_ent = world.find_entity(dst_ent_name, distance=1) 
+                                                # distance lets me say
+                                                # find him in this tile (0),
+                                                # right next to me (1), or
+                                                # within five spaces (5), or
+                                                # anywhere in the world (-1)
+    if dst_ent:     # he's nearby!
+        statusi = CANT_HIT_STATUSI and src_ent.status_msgs # they're sets
+        if statusi:
+            sorry you can't hit him
+        else:
+            # roll for attack
+            # if hit roll for dmg

@@ -1,143 +1,137 @@
-#!/usr/bin/python3.4
+#!/usr/bin/python3
 
-import model.tile
-import model.controller
+import collections
+from datetime import datetime
+import select
+import queue
+
 import model.msg
-import control.spell
-import control.move
-import control.sqldb
-import control.db.spell
-import control.db.entity
-import control.db.tile
-import control.uinput
-import control.socks
-import control.admin
+import model.world
+import control.comm
 import control.mymap
-import curses
+import control.entity.ai
+import control.entity.living
+import play
 
-"""
-This is a temporary function to help setup a world for me.
-This makes a single tile and sets up it's uid and coord.
-"""
-def mtile(uid, coord):
-    tile = model.tile.Tile()
-    tile.uid = uid
-    tile.coord = coord
-    return tile
+CMDS_BASIC_MOVEMENT = {"n", "ne", "e", "se", "s", "sw", "w", "nw"}
+CMDS_BASIC_ATTACK = {"hit", "fhit", "cast"}
+CMDS_BASIC_HUMANOID = {"get", "eat", "drink", "wear", "wield", "remove",
+    "unwield", "look", "quit", "exit"}
+
+def get_input_from_players(world, readable):
+    for s in readable:
+        src_ent = world.player_driven_comms[s]
+        data = src_ent.comms.recv()
+        if data:
+            command = data.split()[0]
+            if command in bob.known_cmds:
+                new_msg = model.msg.ActionMsgs(cmd_word=command,
+                    msg=data, src_entity=src_ent)
+                world.immediate_action_msgs.put(new_msg)
+            else:
+                src_ent.comms.send("Huh? What is {}".format(command))
+
+def get_input_from_ai(world):
+    for ai in world.ai_entities:
+        data = ai.comms.recv()
+        if data:
+            command = data.split()[0]
+            if command in ai.known_cmds:
+                new_msg = model.msg.ActionMsgs(cmd_word=command,
+                    msg=data, src_entity=ai)
+                world.immediate_action_msgs.put(new_msg)
+            else:
+                ai.comms.send("{} doesn't know how to {}...".format(
+                    ai.name, command))
+
+def handle_action_msgs(world):
+    continue_loop = True
+    msg_queue = world.immediate_action_msgs
+    while not msg_queue.empty():
+        msg = msg_queue.get()
+        msg_text = msg.msg
+        src_ent = msg.src_entity
+        if msg_text == "exit":
+            continue_loop = False
+            src_ent.comms.send("Goodbye!  We'll miss you!")
+        else:
+            action = world.actions[msg.cmd_word]
+            action(world, msg)
+        #src_ent.comms.send(msg)     # this just shows what msg was sent
+    return continue_loop
 
 
-def create_temp_world():
-    # create the temporary world (it is a 4x4 world)
-    dim = 3
-    uuid = 0
-    world = model.controller.World()
-    for y in range(-dim, dim+1):
-        for x in range(-dim, dim+1):
-            world.tiles[(x,y)] = mtile(uuid, (x,y))
-            uuid = uuid+1
-    return world
+def get_input_ai(world):
+    ai_input_msgs = []
+    tim = world.find_entity("tim")
+    if tim:
+        msg = tim.run()
+    return ai_input_msgs
 
 
-def create_temp_guy(name, sym, coord, hp, max_hp):
-    # creates entity bob
-    bob = model.tile.Entity()
-    bob.name = name
-    bob.symbol = sym
-    bob.cur_loc = coord
-    bob.cur_hp = hp
-    bob.max_hp = max_hp
-    return bob
+def default_action(world, msg):
+    msg.src_entity.comms.send("Huh? What is \"{}\"?".format(msg.msg))
 
 
-def map_entities(world, entities):
-    for entity_name in entities.keys():
-        entity = entities[entity_name]
-        world.tiles[entity.cur_loc].entities.append(entity)
+def move(world, msg):
+    msg.src_entity.comms.send("Moving {}...".format(msg.cmd_word))
 
 
 if __name__ == "__main__":
 
-    """
-    # Create the temp world:
-    world = create_temp_world()
-    bob = create_temp_guy("Bob", "@", (0, 0), 20, 20)
-    tim = create_temp_guy("Tim", "T", (1, 0), 20, 20)
-    entities = [bob, tim]
-    world.tiles[(0,0)].entities.append(bob)
-    world.tiles[(1,0)].entities.append(tim)
-    """
+    world = play.make_world()
+    world.actions = collections.defaultdict(lambda: default_action)
+    world.actions["hit"] = control.entity.living.action_hit
+    world.actions["fhit"] = control.entity.living.action_hit
+    world.actions["n"] = move
+    world.actions["e"] = move
+    world.actions["s"] = move
+    world.actions["w"] = move
+    world.player_driven_comms = {}
+    world.immediate_action_msgs = queue.Queue()
 
-    """
-    Now loading the world!
-    """
-    world = model.controller.World()
-    world.tiles, world.max_tile_uid = control.db.tile.load_tiles(
-        "tiles.txt")
-    world.basic_ents, basic_uid = control.db.entity.load_entities(
-        "basic_ents.txt")
-    world.weapon_ents, weapon_uid = control.db.entity.load_entities(
-        "weapon_ents.txt")
-    world.armour_ents, armour_uid = control.db.entity.load_entities(
-        "armour_ents.txt")
-    world.living_ents, living_uid = control.db.entity.load_entities(
-        "living_ents.txt")
-    world.max_ent_uid = max(basic_uid, weapon_uid, armour_uid, living_uid)
+    bob = play.make_bob()
+    bob.comms = control.comm.File_IO()
+    world.player_driven_comms[bob.comms.input_handle] = bob
+    bob.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
+    bob.known_cmds = bob.known_cmds.union(CMDS_BASIC_HUMANOID)
+    model.entity.living.remove_status_msg(bob, "paralyzed")
+    play.put(world, bob, (1, 0))
 
-    # TODO: I should figure out a better way to set the dead room
-    world.dead_room = world.tiles[(5, 3)]
+    tim = play.make_tim()
+    Humanoid = model.entity.entity.Humanoid
+    Humanoid.set_next_run_time = control.entity.ai.simple_set_next_run_time
+    tim.cmd_interval = (0, 4)
+    tim.set_next_run_time()
+    Humanoid.get_next_cmd = control.entity.ai.simple_get_next_cmd
+    Humanoid.run = control.entity.ai.simple_run
+    tim.known_cmds = ["n", "e", "s", "w", "hit"]
+    tim.run_cmds = ["n", "e", "s", "w", "hit bob"]
+    for i in range(5):
+        print(tim.get_next_cmd())
+    tim.comms = control.comm.AI_IO(ai_name=tim.name)
+    tim.comms.send("Hey, Tim!")
+    world.ai_entities = [tim]
+    play.put(world, tim, (0, 0))
 
-    # put the entities on the map
-    map_entities(world, world.basic_ents)
-    map_entities(world, world.weapon_ents)
-    map_entities(world, world.living_ents)
-    map_entities(world, world.armour_ents)
+    world.living_ents[bob.name] = bob
+    world.living_ents[tim.name] = tim
 
-    passwds = {}
-    passwds["bob"] = "bob123"
-    passwds["tim"] = "tim123"
-    world.passwds = passwds
+    sword = play.make_sword()
+    play.put(world, sword, (1, 1))
 
-    # initialize spells
-    simple_spells = control.db.spell.load_spells("spells.txt")
-    world.spells = control.spell.initialize_spells(simple_spells)
+    control.mymap.display_map(world, bob)
 
-    #FOR TESTING
-    #bob = world.living_ents["bob"]
-    #bob.special_state = None
-    #print(bob.attack_roll(True, "small", 0))
-    """
-    from datetime import datetime, timedelta
-    td = timedelta(seconds=3.5)
-    msg = model.msg.Msgs(bob, td, "meditate", True)
-    import time
-    n = 0
-    world.add_msg(msg)
-    bob.add_status("meditating")
-    while True:
-        time.sleep(1)
-        print("checking... status_msgs: {} n: {}".format(bob.status_msgs,
-            n))
-        world.run_msgs()
-        n+=1
-        if n>10:
-            bob.remove_status("meditating")
-            break
-    """
+    timeout = .1
+    continue_loop = True
+    while continue_loop:
 
-    # enter main loop of the game
-    control.socks.server_loop(world)
+        readable, writable, exceptional = select.select(
+            world.player_driven_comms, [], [], timeout)
 
-    control.db.entity.save_entities(world.basic_ents, "basic_ents.txt")
-    control.db.entity.save_entities(world.weapon_ents, "weapon_ents.txt")
-    control.db.entity.save_entities(world.armour_ents, "armour_ents.txt")
-    control.db.entity.save_entities(world.living_ents, "living_ents.txt")
+        get_input_from_players(world, readable)
+        get_input_from_ai(world)
 
-    """
-    # commands I've tested:
-    #res_spell = world.spells["resurrection"]
-    #res_spell.cast(res_spell, world, bob, tim)
-    #control.uinput.handle_user_input(world, bob, "cast heal at tim")
-    #control.entity.cast_spell(world, world.entities[0], world.entities[1], "resurrection")
-    #control.admin.make_tile(world, world.entities[0], (3, 0), "2x1")
-    #control.mymap.display_map(world, world.entities[0])
-    """
+        get_input_ai(world)
+
+        continue_loop = handle_action_msgs(world)

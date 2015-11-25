@@ -1,11 +1,11 @@
-import model.entity
+import model.entity.entity
 import model.tile
 import sys
 
 class World:
 
     def __init__(self):
-        stdin = model.entity.Entity()
+        stdin = model.entity.entity.Entity()
         stdin.name = "stdin"
         stdin.sock = sys.stdin
         stdin.special_state = False
@@ -66,4 +66,6 @@ class World:
             entity = self.armour_ents.get(name)
         if not entity:
             entity = self.basic_ents.get(name)
+
+        
         return entity

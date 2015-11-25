@@ -1,7 +1,7 @@
 #!/usr/bin/python3.4
 
 import control.move
-import control.roll
+import model.roll
 import control.admin
 import control.socks
 import control.mymap
