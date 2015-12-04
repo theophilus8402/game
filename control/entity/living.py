@@ -1,12 +1,48 @@
-import model.entity.living
 
+import control.mymap
 from model.entity.living import *
 from model.entity.entity import *
+import model.tile
 from model.util import find_distance
+
 
 #from view.errors import display_error_msg
 
 ERROR_ATTACK_MISSED = 6
+
+def action_look(world, msg):
+    """
+    TODO:
+    In the future, I'd like to be able to look at something, but for now, let's focus
+    on being able to view the map.
+    """
+    control.mymap.display_map(world, msg.src_entity)
+
+
+def action_show_distance(world, msg):
+    """
+    This will be used to show distances between the current tile and the next.
+    This isn't really for general purpose use, but maybe?
+    """
+
+    src_ent = msg.src_entity
+    status_msg_info = {
+        "src_ent" : src_ent,
+    }
+
+    words = msg.msg.split()
+    if len(words) == 2:     # correct number of words
+        direction = words[1]
+        if direction in ["n", "ne", "e", "se", "s", "sw", "w", "nw"]:
+            tile1 = world.tiles[src_ent.cur_loc]
+            distance = model.tile.get_dist_nearby_tiles(tile1, direction)
+
+            # display distance
+            src_ent.comms.send("dist: {}  dir: {}".format(distance, direction))
+        else:
+            status = ERROR_INCORRECT_SYNTAX
+            status_msg_info["bad_direction"] = direction
+            
 
 def action_hit(world, msg):
     """
