@@ -76,20 +76,20 @@ def default_action(world, msg):
     msg.src_entity.comms.send("Unknown world action: \"{}\"?".format(msg.msg))
 
 
-def move(world, msg):
-    msg.src_entity.comms.send("Moving {}...".format(msg.cmd_word))
-
-
 if __name__ == "__main__":
 
     world = play.make_world()
     world.actions = collections.defaultdict(lambda: default_action)
     world.actions["hit"] = control.entity.living.action_hit
     world.actions["fhit"] = control.entity.living.action_hit
-    world.actions["n"] = move
-    world.actions["e"] = move
-    world.actions["s"] = move
-    world.actions["w"] = move
+    world.actions["n"] = control.entity.living.action_move
+    world.actions["nw"] = control.entity.living.action_move
+    world.actions["ne"] = control.entity.living.action_move
+    world.actions["e"] = control.entity.living.action_move
+    world.actions["s"] = control.entity.living.action_move
+    world.actions["se"] = control.entity.living.action_move
+    world.actions["sw"] = control.entity.living.action_move
+    world.actions["w"] = control.entity.living.action_move
     world.actions["dist"] = control.entity.living.action_show_distance
     world.actions["l"] = control.entity.living.action_look
     world.actions["look"] = control.entity.living.action_look

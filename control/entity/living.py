@@ -2,6 +2,7 @@
 import control.mymap
 from model.entity.living import *
 from model.entity.entity import *
+import control.move
 import model.tile
 from model.util import find_distance
 
@@ -9,6 +10,34 @@ from model.util import find_distance
 #from view.errors import display_error_msg
 
 ERROR_ATTACK_MISSED = 6
+
+dir_coord_changes = {
+    "n" : (0, 1),
+    "ne" : (1, 1),
+    "e" : (1, 0),
+    "se" : (1, -1),
+    "s" : (0, -1),
+    "sw" : (-1, -1),
+    "w" : (-1, 0),
+    "nw" : (-1, 1)
+}
+
+def action_move(world, msg):
+
+    src_ent = msg.src_entity
+    words = msg.msg.split()
+
+    if len(words) == 1:     # correct number of words
+        direction = words[0]
+        if direction in dir_coord_changes:  # a proper direction
+            #TODO: Make sure we can move
+            #TODO: Make sure we can move into the room
+            delta_x, delta_y = dir_coord_changes[direction]
+            cur_x, cur_y = src_ent.cur_loc
+            dst_loc = (cur_x + delta_x, cur_y + delta_y)
+            src_ent.comms.send("Moving {}...".format(direction))
+            control.move.move(world, src_ent, src_ent.cur_loc, dst_loc)
+
 
 def action_look(world, msg):
     """
