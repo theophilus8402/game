@@ -1,5 +1,11 @@
+* sight and hearing
+    * Sensory objects
+    * send messages via the sensory objects
+    * distribute the sensory objects
+    * send second/third party msgs
+
 * n, s, e, w, ...
-    * get movement working
+    x get movement working
 
 
 * "hit tim"  action_hit(world, src_ent, dst_ent)
