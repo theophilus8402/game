@@ -16,6 +16,20 @@ Two different methods:
 Coord = namedtuple("Coord", ["x", "y"])
 #Distances = namedtuple("Distances", ["physical", "hearing", "sight"])
 
+class Coord(namedtuple("Coord", "x y")):
+    """
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+    """
+
+    def __add__(self, other_coord):
+        return Coord(self.x + other_coord.x, self.y + other_coord.y)
+
+    def __repr__(self):
+        return "({}, {})".format(self.x, self.y)
+
+
 class Distances(object):
     def __init__(self, physical, hearing, sight):
         self.physical = physical
@@ -25,6 +39,7 @@ class Distances(object):
     def __add__(self, delta):
         return Distances(self.physical + delta.physical, self.hearing +
             delta.hearing, self.sight + delta.sight)
+
 
 class Sense(object):
     def __init__(self, entity, pcoord, distances):
@@ -147,6 +162,11 @@ class Tile(object):
         self.coord = coord
         self.entities = []
         self.senses = []
+
+
+def add_entity_tile(world, entity, coord):
+    tile = get_tile(world, coord)
+    tile.entities.append(entity)
 
 
 class Region(object):
@@ -285,9 +305,9 @@ if __name__ == "__main__":
     make_region("tomorrowland", Coord(-100, -100), Coord(100, 100), world,
         "1", "2")
     bob = Entity("bob", "B", Coord(1, 2))
-    get_tile(world, bob.coord).entities.append(bob)
+    add_entity_tile(world, bob, bob.coord)
     tim = Entity("tim", "T", Coord(8, 2))
-    get_tile(world, tim.coord).entities.append(tim)
+    add_entity_tile(world, tim, tim.coord)
 
     #display_map(12, 12, world)
     
@@ -312,8 +332,10 @@ if __name__ == "__main__":
     display_senses(20, bob, world)
     print(bob)
 
+    """
     with Timer() as t:
         num = 1000
         for i in range(num):
             expand_out_senses(world, bob, 60)
     print("Time to run {} times: {} seconds".format(num, t.interval))
+    """
