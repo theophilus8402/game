@@ -57,7 +57,7 @@ def remove_sense_tile(sense, tile):
     try:
         tile.senses.remove(sense)
     except:
-        print("Something bad happened... {}".format(tile.senses))
+        print("Can't remove: {} from {}".format(sense, tile.coord))
 
 
 def add_sense_tile(sense, tile):
@@ -176,16 +176,16 @@ class Region(object):
         self.entities = []
 
 
-def display_map(width, height, world):
-    for y in range(height):
+def display_map(radius, center, world):
+    for y in range(center.y - radius, center.y + radius).__reversed__():
         line = []
-        for x in range(width):
+        for x in range(center.x - radius, center.x + radius):
             coord = Coord(x, y)
             tile = get_tile(world, coord)
             if tile:
                 symbol = get_symbol(tile)
             else:
-                symbol = "x"
+                symbol = " "
             line.append(symbol)
         print("".join(line))
 
@@ -219,11 +219,14 @@ def display_senses(radius, entity, world):
         for x in range(cx - radius, cx + radius + 1):
             coord = Coord(x, y)
             tile = get_tile(world, coord)
-            sense = get_entity_sense_tile(entity, tile)
-            if sense:
-                symbol = get_sense_symbol(sense)
+            if tile:
+                sense = get_entity_sense_tile(entity, tile)
+                if sense:
+                    symbol = get_sense_symbol(sense)
+                else:
+                    symbol = "."
             else:
-                symbol = "."
+                symbol = " "
             line.append(symbol)
         print("".join(line))
 
