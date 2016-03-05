@@ -23,6 +23,9 @@ class Coord(namedtuple("Coord", "x y")):
         self.y = y
     """
 
+    def __sub__(self, other_coord):
+        return Coord(other_coord.x - self.x, other_coord.y - self.y)
+
     def __add__(self, other_coord):
         return Coord(self.x + other_coord.x, self.y + other_coord.y)
 
@@ -150,6 +153,7 @@ class Entity(object):
         self.name = name
         self.symbol = symbol
         self.coord = coord
+        self.peeps_nearby = set()
 
     def __repr__(self):
         return "{} at {}".format(self.name, self.coord)
@@ -192,7 +196,7 @@ def display_map(radius, center, world):
 
 def get_entity_sense_tile(entity, tile):
     for sense in tile.senses:
-        if sense.entity == entity:
+        if sense.entity.name == entity.name:
             return sense
 
 
@@ -335,10 +339,10 @@ if __name__ == "__main__":
     display_senses(20, bob, world)
     print(bob)
 
-    """
     with Timer() as t:
-        num = 1000
+        num = 100000
         for i in range(num):
             expand_out_senses(world, bob, 60)
     print("Time to run {} times: {} seconds".format(num, t.interval))
+    """
     """

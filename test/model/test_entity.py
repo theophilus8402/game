@@ -1,7 +1,9 @@
 #!/usr/bin/python3.4
 
 import unittest
+
 import model.entity
+from model.entity.status_effects import *
 import play
 
 class util(unittest.TestCase):
@@ -32,24 +34,23 @@ class util(unittest.TestCase):
 
     def test_can_move(self):
         # NOTE: also testing add_status()
-        self.bob.status_msgs = []
         self.assertEqual(self.bob.can_move(), (True, None))
 
-        self.bob.add_status("stupid")
-        self.assertEqual(self.bob.status_msgs, ["stupid"])
+        add_status_effect(self.bob, Afflictions.stupid)
+        self.assertEqual(self.bob.status_effects, {Afflictions.stupid})
         self.assertEqual(self.bob.can_move(), (True, None))
 
-        self.bob.add_status("paralyzed")
-        self.assertEqual(self.bob.can_move(), (False, "paralyzed"))
+        add_status_effect(self.bob, Afflictions.paralysis)
+        self.assertEqual(self.bob.can_move(), (False, Afflictions.paralysis))
 
-        self.bob.remove_status("stupid")
-        self.assertEqual(self.bob.status_msgs, ["paralyzed"])
-        self.bob.remove_status("paralyzed")
-        self.assertEqual(self.bob.status_msgs, [])
+        remove_status_effect(self.bob, Afflictions.stupid)
+        self.assertEqual(self.bob.status_effects, {Afflictions.paralysis})
+        remove_status_effect(self.bob, Afflictions.paralysis)
+        self.assertEqual(self.bob.status_effects, set())
         self.assertEqual(self.bob.can_move(), (True, None))
 
-        self.bob.add_status("lost balance")
-        self.assertEqual(self.bob.can_move(), (False, "lost balance"))
+        add_status_effect(self.bob, Afflictions.lost_balance)
+        self.assertEqual(self.bob.can_move(), (False, Afflictions.lost_balance))
 
     def test_get_attack_bonus(self):
         attack_bonus_list = self.bob.get_attack_bonus()
@@ -101,9 +102,9 @@ class util(unittest.TestCase):
         #TODO: there might be more to do in the future
         # But for now, all it's supposed to do is add "dead" to the
         #   status_msgs
-        self.assertFalse("dead" in self.bob.status_msgs)
+        self.assertFalse(Afflictions.dead in self.bob.status_effects)
         self.bob.die()
-        self.assertTrue("dead" in self.bob.status_msgs)
+        self.assertTrue(Afflictions.dead in self.bob.status_effects)
 
     def test_calculate_ac(self):
         self.bob.ac["armour"] = 0

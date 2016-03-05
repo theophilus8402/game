@@ -14,6 +14,7 @@ if __name__ == '__main__':
         "db": "test/control/db",
         "control": "test/control",
         "model": "test/model",
+        "afflictions": "test/model/entity",
         "all": "test",
     }
     suite = unittest.TestLoader().discover(mods[args.m], top_level_dir='.')

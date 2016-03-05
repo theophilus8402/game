@@ -156,7 +156,6 @@ def make_bob():
     bob.cur_mp = 10
     bob.max_mp = 10
     bob.vision_range = 6
-    model.entity.living.add_status_msg(bob, "paralyzed")
 
     bob.pclass = "fighter"
     bob.level = 10

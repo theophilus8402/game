@@ -2,10 +2,12 @@
 
 import math
 import queue
+
 import model.roll
 import model.util
+from model.info import Status
+from model.entity.status_effects import *
 
-KILLED_TARGET = 7
 
 """
 Types of Entities:
@@ -24,7 +26,7 @@ def change_hp(dst_ent, hp_delta):
     status = 0
     dst_ent.cur_hp += hp_delta
     if dst_ent.cur_hp <= 0:
-        status = KILLED_TARGET
+        status = Status.killed_target
     return status
 
 
@@ -142,7 +144,9 @@ class Living(Entity):
         self.level = 0
         self.hit_dice = "2d4"
         self.race = "creature"
+
         # new
+        self.status_effects = set()
 
         self.attrib = {
             "str": (10, 0),
@@ -248,25 +252,17 @@ class Living(Entity):
 
     def can_move(self):
         can_move = True
-        reason = None
-        bad_statusi = ["lost balance", "paralyzed"]
-        for bstate in bad_statusi:
-            if bstate in self.status_msgs:
-                can_move = False
-                reason = bstate
-        return (can_move, reason)
+        required_parts = {Body.left_leg, Body.right_leg}
+        status = check_health(self, required_parts)
+        if status:
+            can_move = False
+        return (can_move, status)
 
     #TODO: I think I'm gonna get rid of mp and have some kind of time thing
     def change_mp(self, mp_delta):
         self.cur_mp += mp_delta
         if self.cur_mp > self.max_mp:
             self.cur_mp = self.max_mp
-
-    def add_status(self, status_msg):
-        self.status_msgs.append(status_msg)
-
-    def remove_status(self, status_msg):
-        self.status_msgs.remove(status_msg)
 
     def get_attack_bonus(self, melee=True, range_pen=0):
         """
@@ -410,7 +406,7 @@ class Living(Entity):
         return status
                 
     def die(self):
-        self.add_status("dead")
+        add_status_effect(self, Afflictions.dead)
 
 
 

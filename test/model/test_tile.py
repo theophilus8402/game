@@ -2,14 +2,16 @@
 
 import unittest
 import sys
+
+from model.info import Status
 import model.tile
-import model.controller
+import model.world
 import play
 
 class tile(unittest.TestCase):
 
     def setUp(self):
-        self.world = model.controller.World()
+        self.world = model.world.World()
         self.world.passwds["bob"] = "bob123"
         self.bob = play.make_bob()
         self.bob.sock = sys.stdout
@@ -29,10 +31,12 @@ class tile(unittest.TestCase):
         model.tile.remove_entity(self.tile, self.bob)
         self.assertEqual(self.tile.entities, [self.sword])
 
-        self.assertEqual(model.tile.remove_entity(self.tile, self.sword), 0)
+        self.assertEqual(model.tile.remove_entity(self.tile, self.sword), 
+            Status.all_good)
         self.assertEqual(self.tile.entities, [])
 
-        self.assertEqual(model.tile.remove_entity(self.tile, self.sword), 6)
+        self.assertEqual(model.tile.remove_entity(self.tile, self.sword), 
+            Status.entity_not_in_tile)
         #self.assertTrue(False)
 
 

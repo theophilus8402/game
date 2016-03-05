@@ -5,23 +5,30 @@ import queue
 import sys
 
 import model.entity
+from model.info import Status
 
 
 def add_entity(tile, entity):
+    """Adds the entity to the tile.  Returns the result of adding the entity."""
     # here, I can check to see if there's enough space for the entity
     #   or other... stuff...
-    status = 0
+    status = Status.all_good
+    # if there's no room in the tile, status = Status.no_room_in_tile
     tile.entities.append(entity)
     return status
 
 
 def remove_entity(tile, entity):
-    status = 0
+    """
+    Removes the entity from the tile.  Returns Status.entity_not_in_tile if
+    the entity is not there.
+    """
+    status = Status.all_good
     # make sure the entity was there in the first place
     if entity in tile.entities:
         tile.entities.remove(entity)
     else:
-        status = 6      # entity wasn't in tile.entities
+        status = Status.entity_not_in_tile
     return status
 
 

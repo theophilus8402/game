@@ -1,0 +1,13 @@
+
+function                                   written         tested      documented
+-------------------------------------------------------------------------------------
+model.entity.status_effects.add_status_effect         x           x               x
+model.entity.status_effects.remove_status_effect      x           x               x
+model.entity.status_effects.check_health           x           x               x
+model.world.move                                _           _               _
+model.world.get_tile                            _           _               _
+model.tile.add_entity                           x           x               x
+model.tile.remove_entity                        x           x               x
+x move model.entity.affs to model.entity.status_effects
+x move model.entity.entity status msgs to model.entity.status_effects
+x change entity to keep track of status_effects
