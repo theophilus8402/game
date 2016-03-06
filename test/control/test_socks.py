@@ -4,14 +4,15 @@ import unittest
 import sys
 import control.socks
 import model.tile
-import model.controller
+import model.world
+import play
 
 class socks_add_remove_connection(unittest.TestCase):
 
     def setUp(self):
-        self.world = model.controller.World()
+        self.world = model.world.World()
         self.world.passwds["bob"] = "bob123"
-        self.bob = model.entity.Player()
+        self.bob = play.make_bob()
         self.bob.sock = sys.stdout
         self.bob.world = self.world
         self.tile = model.tile.Tile()
@@ -35,9 +36,9 @@ class socks_add_remove_connection(unittest.TestCase):
 class socks_send_msg(unittest.TestCase):
 
     def setUp(self):
-        self.world = model.controller.World()
+        self.world = model.world.World()
         self.world.passwds["bob"] = "bob123"
-        self.bob = model.entity.Player()
+        self.bob = play.make_bob()
         self.bob.sock = sys.stdout
         self.bob.world = self.world
 
@@ -57,9 +58,9 @@ class socks_send_msg(unittest.TestCase):
 class socks_login(unittest.TestCase):
 
     def setUp(self):
-        self.world = model.controller.World()
+        self.world = model.world.World()
         self.world.passwds["bob"] = "bob123"
-        self.bob = model.entity.Player()
+        self.bob = play.make_bob()
         self.bob.sock = sys.stdout
         self.bob.world = self.world
         self.living_bob = model.entity.Living()

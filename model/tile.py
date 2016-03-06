@@ -15,6 +15,7 @@ def add_entity(tile, entity):
     status = Status.all_good
     # if there's no room in the tile, status = Status.no_room_in_tile
     tile.entities.append(entity)
+    entity.coord = tile.coord
     return status
 
 

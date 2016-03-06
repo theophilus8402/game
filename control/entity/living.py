@@ -2,14 +2,11 @@
 import control.mymap
 from model.entity.living import *
 from model.entity.entity import *
+from model.info import dir_coord_changes, Status
 import control.move
 import model.tile
 from model.util import find_distance
 
-
-#from view.errors import display_error_msg
-
-ERROR_ATTACK_MISSED = 6
 
 dir_coord_changes = {
     "n" : (0, 1),
@@ -69,7 +66,7 @@ def action_show_distance(world, msg):
             # display distance
             src_ent.comms.send("dist: {}  dir: {}".format(distance, direction))
         else:
-            status = ERROR_INCORRECT_SYNTAX
+            status = Status.incorrect_syntax
             status_msg_info["bad_direction"] = direction
             
 
@@ -82,7 +79,7 @@ def action_hit(world, msg):
     the attacker wants to hit someone in a round.
     """
 
-    status = 0
+    status = None
     src_ent = msg.src_entity
     status_msg_info = {
         "src_ent": src_ent,
@@ -94,26 +91,23 @@ def action_hit(world, msg):
         target_name = words[1]
         dst_ent = world.find_entity(target_name) # make sure target exists
         if not dst_ent:
-            status = ERROR_TARGET_DOESNT_EXIST
+            status = Status.target_doesnt_exist
         status_msg_info["dst_ent_name"] = target_name
     else:
         print("incorrect syntax: words : {}".format(words))
-        status = ERROR_INCORRECT_SYNTAX
+        status = Status.incorrect_syntax
 
-    if status == 0:     # make sure he's within a distance of 1 space
+    if status == None:     # make sure he's within a distance of 1 space
         nearby = (1 >= find_distance(src_ent.cur_loc, dst_ent.cur_loc))
         if not nearby:
-            status = ERROR_TARGET_TOO_FAR
+            status = Status.target_too_far_away
 
-    if status == 0:     # check to make sure he can do the attack
-        bad_status_msgs = check_status_msgs(src_ent, {PARALYZED,
-            BROKEN_ARM})
-        if len(bad_status_msgs) > 0:
-            status = ERRORS_STATUS[bad_status_msgs.pop()]
-        #TODO: need to figure out how to determine if the attacker has
-        # enough action points for the round to do the attack."
+    if status == None:     # check to make sure he can do the attack
+        required_parts = {Body.right_arm, Body.left_arm}
+        status = check_health(src_ent, required_parts)
+        # TODO: Figure out how to print out the bad status effect
 
-    if status == 0:     # conduct the attack
+    if status == None:     # conduct the attack
         attack_bonus_list = get_attack_bonus(src_ent, melee=True)
         if msg.cmd_word == "hit":       # only doing the first attack bonus
             attack_bonus_list = attack_bonus_list[0:1]
@@ -124,7 +118,7 @@ def action_hit(world, msg):
             successful_attack = check_successful_attack(src_ent, dst_ent,
                 info=attack_msg_info)
             if not successful_attack:       # conduct attack_roll
-                status = ERROR_ATTACK_MISSED
+                status = Status.attack_missed
             if status == 0:     # you hit!
                 dmg = determine_weapon_dmg(src_ent, dst_ent)
                 attack_msg_info["dmg"] = dmg
@@ -132,7 +126,7 @@ def action_hit(world, msg):
                 result = change_hp(dst_ent, dmg)
                 #display_attacker_info(src_ent, attack_msg_info)
                 #display_defender_info(dst_ent, attack_msg_info)
-            if result == KILLED_TARGET:
+            if result == Status.killed_target:
                 #TODO: do something about killing a target.
                 break
 

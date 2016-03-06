@@ -23,7 +23,7 @@ Types of Entities:
 """
 
 def change_hp(dst_ent, hp_delta):
-    status = 0
+    status = None
     dst_ent.cur_hp += hp_delta
     if dst_ent.cur_hp <= 0:
         status = Status.killed_target

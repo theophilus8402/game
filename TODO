@@ -11,3 +11,8 @@ model.tile.remove_entity                        x           x               x
 x move model.entity.affs to model.entity.status_effects
 x move model.entity.entity status msgs to model.entity.status_effects
 x change entity to keep track of status_effects
+model.world.distance_between_entities           x               x               x
+
+_ clean up a lot of the old structures... get rid of junk
+_ clean up the tests in test/control/test_socks.py
+_ test the "new" way of handling entities and how to interact with them

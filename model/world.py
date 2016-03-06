@@ -1,6 +1,8 @@
+from math import sqrt
+import sys
+
 import model.entity.entity
 import model.tile
-import sys
 
 class World:
 
@@ -69,3 +71,12 @@ class World:
 
         
         return entity
+
+
+def distance_between_entities(ent1, ent2):
+    """Returns the distance between two entities."""
+    x1, y1 = ent1.coord
+    x2, y2 = ent2.coord
+    distance_squared = (x2 - x1)**2 + (y2 - y1)**2
+    return sqrt(distance_squared)
+
