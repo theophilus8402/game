@@ -2,7 +2,8 @@ from math import sqrt
 import sys
 
 import model.entity.entity
-import model.tile
+from model.info import Status
+from model.tile import *
 
 class World:
 
@@ -34,9 +35,6 @@ class World:
 
         self.msgs = []
 
-    # tile commands
-    tile_add_entity = model.tile.add_entity
-    tile_remove_entity = model.tile.remove_entity
 
     def add_msg(self, msg):
         self.msgs.append(msg)
@@ -73,10 +71,106 @@ class World:
         return entity
 
 
-def distance_between_entities(ent1, ent2):
+def distance_between_coords(coord1, coord2):
     """Returns the distance between two entities."""
-    x1, y1 = ent1.coord
-    x2, y2 = ent2.coord
+    x1, y1 = coord1
+    x2, y2 = coord2
     distance_squared = (x2 - x1)**2 + (y2 - y1)**2
     return sqrt(distance_squared)
+
+
+def move_entity(world, entity, cur_loc, dst_loc):
+    """
+    Actually moves the entity from cur_loc to dst_loc.  This enables both the entity
+    walking from one tile to another and some mechanism of teleporting to a different
+    area in the world.
+    Checks the area for new/old entities.
+    TODO: May need to make more checks.  Currently, making a lot of assumptions.
+    """
+    cur_tile = get_tile(world, cur_loc)
+    dst_tile = get_tile(world, dst_loc)
+
+    # make sure entity is in cur_tile
+    if entity in cur_tile.entities:
+
+        # remove entity from cur_tile
+        remove_entity(cur_tile, entity)
+
+        # add entity to dest_tile
+        add_entity(dst_tile, entity)
+
+        dist_travelled = distance_between_coords(cur_loc, dst_loc)
+        # if only moved a distance of once square
+        if dist_travelled < 2:
+            move_check(world, entity, dst_loc - cur_loc)
+        # if further, probably teleported and needs to check the area again
+        else:
+            area_entity_check(world, entity)
+
+
+# this will be called after the entity has been moved
+def move_check(world, entity, coord_delta):
+    delta_x, delta_y = coord_delta
+    center_x, center_y = entity.coord
+    visual_range = entity.visual_range
+    # need to check both because we may move diagonally
+    if delta_x:
+        # fix x and search along the y-axis
+        new_x = center_x + delta_x*visual_range
+        old_x = center_x - delta_x*(visual_range + 1)
+
+        # look for new entities to add
+        for temp_y in range(center_y - visual_range, center_y + visual_range + 1):
+            #print("move_check at {}".format(Coord(new_x, temp_y)))
+            check_tile_new_entity(world, Coord(new_x, temp_y), entity)
+
+        # look for entities no longer in view to remove
+        check_entities_out_of_range(entity, old_x, None)
+
+    if delta_y:
+        # fix y and search along the x-axis
+        new_y = center_y + delta_y*visual_range
+        old_y = center_y - delta_y*(visual_range + 1)
+
+        # look for new entities to add
+        for temp_x in range(center_x - visual_range, center_x + visual_range + 1):
+            #print("move_check at {}".format(Coord(temp_x, new_y)))
+            check_tile_new_entity(world, Coord(temp_x, new_y), entity)
+
+        # look for entities no longer in view to remove
+        check_entities_out_of_range(entity, None, old_y)
+
+
+def get_tile(world, coord):
+    """Returns the tile at the given coord.  Returns None, if tile doesn't exist."""
+    return world.tiles.get(coord)
+
+
+def area_entity_check(world, entity):
+    """Checks for entities in the area to add to each other's peeps_nearby lists."""
+    entity.peeps_nearby.clear()
+    # look in the area for people to add
+    vrange = entity.visual_range
+    center_x, center_y = entity.coord
+    for y in range(center_y - vrange, center_y + vrange + 1).__reversed__():
+        for x in range(center_x - vrange, center_x + vrange + 1):
+            #print("initial_check at {}".format(Coord(x, y)))
+            check_tile_new_entity(world, Coord(x, y), entity)
+
+
+def check_entities_out_of_range(entity, check_x, check_y):
+    """
+    Removes entities from each other's list of peeps_nearby that are now
+    out-of-range because of a move.
+    """
+    #print("Check out of range: ({}, {})".format(check_x, check_y))
+    peeps = copy(entity.peeps_nearby)
+    for ent in peeps:
+        temp_x, temp_y = ent.coord
+        if ((check_x != None and temp_x == check_x) or
+            (check_y != None and temp_y == check_y)):
+            entity.peeps_nearby.discard(ent)
+            ent.peeps_nearby.discard(entity)
+
+
 

@@ -1,12 +1,12 @@
 #!/usr/bin/python3.4
 
-import control.move
-import model.roll
 import control.admin
 import control.socks
 import control.mymap
 import control.entity
 import model.msg
+import model.roll
+import model.world
 import re
 from datetime import datetime, timedelta
 
@@ -119,7 +119,7 @@ def handle_user_input(world, bob, msg):
     elif msg == "n":
         x, y = bob.cur_loc
         try:
-            control.move.move(world, bob, (x,y), (x,y+1))
+            model.world.move(world, bob, (x,y), (x,y+1))
             control.mymap.display_map(world, bob)
             bob.send_msg("Now at: {}".format(bob.cur_loc))
             # need this at the end, if it fails, the try block is gonna stop

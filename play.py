@@ -1,12 +1,14 @@
 #!/usr/bin/python3.4
 
 import model.entity.entity
-import model.entity.living
-import model.tile
+from model.entity.living import *
+from model.entity.status_effects import *
+from model.tile import *
 import model.util
+import model.roll
 
 def mtile(uid, coord):
-    tile = model.tile.Tile()
+    tile = Tile()
     tile.uid = uid
     tile.coord = coord
     return tile
@@ -19,7 +21,7 @@ def make_world():
     world = model.world.World()
     for y in range(-dim, dim+1):
         for x in range(-dim, dim+1):
-            world.tiles[(x,y)] = mtile(uuid, (x,y))
+            world.tiles[Coord(x,y)] = mtile(uuid, Coord(x,y))
             uuid = uuid+1
     return world
 
@@ -30,7 +32,7 @@ def make_shoe():
     shoe.uid = 20
     shoe.name = "shoe"
     shoe.symbol = "*"
-    shoe.cur_loc = (1, 3)
+    shoe.coord = (1, 3)
     shoe.cur_hp = 10
     shoe.max_hp = 10
     shoe.short_desc = "This is an old shoe."
@@ -46,7 +48,7 @@ def make_sword():
     sword.uid = 21
     sword.name = "sword"
     sword.symbol = "-"
-    sword.cur_loc = (1, 3)
+    sword.coord = (1, 3)
     sword.cur_hp = 13
     sword.max_hp = 13
     sword.short_desc = "This is a shiny sword."
@@ -76,7 +78,7 @@ def make_shield():
     shield.uid = 24
     shield.name = "shield"
     shield.symbol = "o"
-    shield.cur_loc = (-2, -1)
+    shield.coord = (-2, -1)
     shield.cur_hp = 20
     shield.max_hp = 20
     shield.short_desc = "This is a small, wooden shield."
@@ -100,7 +102,7 @@ def make_plate():
     plate.uid = 23
     plate.name = "plate"
     plate.symbol = "&"
-    plate.cur_loc = (-1, -1)
+    plate.coord = (-1, -1)
     plate.cur_hp = 20
     plate.max_hp = 20
     plate.short_desc = "This is a spiffy suite of plate mail armour."
@@ -124,7 +126,7 @@ def make_dog():
     dog.uid = 44
     dog.name = "dog"
     dog.symbol = "d"
-    dog.cur_loc = (-1, 2)
+    dog.coord = (-1, 2)
     dog.cur_hp = 7
     dog.max_hp = 7
     dog.short_desc = "This dog is annoying."
@@ -134,9 +136,8 @@ def make_dog():
     dog.friction = 5
     dog.cur_mp = 0
     dog.max_mp = 0
-    model.entity.living.add_status_msg(dog, "dumb")
-    model.entity.living.add_status_msg(dog, "hungry")
-    model.entity.living.add_status_msg(dog, "lost_balance")
+    add_status_effect(dog, Afflictions.stupid)
+    add_status_effect(dog, Afflictions.lost_balance)
     return dog
 
 
@@ -145,7 +146,7 @@ def make_bob():
     bob.uid = 1
     bob.name = "bob"
     bob.symbol = "B"
-    bob.cur_loc = (1, 2)
+    bob.coord = (1, 2)
     bob.cur_hp = 10
     bob.max_hp = 10
     bob.short_desc = "This is Bob."
@@ -156,6 +157,10 @@ def make_bob():
     bob.cur_mp = 10
     bob.max_mp = 10
     bob.vision_range = 6
+
+    bob.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
+    bob.known_cmds = bob.known_cmds.union(CMDS_BASIC_HUMANOID)
+    bob.known_cmds = bob.known_cmds.union(CMDS_DEBUG)
 
     bob.pclass = "fighter"
     bob.level = 10
@@ -175,7 +180,7 @@ def make_tim():
     tim.uid = 2
     tim.name = "tim"
     tim.symbol = "T"
-    tim.cur_loc = (2, 2)
+    tim.coord = (2, 2)
     tim.cur_hp = 10
     tim.max_hp = 10
     tim.short_desc = "This is Tim."
@@ -186,7 +191,9 @@ def make_tim():
     tim.cur_mp = 10
     tim.max_mp = 10
     tim.vision_range = 6
-    model.entity.living.add_status_msg(tim, "lost_balance")
+    add_status_effect(tim, Afflictions.lost_balance)
+
+    tim.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
 
     tim.pclass = "fighter"
     tim.level = 10
@@ -205,7 +212,7 @@ def put(world, entity, coord):
     if coord in world.tiles:
         tile = world.tiles[coord]
         tile.entities.append(entity)
-        entity.cur_loc = coord
+        entity.coord = coord
 
 
 if __name__ == "__main__":
@@ -223,7 +230,7 @@ if __name__ == "__main__":
     print()
 
     for att_bonus in bob.get_attack_bonus(melee=True):
-        att_roll = control.roll.attack_roll(att_bonus)
+        att_roll = model.roll.attack_roll(att_bonus)
         print("att_roll = {} + {} = {}".format(att_roll-att_bonus,
             att_bonus, att_roll))
     print()

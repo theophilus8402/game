@@ -1,5 +1,12 @@
 import model.util
 
+
+CMDS_BASIC_MOVEMENT = {"n", "ne", "e", "se", "s", "sw", "w", "nw"}
+CMDS_BASIC_ATTACK = {"hit", "fhit", "cast"}
+CMDS_BASIC_HUMANOID = {"get", "eat", "drink", "wear", "wield", "remove",
+    "unwield", "l", "look", "quit", "exit"}
+CMDS_DEBUG = {"dist"}
+
 PARALYZED = "paralyzed"
 BROKEN_ARM = "broken_arm"
 ERROR_TARGET_DOESNT_EXIST = 2

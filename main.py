@@ -8,16 +8,12 @@ import queue
 import model.msg
 import model.world
 import control.comm
+from model.entity.living import *
 import control.mymap
 import control.entity.ai
 import control.entity.living
 import play
 
-CMDS_BASIC_MOVEMENT = {"n", "ne", "e", "se", "s", "sw", "w", "nw"}
-CMDS_BASIC_ATTACK = {"hit", "fhit", "cast"}
-CMDS_BASIC_HUMANOID = {"get", "eat", "drink", "wear", "wield", "remove",
-    "unwield", "l", "look", "quit", "exit"}
-CMDS_DEBUG = {"dist"}
 
 def get_input_from_players(world, readable):
     for s in readable:
@@ -99,10 +95,6 @@ if __name__ == "__main__":
     bob = play.make_bob()
     bob.comms = control.comm.File_IO()
     world.player_driven_comms[bob.comms.input_handle] = bob
-    bob.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
-    bob.known_cmds = bob.known_cmds.union(CMDS_BASIC_HUMANOID)
-    bob.known_cmds = bob.known_cmds.union(CMDS_DEBUG)
-    model.entity.living.remove_status_msg(bob, "paralyzed")
     play.put(world, bob, (1, 0))
     print("cur_loc: {}".format(bob.cur_loc))
 
@@ -113,7 +105,6 @@ if __name__ == "__main__":
     tim.set_next_run_time()
     Humanoid.get_next_cmd = control.entity.ai.simple_get_next_cmd
     Humanoid.run = control.entity.ai.simple_run
-    tim.known_cmds = ["n", "e", "s", "w", "hit"]
     tim.run_cmds = ["n", "e", "s", "w", "hit bob"]
     """
     for i in range(5):

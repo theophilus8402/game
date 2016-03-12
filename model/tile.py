@@ -1,11 +1,24 @@
 #!/usr/bin/python3.4
 
+from collections import namedtuple
 import math
 import queue
 import sys
 
 import model.entity
 from model.info import Status
+
+
+class Coord(namedtuple("Coord", "x y")):
+
+    def __sub__(self, other_coord):
+        return Coord(other_coord.x - self.x, other_coord.y - self.y)
+
+    def __add__(self, other_coord):
+        return Coord(self.x + other_coord.x, self.y + other_coord.y)
+
+    def __repr__(self):
+        return "({}, {})".format(self.x, self.y)
 
 
 def add_entity(tile, entity):
@@ -31,6 +44,28 @@ def remove_entity(tile, entity):
     else:
         status = Status.entity_not_in_tile
     return status
+
+
+def lost_entity(entity1, entity2):
+    """Removes each entity from the other's list of peeps_nearby."""
+    #print("Removing {} and {} from each other's peeps_nearby set.".format(
+    #   entity1.name, entity2.name))
+    entity1.peeps_nearby.discard(entity2)
+    entity2.peeps_nearby.discard(entity1)
+
+
+def check_tile_new_entity(tile, searching_entity):
+    """
+    Checks the given tile for a list of entities and makes sure it's not the calling
+    entities name.  Adds each entity to the other's list of nearby entities.
+    TODO: I don't think this quite enables us to have different entities with
+    different visual ranges.
+    """
+    for ent in temp_tile.entities:
+        if ent.name != searching_entity.name:
+            searching_entity.peeps_nearby.add(ent)
+            ent.peeps_nearby.add(searching_entity)
+            #print("Saw {} at {}.".format(ent.name, coord))
 
 
 NORTH = "n"

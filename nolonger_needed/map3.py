@@ -29,25 +29,24 @@ def calculate_delta_distances(src_tile, dst_tile):
     return Distances(physical, hearing, sight)
 
 
-def saw_someone(entity1, entity2):
+def saw_entity(entity1, entity2):
+    """
     # yep, add the peeps, both ways
     # the entities are within visual range of each other and need to be added
     #   to entity.peeps_nearby
     """
-    print("Adding {} and {} to each other's peeps_nearby set.".format(entity1.name,
-        entity2.name))
-    """
+    #print("Adding {} and {} to each other's peeps_nearby set.".format(entity1.name,
+    #   entity2.name))
     entity1.peeps_nearby.add(entity2)
     entity2.peeps_nearby.add(entity1)
-    pass
 
 
 def lost_someone(entity1, entity2):
+    """
     # the entities moved out of visual range from each other
     """
-    print("Removing {} and {} from each other's peeps_nearby set.".format(entity1.name,
-        entity2.name))
-    """
+    #print("Removing {} and {} from each other's peeps_nearby set.".format(
+    #   entity1.name, entity2.name))
     entity1.peeps_nearby.discard(entity2)
     entity2.peeps_nearby.discard(entity1)
 
@@ -55,10 +54,9 @@ def lost_someone(entity1, entity2):
 def check_tile_new_entity(world, coord, searching_entity):
     temp_tile = get_tile(world, coord)
     if temp_tile:
-        new_entities = []
         for ent in temp_tile.entities:
             if ent.name != searching_entity.name:
-                saw_someone(searching_entity, ent)
+                saw_entity(searching_entity, ent)
                 #print("Saw {} at {}.".format(ent.name, coord))
 
 
@@ -81,52 +79,6 @@ def initial_check(world, entity):
         for x in range(center_x - vrange, center_x + vrange + 1):
             #print("initial_check at {}".format(Coord(x, y)))
             check_tile_new_entity(world, Coord(x, y), entity)
-
-# this will be called after the entity has been moved
-def move_check(world, entity, coord_delta):
-    delta_x, delta_y = coord_delta
-    center_x, center_y = entity.coord
-    visual_range = entity.visual_range
-    # need to check both because we may move diagonally
-    if delta_x:
-        # fix x and search along the y-axis
-        new_x = center_x + delta_x*visual_range
-        old_x = center_x - delta_x*(visual_range + 1)
-
-        # look for new entities to add
-        for temp_y in range(center_y - visual_range, center_y + visual_range + 1):
-            #print("move_check at {}".format(Coord(new_x, temp_y)))
-            check_tile_new_entity(world, Coord(new_x, temp_y), entity)
-
-        # look for entities no longer in view to remove
-        check_entities_out_of_range(entity, old_x, None)
-
-    if delta_y:
-        # fix y and search along the x-axis
-        new_y = center_y + delta_y*visual_range
-        old_y = center_y - delta_y*(visual_range + 1)
-
-        # look for new entities to add
-        for temp_x in range(center_x - visual_range, center_x + visual_range + 1):
-            #print("move_check at {}".format(Coord(temp_x, new_y)))
-            check_tile_new_entity(world, Coord(temp_x, new_y), entity)
-
-        # look for entities no longer in view to remove
-        check_entities_out_of_range(entity, None, old_y)
-
-
-# this is the base move action
-def move(world, entity, dst_tile):
-
-    # remove the entity from the current tile
-    cur_tile = get_tile(world, entity.coord)
-    cur_tile.entities.remove(entity)
-
-    # add entity to the new tile
-    dst_tile.entities.append(entity)
-
-    # update entity's coord
-    entity.coord = dst_tile.coord
 
 
 # this is called when the user initiates a move

@@ -12,6 +12,7 @@ class Status(enum.Enum):
     incorrect_syntax = 5
     target_doesnt_exist = 6
     target_too_far_away = 7
+    tile_doesnt_exist = 8
 
 
 dir_coord_changes = {

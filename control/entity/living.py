@@ -3,7 +3,7 @@ import control.mymap
 from model.entity.living import *
 from model.entity.entity import *
 from model.info import dir_coord_changes, Status
-import control.move
+import model.world
 import model.tile
 from model.util import find_distance
 
@@ -30,10 +30,10 @@ def action_move(world, msg):
             #TODO: Make sure we can move
             #TODO: Make sure we can move into the room
             delta_x, delta_y = dir_coord_changes[direction]
-            cur_x, cur_y = src_ent.cur_loc
+            cur_x, cur_y = src_ent.coord
             dst_loc = (cur_x + delta_x, cur_y + delta_y)
             src_ent.comms.send("Moving {}...".format(direction))
-            control.move.move(world, src_ent, src_ent.cur_loc, dst_loc)
+            model.world.move_entity(world, src_ent, src_ent.coord, dst_loc)
 
 
 def action_look(world, msg):
@@ -119,14 +119,14 @@ def action_hit(world, msg):
                 info=attack_msg_info)
             if not successful_attack:       # conduct attack_roll
                 status = Status.attack_missed
-            if status == 0:     # you hit!
+            if status == None:     # you hit!
                 dmg = determine_weapon_dmg(src_ent, dst_ent)
                 attack_msg_info["dmg"] = dmg
                 attack_msg_info["weapon"] = dst_ent.eq["right_hand"] #TODO
-                result = change_hp(dst_ent, dmg)
+                status = change_hp(dst_ent, dmg)
                 #display_attacker_info(src_ent, attack_msg_info)
                 #display_defender_info(dst_ent, attack_msg_info)
-            if result == Status.killed_target:
+            if status == Status.killed_target:
                 #TODO: do something about killing a target.
                 break
 
