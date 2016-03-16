@@ -22,7 +22,11 @@ class Coord(namedtuple("Coord", "x y")):
 
 
 def add_entity(tile, entity):
-    """Adds the entity to the tile.  Returns the result of adding the entity."""
+    """
+    Checks if the entity can be added to the tile.
+    Adds the entity to the tile, and updates the entity's coord.
+    Returns the whether act of adding the entity was successful.
+    """
     # here, I can check to see if there's enough space for the entity
     #   or other... stuff...
     status = Status.all_good
@@ -60,8 +64,10 @@ def check_tile_new_entity(tile, searching_entity):
     entities name.  Adds each entity to the other's list of nearby entities.
     TODO: I don't think this quite enables us to have different entities with
     different visual ranges.
+    MAYBE: I can have a large default visual range and then just check each time
+    a message is sent if the entity can see the message.
     """
-    for ent in temp_tile.entities:
+    for ent in tile.entities:
         if ent.name != searching_entity.name:
             searching_entity.peeps_nearby.add(ent)
             ent.peeps_nearby.add(searching_entity)

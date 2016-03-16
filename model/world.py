@@ -1,3 +1,4 @@
+from copy import copy
 from math import sqrt
 import sys
 
@@ -102,14 +103,21 @@ def move_entity(world, entity, cur_loc, dst_loc):
         dist_travelled = distance_between_coords(cur_loc, dst_loc)
         # if only moved a distance of once square
         if dist_travelled < 2:
-            move_check(world, entity, dst_loc - cur_loc)
+            move_check_nearby_entities(world, entity, dst_loc - cur_loc)
         # if further, probably teleported and needs to check the area again
         else:
             area_entity_check(world, entity)
 
 
 # this will be called after the entity has been moved
-def move_check(world, entity, coord_delta):
+def move_check_nearby_entities(world, entity, coord_delta):
+    """
+    Checks the surrounding area within the entity's visual_range for new entities.
+    If new entities are found, they're added to the list of nearby_peeps.
+    It only does a partial check checking only the newest tiles within visual_range.
+    It also checks to see if any entities left this entity's visual range and removes
+    them from the list.  It only checks coords which are no longer in range.
+    """
     delta_x, delta_y = coord_delta
     center_x, center_y = entity.coord
     visual_range = entity.visual_range
@@ -121,8 +129,13 @@ def move_check(world, entity, coord_delta):
 
         # look for new entities to add
         for temp_y in range(center_y - visual_range, center_y + visual_range + 1):
-            #print("move_check at {}".format(Coord(new_x, temp_y)))
-            check_tile_new_entity(world, Coord(new_x, temp_y), entity)
+            #print("move_check_nearby_entities at {}".format(Coord(new_x, temp_y)))
+            tmp_tile = get_tile(world, Coord(new_x, temp_y))
+            try:
+                check_tile_new_entity(tmp_tile, entity)
+            except:
+                #print("The coord, {}, doesn't exist!".format(Coord(new_x, temp_y)))
+                pass
 
         # look for entities no longer in view to remove
         check_entities_out_of_range(entity, old_x, None)
@@ -134,8 +147,13 @@ def move_check(world, entity, coord_delta):
 
         # look for new entities to add
         for temp_x in range(center_x - visual_range, center_x + visual_range + 1):
-            #print("move_check at {}".format(Coord(temp_x, new_y)))
-            check_tile_new_entity(world, Coord(temp_x, new_y), entity)
+            #print("move_check_nearby_entities at {}".format(Coord(temp_x, new_y)))
+            tmp_tile = get_tile(world, Coord(temp_x, new_y))
+            try:
+                check_tile_new_entity(tmp_tile, entity)
+            except:
+                #print("The coord, {}, doesn't exist!".format(Coord(temp_x, new_y)))
+                pass
 
         # look for entities no longer in view to remove
         check_entities_out_of_range(entity, None, old_y)

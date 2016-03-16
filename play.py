@@ -32,7 +32,7 @@ def make_shoe():
     shoe.uid = 20
     shoe.name = "shoe"
     shoe.symbol = "*"
-    shoe.coord = (1, 3)
+    shoe.coord = Coord(1, 3)
     shoe.cur_hp = 10
     shoe.max_hp = 10
     shoe.short_desc = "This is an old shoe."
@@ -48,7 +48,7 @@ def make_sword():
     sword.uid = 21
     sword.name = "sword"
     sword.symbol = "-"
-    sword.coord = (1, 3)
+    sword.coord = Coord(1, 3)
     sword.cur_hp = 13
     sword.max_hp = 13
     sword.short_desc = "This is a shiny sword."
@@ -78,7 +78,7 @@ def make_shield():
     shield.uid = 24
     shield.name = "shield"
     shield.symbol = "o"
-    shield.coord = (-2, -1)
+    shield.coord = Coord(-2, -1)
     shield.cur_hp = 20
     shield.max_hp = 20
     shield.short_desc = "This is a small, wooden shield."
@@ -97,12 +97,12 @@ def make_shield():
     return shield
 
 
-def make_plate():
+def make_armour():
     plate = model.entity.entity.Armour()
     plate.uid = 23
     plate.name = "plate"
     plate.symbol = "&"
-    plate.coord = (-1, -1)
+    plate.coord = Coord(-1, -1)
     plate.cur_hp = 20
     plate.max_hp = 20
     plate.short_desc = "This is a spiffy suite of plate mail armour."
@@ -126,7 +126,7 @@ def make_dog():
     dog.uid = 44
     dog.name = "dog"
     dog.symbol = "d"
-    dog.coord = (-1, 2)
+    dog.coord = Coord(-1, 2)
     dog.cur_hp = 7
     dog.max_hp = 7
     dog.short_desc = "This dog is annoying."
@@ -146,7 +146,7 @@ def make_bob():
     bob.uid = 1
     bob.name = "bob"
     bob.symbol = "B"
-    bob.coord = (1, 2)
+    bob.coord = Coord(1, 2)
     bob.cur_hp = 10
     bob.max_hp = 10
     bob.short_desc = "This is Bob."
@@ -180,7 +180,7 @@ def make_tim():
     tim.uid = 2
     tim.name = "tim"
     tim.symbol = "T"
-    tim.coord = (2, 2)
+    tim.coord = Coord(2, 2)
     tim.cur_hp = 10
     tim.max_hp = 10
     tim.short_desc = "This is Tim."
@@ -206,13 +206,6 @@ def make_tim():
     tim.attack_bonus["base"] = model.util.get_bab(tim.pclass, tim.level)
     tim.size = "small"
     return tim
-
-
-def put(world, entity, coord):
-    if coord in world.tiles:
-        tile = world.tiles[coord]
-        tile.entities.append(entity)
-        entity.coord = coord
 
 
 if __name__ == "__main__":

@@ -19,8 +19,8 @@ x integrate map3.py stuff into the game (see who's nearby)
 
 model.world.get_tile                            x           x               x
 model.world.move_entity                         x           _               x
-    model.world.move_check                      x           _               _
-        model.tile.check_tile_new_entity        x           _               _
-        model.world.check_entities_out_of_range x           _               x
+    model.world.move_check_nearby_entities      x           x               x
+        model.tile.check_tile_new_entity        x           x               x
+        model.world.check_entities_out_of_range x           x               x
     model.world.area_entity_check               x           _               x
 

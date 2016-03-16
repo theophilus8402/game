@@ -50,6 +50,9 @@ class Entity:
                          # a 5ftx5ftx10ft room is a max 250ft^3
         self.friction = 0
 
+        #TODO: probably gonna change it so peeps_nearby is only in living entities
+        self.peeps_nearby = set()
+
         # stuff not stored in db
         self.world = None
 
