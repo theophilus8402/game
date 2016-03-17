@@ -151,6 +151,51 @@ class world(unittest.TestCase):
         self.pseudo_move(self.bob, Coord(1, 0))
         self.assertEqual(self.bob.peeps_nearby, {self.dog, self.tim, self.armour})
 
+    def pseudo_teleport(self, entity, coord):
+        old_entity_tile = get_tile(self.world, entity.coord)
+        remove_entity(old_entity_tile, entity)
+        new_entity_tile = get_tile(self.world, coord)
+        add_entity(new_entity_tile, entity)
+        area_entity_check(self.world, entity)
+
+    def test_area_entity_check(self):
+
+        self.assertEqual(self.bob.peeps_nearby, set())
+
+        # 432101234
+        # ......... 4
+        # .....s... 3
+        # ...d..t.. 2
+        # ......... 1
+        # ......... 0
+        # .........-1
+        # B........-2
+        # .........-3
+        # .......a.-4
+        add_entity(self.dog_tile, self.dog)
+        add_entity(self.sword_tile, self.sword)
+        add_entity(self.tim_tile, self.tim)
+        add_entity(self.armour_tile, self.armour)
+        tmp_bob_tile = get_tile(self.world, Coord(-4, -2))
+        add_entity(tmp_bob_tile, self.bob)
+        self.bob.visual_range = 3
+
+        # bob shouldn't see anyone while at Coord(-4, -2) w/ visual_range 3
+        area_entity_check(self.world, self.bob)
+        self.assertEqual(self.bob.peeps_nearby, set())
+
+        # teleport bob to Coord(0, 1) and he should see: dog, sword, tim
+        self.pseudo_teleport(self.bob, Coord(0, 1))
+        self.assertEqual(self.bob.peeps_nearby, {self.dog, self.sword, self.tim})
+
+        # teleport bob to Coord(4, -3) and he should see: armour
+        self.pseudo_teleport(self.bob, Coord(4, -3))
+        self.assertEqual(self.bob.peeps_nearby, {self.armour})
+
+        # teleport bob to Coord(-4, -3) and he should see: armour
+        self.pseudo_teleport(self.bob, Coord(-4, -3))
+        self.assertEqual(self.bob.peeps_nearby, set())
+
 
 if __name__ == '__main__':
     unittest.main()

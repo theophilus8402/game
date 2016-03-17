@@ -173,7 +173,12 @@ def area_entity_check(world, entity):
     for y in range(center_y - vrange, center_y + vrange + 1).__reversed__():
         for x in range(center_x - vrange, center_x + vrange + 1):
             #print("initial_check at {}".format(Coord(x, y)))
-            check_tile_new_entity(world, Coord(x, y), entity)
+            tmp_tile = get_tile(world, Coord(x, y))
+            try:
+                check_tile_new_entity(tmp_tile, entity)
+            except:
+                # the tile doesn't exist, so don't do anything
+                pass
 
 
 def check_entities_out_of_range(entity, check_x, check_y):
