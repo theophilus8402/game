@@ -1,12 +1,10 @@
 #!/usr/bin/python3.4
 
-import control.socks
-
 def display_map(world, bob, center=None, dimension=None):
     if center == None:
-        center = bob.cur_loc
+        center = bob.coord
     if dimension == None:
-        dimension = bob.vision_range
+        dimension = bob.visual_range
     map_rows = []     # a list of the string for each row
     x, y = center
     """
@@ -36,14 +34,3 @@ def display_map(world, bob, center=None, dimension=None):
     return True
 
 
-def kill_creature(world, killer, dead_guy):
-    # remove creature from the current location
-    world.tiles[dead_guy.cur_loc].entities.remove(dead_guy)
-    # move dead guy to the dead room
-    world.dead_room.entities.append(dead_guy)
-    dead_guy.cur_loc = world.dead_room.coord
-    # TODO: give exp to the killer
-
-    # update map window
-    display_map(world, killer)
-    return True

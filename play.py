@@ -4,8 +4,8 @@ import model.entity.entity
 from model.entity.living import *
 from model.entity.status_effects import *
 from model.tile import *
+from model.info import Coord
 import model.util
-import model.roll
 
 def mtile(uid, coord):
     tile = Tile()
@@ -223,7 +223,7 @@ if __name__ == "__main__":
     print()
 
     for att_bonus in bob.get_attack_bonus(melee=True):
-        att_roll = model.roll.attack_roll(att_bonus)
+        att_roll = model.roll.roll(1, 20, att_bonus)
         print("att_roll = {} + {} = {}".format(att_roll-att_bonus,
             att_bonus, att_roll))
     print()

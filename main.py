@@ -6,7 +6,8 @@ import select
 import queue
 
 import model.msg
-import model.world
+from model.world import get_tile
+from model.tile import Coord, add_entity
 import control.comm
 from model.entity.living import *
 import control.mymap
@@ -95,8 +96,8 @@ if __name__ == "__main__":
     bob = play.make_bob()
     bob.comms = control.comm.File_IO()
     world.player_driven_comms[bob.comms.input_handle] = bob
-    play.put(world, bob, (1, 0))
-    print("cur_loc: {}".format(bob.cur_loc))
+    add_entity(get_tile(world, Coord(1, 0)), bob)
+    print("bob's current coord: {}".format(bob.coord))
 
     tim = play.make_tim()
     Humanoid = model.entity.entity.Humanoid
@@ -113,13 +114,13 @@ if __name__ == "__main__":
     tim.comms = control.comm.AI_IO(ai_name=tim.name)
     tim.comms.send("Hey, Tim!")
     world.ai_entities = [tim]
-    play.put(world, tim, (0, 0))
+    add_entity(get_tile(world, Coord(0, 0)), tim)
 
     world.living_ents[bob.name] = bob
     world.living_ents[tim.name] = tim
 
     sword = play.make_sword()
-    play.put(world, sword, (1, 1))
+    add_entity(get_tile(world, Coord(1, 1)), sword)
 
     control.mymap.display_map(world, bob)
 

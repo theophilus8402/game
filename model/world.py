@@ -3,7 +3,7 @@ from math import sqrt
 import sys
 
 import model.entity.entity
-from model.info import Status
+from model.info import Status, Coord
 from model.tile import *
 
 class World:
@@ -67,20 +67,10 @@ class World:
             entity = self.armour_ents.get(name)
         if not entity:
             entity = self.basic_ents.get(name)
-
-        
         return entity
 
 
-def distance_between_coords(coord1, coord2):
-    """Returns the distance between two entities."""
-    x1, y1 = coord1
-    x2, y2 = coord2
-    distance_squared = (x2 - x1)**2 + (y2 - y1)**2
-    return sqrt(distance_squared)
-
-
-def move_entity(world, entity, cur_loc, dst_loc):
+def move_entity(world, entity, dst_loc):
     """
     Actually moves the entity from cur_loc to dst_loc.  This enables both the entity
     walking from one tile to another and some mechanism of teleporting to a different
@@ -88,11 +78,17 @@ def move_entity(world, entity, cur_loc, dst_loc):
     Checks the area for new/old entities.
     TODO: May need to make more checks.  Currently, making a lot of assumptions.
     """
+    cur_loc = entity.coord
     cur_tile = get_tile(world, cur_loc)
     dst_tile = get_tile(world, dst_loc)
 
+    status = Status.all_good
+
+    if not dst_tile:
+        status = Status.tile_doesnt_exist
+
     # make sure entity is in cur_tile
-    if entity in cur_tile.entities:
+    if ((status == Status.all_good) and (entity in cur_tile.entities)):
 
         # remove entity from cur_tile
         remove_entity(cur_tile, entity)
@@ -100,13 +96,17 @@ def move_entity(world, entity, cur_loc, dst_loc):
         # add entity to dest_tile
         add_entity(dst_tile, entity)
 
+        # update peeps_nearby
         dist_travelled = distance_between_coords(cur_loc, dst_loc)
-        # if only moved a distance of once square
+        # if only moved a distance of one square
         if dist_travelled < 2:
-            move_check_nearby_entities(world, entity, dst_loc - cur_loc)
+            move_check_nearby_entities(world, entity, cur_loc-dst_loc)
+            #print("running move_check_nearby: {}".format(cur_loc-dst_loc))
         # if further, probably teleported and needs to check the area again
         else:
             area_entity_check(world, entity)
+
+    return status
 
 
 # this will be called after the entity has been moved

@@ -3,7 +3,6 @@
 import math
 import queue
 
-import model.roll
 import model.util
 from model.info import Status
 from model.entity.status_effects import *
@@ -22,12 +21,9 @@ Types of Entities:
             display/handle information and actions available
 """
 
-def change_hp(dst_ent, hp_delta):
-    status = None
-    dst_ent.cur_hp += hp_delta
-    if dst_ent.cur_hp <= 0:
-        status = Status.killed_target
-    return status
+def change_hp(entity, hp_delta):
+    """Changes entity's HP by the given amount.  Doesn't return anything."""
+    entity.cur_hp += hp_delta
 
 
 # Most basic class:
@@ -39,7 +35,7 @@ class Entity:
         self.name = None
         self.type = "entity"      # the different entity classes
         self.symbol = ""
-        self.cur_loc = (0, 0)
+        self.coord = (0, 0)
         self.cur_hp = 0
         self.max_hp = 10
 
@@ -56,40 +52,8 @@ class Entity:
         # stuff not stored in db
         self.world = None
 
-    def send_msg(self, msg):
-        print(msg)
-
-    """
-    This function can be used to heal or dmg a target.
-    hp_change can be positive to heal someone or negative to hurt someone
-    the control module will handle what happens when the entities hp falls
-        below 0
-    """
-    def change_hp(self, src_entity, hp_change):
-        self.cur_hp = self.cur_hp + hp_change
-        return self.cur_hp
-
     def die(self):
         pass
-
-    def change_location(self, location_type, location):
-        """
-        location_type = "tile" or "entity"
-        location = tile or entity
-        This might help with giving an item to another entity...
-        """
-        status = 0
-        if location_type == "tile":
-            self.carried_by = None      # entity has been "dropped"
-            status = location.add_entity(self)   # add the item to the tile
-            self.cur_loc = location.coord
-        elif location_type == "entity":
-            pass
-        # take the item out of the current room
-        #   remove it out of the tile's list
-        #   remove the item's current location
-        #   maybe I have some indication of who's carrying the item???
-        #       item.carried_by = entity    (None when on the ground)
 
 
 # Basic weapon:
@@ -143,7 +107,7 @@ class Living(Entity):
         self.cur_mp = 0
         self.max_mp = 10
         self.status_msgs = set()
-        self.vision_range = 5
+        self.visual_range = 5
         self.level = 0
         self.hit_dice = "2d4"
         self.race = "creature"
@@ -424,12 +388,6 @@ class Humanoid(Living):
         # self.left_hand = shield
         # self.right_hand = sword
 
-"""
-    def die(self):
-    def move(self):
-"""
-
-
 # Advanced Player:
 class Player(Humanoid):
 
@@ -461,77 +419,3 @@ class Player(Humanoid):
             print(msg)
         return True
 
-
-"""
-I'll need to make sure I keep this up-to-date, which will suck, but
-I don't know a better way to transfer info between objects.
-"""
-from copy import copy
-def transfer_living_to_player(life, plife):
-
-    # when a player disconnects from the game and then reconnects,
-    #   their entity is a Player object. If that's the case, delete
-    #   the player specific entires in the object and then transfer that
-    """
-    # this shouldn't happen any more...
-    if life.type == "player":
-        del(life.sock)
-        del(life.msg_queue)
-        del(life.special_state)
-    """
-
-    # copy over all the appropriate information from life to plife
-    list_to_transfer = [entry for entry in dir(life)
-        # make sure the variable name doesn't start with "__"
-        if ((not entry.startswith("_")) and
-            # make sure the variable isn't a function
-            (not callable(life.__getattribute__(entry))))]
-    #print("Before transfer:")
-    for entry in list_to_transfer:
-    #    print("{} : {}".format(entry, plife.__getattribute__(entry)))
-        plife.__setattr__(entry, life.__getattribute__(entry))
-    plife.type = "player"
-    #print("After transfer:")
-    #for entry in list_to_transfer:
-    #    print("{} : {}".format(entry, plife.__getattribute__(entry)))
-
-    # tell world to point to the player object now
-    plife.world.living_ents[life.name] = plife
-    # check to see if the life object is already on a tile then remove it
-    tile = plife.world.tiles[plife.cur_loc]
-    if life in tile.entities:
-        tile.entities.remove(life)
-    # add the plife to the tile
-    tile.entities.append(plife)
-
-
-"""
-I'll need to make sure I keep this up-to-date, which will suck, but
-I don't know a better way to transfer info between objects.
-"""
-def transfer_player_to_living(plife, life):
-
-    del(plife.sock)
-    del(plife.msg_queue)
-    del(plife.special_state)
-    plife.type = "living"
-
-    # generate a list of variables to copy over
-    list_to_transfer = [entry for entry in dir(life)
-        # make sure the variable name doesn't start with "__"
-        if ((not entry.startswith("_")) and
-            # make sure the variable isn't a function
-            (not callable(life.__getattribute__(entry))))]
-    # copy the information from plife to life
-    for entry in list_to_transfer:
-        life.__setattr__(entry, plife.__getattribute__(entry))
-
-    # tell world to point to the player object now
-    life.world.living_ents[life.name] = life
-    # check to see if the plife object is already on a tile then remove it
-    tile = life.world.tiles[life.cur_loc]
-    if plife in tile.entities:
-        tile.entities.remove(plife)
-    # add the life to the tile
-    tile.entities.append(life)
-    #TODO: there might be more places where I'll have to make the transfer

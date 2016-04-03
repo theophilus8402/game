@@ -104,7 +104,7 @@ def cast_resurrection(spell, world, caster, target):
         # move him back to the realm of the living
         #possible_coord_changes = [(0, 1), (1, 1), (1, 0), (1, -1), 
         #TODO: make it more centered on where the caster or the body is
-        control.move.move(world, target, target.cur_loc, (1, 1))
+        model.world.move(world, target, (1, 1))
 
         # change target's status effect so he is no longer dead
         target.remove_status("dead")

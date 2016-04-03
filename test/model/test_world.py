@@ -60,8 +60,6 @@ class world(unittest.TestCase):
         self.assertTrue(dist>=4)
 
     def test_get_tile(self):
-        #for tile in self.world.tiles:
-        #    print(tile.coord)
         tile = get_tile(self.world, Coord(0, 1))
         self.assertEqual(tile.coord, Coord(0, 1))
 
@@ -157,6 +155,76 @@ class world(unittest.TestCase):
         new_entity_tile = get_tile(self.world, coord)
         add_entity(new_entity_tile, entity)
         area_entity_check(self.world, entity)
+
+    def test_move_entity(self):
+
+        self.assertEqual(self.bob.peeps_nearby, set())
+
+        # 432101234
+        # ......... 4
+        # .....s... 3
+        # ...d..t.. 2
+        # ......... 1
+        # ......... 0
+        # .........-1
+        # B........-2
+        # .........-3
+        # .......a.-4
+        add_entity(self.dog_tile, self.dog)
+        add_entity(self.sword_tile, self.sword)
+        add_entity(self.tim_tile, self.tim)
+        add_entity(self.armour_tile, self.armour)
+        tmp_bob_tile = get_tile(self.world, Coord(-4, -2))
+        add_entity(tmp_bob_tile, self.bob)
+        self.bob.visual_range = 3
+        self.dog.visual_range = 3
+        self.sword.visual_range = 3
+        self.tim.visual_range = 3
+        self.armour.visual_range = 3
+
+        # do initial checks for entities nearby
+        area_entity_check(self.world, self.bob)
+        area_entity_check(self.world, self.sword)
+        area_entity_check(self.world, self.dog)
+        area_entity_check(self.world, self.tim)
+        area_entity_check(self.world, self.armour)
+
+        # bob shouldn't see anyone where he starts out
+        self.assertEqual(self.bob.peeps_nearby, set())
+        self.assertEqual(self.dog.peeps_nearby, {self.sword, self.tim})
+        self.assertEqual(self.sword.peeps_nearby, {self.dog, self.tim})
+        self.assertEqual(self.tim.peeps_nearby, {self.dog, self.sword})
+        self.assertEqual(self.armour.peeps_nearby, set())
+
+        # bob moves right in between the dog, sword, and tim
+        move_entity(self.world, self.bob, Coord(1, 2))
+        self.assertEqual(self.bob.peeps_nearby, {self.dog, self.sword, self.tim})
+        self.assertEqual(self.dog.peeps_nearby, {self.bob, self.sword, self.tim})
+        self.assertEqual(self.sword.peeps_nearby, {self.dog, self.bob, self.tim})
+        self.assertEqual(self.tim.peeps_nearby, {self.dog, self.sword, self.bob})
+        self.assertEqual(self.armour.peeps_nearby, set())
+
+        # walks south a bit
+        move_entity(self.world, self.bob, Coord(1, 1))
+        self.assertEqual(self.bob.peeps_nearby, {self.dog, self.sword, self.tim})
+        move_entity(self.world, self.bob, Coord(1, 0))
+        self.assertEqual(self.bob.peeps_nearby, {self.dog, self.sword, self.tim})
+        move_entity(self.world, self.bob, Coord(1, -1))
+        self.assertEqual(self.bob.peeps_nearby, {self.dog, self.armour, self.tim})
+        move_entity(self.world, self.bob, Coord(1, -2))
+        self.assertEqual(self.bob.peeps_nearby, {self.armour})
+
+        # walks to the west
+        move_entity(self.world, self.bob, Coord(0, -2))
+        self.assertEqual(self.bob.peeps_nearby, {self.armour})
+        move_entity(self.world, self.bob, Coord(-1, -2))
+        self.assertEqual(self.bob.peeps_nearby, set())
+        move_entity(self.world, self.bob, Coord(-2, -2))
+        self.assertEqual(self.bob.peeps_nearby, set())
+
+        # walks north east
+        move_entity(self.world, self.bob, Coord(-1, -1))
+        self.assertEqual(self.bob.peeps_nearby, {self.dog, self.tim})
 
     def test_area_entity_check(self):
 

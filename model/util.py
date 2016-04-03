@@ -1,4 +1,5 @@
 from math import sqrt
+import random
 
 fighter_bab = [[0], [1], [2], [3], [4], [5], [6, 1], [7, 2], [8, 3], [9, 4],
     [10, 5], [11, 6, 1], [12, 7, 2], [13, 8, 3], [14, 9, 4], [15, 10, 5],
@@ -160,8 +161,28 @@ def check_for_new_attrib(level):
 size_modifiers = {"colossal": -8, "gargantuan": -4, "huge": -2, "large": -1,
             "medium": 0, "small": 1, "tiny": 2, "diminutive": 4, "fine": 8}
 
-def find_distance(coord1, coord2):
+def distance_between_coords(coord1, coord2):
+    """Returns the distance between two coords."""
     x1, y1 = coord1
     x2, y2 = coord2
     squared_distance = (x2 - x1)**2 + (y2 - y1)**2
     return sqrt(squared_distance)
+
+
+"""
+2d6+3
+Roll two die 1-6 then add 3.
+"""
+def roll(num_die, sides, modifier=0):
+    """
+    Generates random number (num_die number of times) from 1 to number of sides
+    (inclusive).  Returns the sum of all the generated numbers and the modifier.
+    Example: 2d6+3
+    """
+    total = 0
+    for i in range(num_die):
+        total = total+random.randint(1,sides)
+    total = total+modifier
+    return total
+
+

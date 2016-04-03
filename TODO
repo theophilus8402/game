@@ -18,9 +18,16 @@ x integrate map3.py stuff into the game (see who's nearby)
 
 
 model.world.get_tile                            x           x               x
-model.world.move_entity                         x           _               x
+model.world.move_entity                         x           x               x
     model.world.move_check_nearby_entities      x           x               x
         model.tile.check_tile_new_entity        x           x               x
         model.world.check_entities_out_of_range x           x               x
     model.world.area_entity_check               x           x               x
 
+model.util.roll (moved it)                      x           x               x
+
+moved model.world.distance_between_coords to model.util.distance_between_coords
+fixed some of control.entity.living.action_hit to better use model.info.Status
+got rid of entity.cur_loc and changed it to entity.coord
+moved control/admin.py to ../bak_game/control/admin
+moved all the db stuff to ../bak_game as well
