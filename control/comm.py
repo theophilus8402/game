@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
+import os
 import sys
 import time
 from queue import Queue
+from io import StringIO
 
 """
 class Msg(object):
@@ -70,20 +72,35 @@ class AI_IO(Communication):
         self.inbox = Queue()      # what the AI receives
         self.name = ai_name
         self.output_handle = sys.stdout     # not actual AI's output
+        # Aha!  I need to use os.pipe... this will give me similar functionality to sockets and let me use select on em...
+        server_read_fd, client_write_fd = os.pipe()     # client -> server comms
+        client_read_fd, server_write_fd = os.pipe()     # server -> client comms
+        self.server_read_handle = os.fdopen(server_read_fd, "rt")
+        self.client_read_handle = os.fdopen(client_read_fd, "rt")
+        self.server_write_handle = os.fdopen(server_write_fd, "wt")
+        self.client_write_handle = os.fdopen(client_write_fd, "wt")
+        
 
     def send(self, msg):    # data being sent TO the AI
-        print("{} got: {}".format(self.name, msg), file=self.output_handle)
-        self.inbox.put(msg)
+        print("Server: {} got: {}".format(self.name, msg), file=self.output_handle)
+        #self.inbox.put(msg)
+        self.server_write_handle.write("{}\n".format(msg))
+        self.server_write_handle.flush()
 
-    def send_msg(self, msg):    
+    def send_msg_to_server(self, msg):    
         #print("Adding to outbox: {}".format(msg))
-        self.outbox.put(msg)
+        #self.outbox.put(msg)
+        self.client_write_handle.write("{}\n".format(msg))
+        self.client_write_handle.flush()
+        print("Server: {} .send_msg_to_server: {}".format(self.name, msg))
 
     def recv(self):         # data the AI has sent to the game
-        try:
-            data = self.outbox.get_nowait().strip()
-        except:
-            data = None
+        #try:
+        #    data = self.outbox.get_nowait().strip()
+        #except:
+        #    data = None
+        data = self.server_read_handle.readline()
+        print("Server: {} .recv: {}".format(self.name, data))
         return data
 
 """

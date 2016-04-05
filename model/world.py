@@ -5,6 +5,7 @@ import sys
 import model.entity.entity
 from model.info import Status, Coord
 from model.tile import *
+from model.util import distance_between_coords
 
 class World:
 

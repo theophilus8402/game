@@ -69,11 +69,11 @@ def action_hit(world, msg):
 
     if status == Status.all_good:     # check to make sure he can do the attack
         required_parts = {Body.right_arm, Body.left_arm}
-        afflicted = check_health(src_ent, required_parts)
-        if afflicted:
+        affliction = check_health(src_ent, required_parts)
+        if affliction:
             src_ent.comms.send(
                 "Ack! Something is wrong with you ({})! So you can't hit...".format(
-                bad_part))
+                affliction))
             status = Status.affliction_impeding
         # TODO: Figure out how to print out the bad status effect
 

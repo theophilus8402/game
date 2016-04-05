@@ -28,7 +28,7 @@ def simple_run(self):
 
     if datetime.now() >= self.next_run_time:
         cmd = self.get_next_cmd()
-        self.comms.send_msg(cmd)
+        self.comms.send_msg_to_server(cmd)
 
         self.set_next_run_time()
 

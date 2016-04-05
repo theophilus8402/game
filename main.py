@@ -18,16 +18,16 @@ import play
 
 def get_input_from_players(world, readable):
     for s in readable:
-        src_ent = world.player_driven_comms[s]
-        data = src_ent.comms.recv()
+        entity = world.player_driven_comms[s]
+        data = entity.comms.recv()
         if data:
             command = data.split()[0]
             if command in bob.known_cmds:
                 new_msg = model.msg.ActionMsgs(cmd_word=command,
-                    msg=data, src_entity=src_ent)
+                    msg=data, src_entity=entity)
                 world.immediate_action_msgs.put(new_msg)
             else:
-                src_ent.comms.send("Huh? What is {}".format(command))
+                entity.comms.send("Huh? What is {}".format(command))
 
 
 def get_input_from_ai(world):
@@ -87,7 +87,6 @@ if __name__ == "__main__":
     world.actions["se"] = control.entity.living.action_move
     world.actions["sw"] = control.entity.living.action_move
     world.actions["w"] = control.entity.living.action_move
-    world.actions["dist"] = control.entity.living.action_show_distance
     world.actions["l"] = control.entity.living.action_look
     world.actions["look"] = control.entity.living.action_look
     world.player_driven_comms = {}
@@ -113,7 +112,8 @@ if __name__ == "__main__":
     """
     tim.comms = control.comm.AI_IO(ai_name=tim.name)
     tim.comms.send("Hey, Tim!")
-    world.ai_entities = [tim]
+    world.player_driven_comms[tim.comms.server_read_handle] = tim
+    #world.ai_entities = [tim]
     add_entity(get_tile(world, Coord(0, 0)), tim)
 
     world.living_ents[bob.name] = bob
@@ -134,6 +134,6 @@ if __name__ == "__main__":
         get_input_from_players(world, readable)
         #get_input_from_ai(world)
 
-        #run_ai(world)
+        run_ai(world)
 
         continue_loop = handle_action_msgs(world)

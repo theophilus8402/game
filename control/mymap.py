@@ -1,10 +1,10 @@
 #!/usr/bin/python3.4
 
-def display_map(world, bob, center=None, dimension=None):
+def display_map(world, entity, center=None, dimension=None):
     if center == None:
-        center = bob.coord
+        center = entity.coord
     if dimension == None:
-        dimension = bob.visual_range
+        dimension = entity.visual_range
     map_rows = []     # a list of the string for each row
     x, y = center
     """
@@ -30,7 +30,7 @@ def display_map(world, bob, center=None, dimension=None):
                 row.append(" ")
         # turn the row into a string and append it to the list
         if len(row) > 0: map_rows.append("".join(row))
-    bob.send_msg("\n".join(map_rows))
+    entity.comms.send("\n".join(map_rows))
     return True
 
 

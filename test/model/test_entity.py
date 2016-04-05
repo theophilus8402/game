@@ -2,7 +2,7 @@
 
 import unittest
 
-import model.entity
+from model.entity.entity import change_hp
 from model.entity.status_effects import *
 import play
 
@@ -92,10 +92,10 @@ class util(unittest.TestCase):
 
     def test_change_hp(self):
         self.bob.cur_hp = 10
-        self.bob.change_hp(self.bob, 10)
+        change_hp(self.bob, 10)
         self.assertEqual(self.bob.cur_hp, 20)
 
-        self.bob.change_hp(self.bob, -30)
+        change_hp(self.bob, -30)
         self.assertEqual(self.bob.cur_hp, -10)
 
     def test_die(self):
