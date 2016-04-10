@@ -4,7 +4,7 @@ import model.util
 CMDS_BASIC_MOVEMENT = {"n", "ne", "e", "se", "s", "sw", "w", "nw"}
 CMDS_BASIC_ATTACK = {"hit", "fhit", "cast"}
 CMDS_BASIC_HUMANOID = {"get", "eat", "drink", "wear", "wield", "remove",
-    "unwield", "l", "look", "quit", "exit"}
+    "unwield", "l", "look", "quit", "exit", "say"}
 CMDS_DEBUG = {"dist"}
 
 PARALYZED = "paralyzed"

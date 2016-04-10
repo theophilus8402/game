@@ -4,11 +4,11 @@ import random
 def simple_get_next_cmd(self):
     """
     Needs:
-        self.cmd_list
+        self.run_cmds
     """
     return random.choice(self.run_cmds)
 
-def simple_set_next_run_time(self=None):
+def simple_set_next_run_time(self):
     """
     Needs:
         self.cmd_interval
@@ -28,9 +28,22 @@ def simple_run(self):
 
     if datetime.now() >= self.next_run_time:
         cmd = self.get_next_cmd()
-        self.comms.send_msg_to_server(cmd)
+        self.entity.comms.send_msg_to_server(cmd)
 
         self.set_next_run_time()
+
+
+class Simple_AI(object):
+
+    def __init__(self, entity):
+        self.cmd_interval = (0, 4)
+        self.set_next_run_time()
+        self.run_cmds = ["n", "e", "s", "w", "hit bob"]
+        self.entity = entity
+
+    set_next_run_time = simple_set_next_run_time
+    get_next_cmd = simple_get_next_cmd
+    run = simple_run
 
 """
 def simple_handle_msgs(self):

@@ -68,11 +68,8 @@ a key word by the system to exit.
 class AI_IO(Communication):
 
     def __init__(self, ai_name="AI"):
-        self.outbox = Queue()     # what the AI sends out
-        self.inbox = Queue()      # what the AI receives
         self.name = ai_name
         self.output_handle = sys.stdout     # not actual AI's output
-        # Aha!  I need to use os.pipe... this will give me similar functionality to sockets and let me use select on em...
         server_read_fd, client_write_fd = os.pipe()     # client -> server comms
         client_read_fd, server_write_fd = os.pipe()     # server -> client comms
         self.server_read_handle = os.fdopen(server_read_fd, "rt")
@@ -82,25 +79,19 @@ class AI_IO(Communication):
         
 
     def send(self, msg):    # data being sent TO the AI
-        print("Server: {} got: {}".format(self.name, msg), file=self.output_handle)
-        #self.inbox.put(msg)
+        #print("{} recv'd: {}".format(self.name, msg), file=self.output_handle)
         self.server_write_handle.write("{}\n".format(msg))
         self.server_write_handle.flush()
 
     def send_msg_to_server(self, msg):    
-        #print("Adding to outbox: {}".format(msg))
-        #self.outbox.put(msg)
         self.client_write_handle.write("{}\n".format(msg))
         self.client_write_handle.flush()
-        print("Server: {} .send_msg_to_server: {}".format(self.name, msg))
+        print("Server: {} .send_msg_to_server: {}".format(self.name, msg),
+            file=self.output_handle)
 
     def recv(self):         # data the AI has sent to the game
-        #try:
-        #    data = self.outbox.get_nowait().strip()
-        #except:
-        #    data = None
         data = self.server_read_handle.readline()
-        print("Server: {} .recv: {}".format(self.name, data))
+        #print("Server: {} .recv: {}".format(self.name, data), file=self.output_handle)
         return data
 
 """

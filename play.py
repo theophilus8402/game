@@ -138,6 +138,7 @@ def make_dog():
     dog.max_mp = 0
     add_status_effect(dog, Afflictions.stupid)
     add_status_effect(dog, Afflictions.lost_balance)
+    dog.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_HUMANOID)
     return dog
 
 
@@ -156,7 +157,6 @@ def make_bob():
     bob.friction = 10
     bob.cur_mp = 10
     bob.max_mp = 10
-    bob.vision_range = 6
 
     bob.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
     bob.known_cmds = bob.known_cmds.union(CMDS_BASIC_HUMANOID)
@@ -190,7 +190,6 @@ def make_tim():
     tim.friction = 10
     tim.cur_mp = 10
     tim.max_mp = 10
-    tim.vision_range = 6
     add_status_effect(tim, Afflictions.lost_balance)
 
     tim.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)

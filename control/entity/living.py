@@ -1,11 +1,53 @@
+import collections
 
 import control.mymap
 from model.entity.living import *
 from model.entity.entity import *
 from model.info import dir_coord_changes, Status
+from model.msg import ActionMsgs
 import model.world
 import model.tile
 from model.util import distance_between_coords
+
+
+def get_input_from_entities(world, readable):
+    for s in readable:
+        entity = world.socket_entity_map[s]
+        data = entity.comms.recv()
+        if data:
+            command = data.split()[0]
+            if command in entity.known_cmds:
+                new_msg = ActionMsgs(cmd_word=command,
+                    msg=data, src_entity=entity)
+                world.immediate_action_msgs.put(new_msg)
+            else:
+                entity.comms.send("Huh? What is {}".format(command))
+
+
+def handle_action_msgs(world):
+    continue_loop = True
+    msg_queue = world.immediate_action_msgs
+    while not msg_queue.empty():
+        msg = msg_queue.get()
+        msg_text = msg.msg
+        src_ent = msg.src_entity
+        if msg_text == "exit":
+            continue_loop = False
+            src_ent.comms.send("Goodbye!  We'll miss you!")
+        else:
+            action = world.actions[msg.cmd_word]
+            action(world, msg)
+        #src_ent.comms.send(msg)     # this just shows what msg was sent
+    return continue_loop
+
+
+def run_ai(world):
+    for ai in world.ai_entities:
+        ai.run()
+
+
+def default_action(world, msg):
+    msg.src_entity.comms.send("Unknown world action: \"{}\"?".format(msg.msg))
 
 
 def action_move(world, msg):
@@ -102,3 +144,36 @@ def action_hit(world, msg):
 
     src_ent.comms.send("status: {}".format(status))
     return status
+
+def send_msg_third_party(entity, msg_to_send):
+    for nearby_entity in [ent for ent in entity.peeps_nearby if hasattr(ent, "comms")]:
+        #TODO: can do checks here to see if the peeps_nearby can actually hear
+        #  i.e. they can't hear because they are deaf
+        #  or they can't hear because the target is whispering and they're too far away
+        # may also need to keep track if the msg is visual or auditory
+        nearby_entity.comms.send(msg_to_send)
+
+def action_say(world, msg):
+    entity = msg.src_entity
+    words = msg.msg.split()
+
+    words_said = " ".join(words[1:])
+
+    print("peeps nearby: {}".format(entity.peeps_nearby))
+    send_msg_third_party(entity, "{} said, \"{}\".".format(entity.name, words_said))
+
+
+default_world_actions = collections.defaultdict(lambda: default_action)
+default_world_actions["hit"] = action_hit
+default_world_actions["n"] = action_move
+default_world_actions["nw"] = action_move
+default_world_actions["ne"] = action_move
+default_world_actions["e"] = action_move
+default_world_actions["s"] = action_move
+default_world_actions["se"] = action_move
+default_world_actions["sw"] = action_move
+default_world_actions["w"] = action_move
+default_world_actions["l"] = action_look
+default_world_actions["look"] = action_look
+default_world_actions["say"] = action_say
+

@@ -15,6 +15,10 @@ _ clean up a lot of the old structures... get rid of junk
 _ clean up the tests in test/control/test_socks.py
 _ test the "new" way of handling entities and how to interact with them
 x integrate map3.py stuff into the game (see who's nearby)
+_ document/test all the ai stuff
+_ implement a way for the ai to detect if he's been hit and to try to kill the attacker
+_ make it so each entity is outputing stuff to it's own file, that would make reading
+    easier
 
 
 model.world.get_tile                            x           x               x
