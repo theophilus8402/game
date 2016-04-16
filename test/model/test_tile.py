@@ -32,6 +32,8 @@ class tile(unittest.TestCase):
         self.dog_tile = get_tile(self.world, Coord(-1, 2))
         add_entity(self.dog_tile, self.dog)
 
+        self.armour = play.make_armour()
+
         self.empty_tile = get_tile(self.world, Coord(0, 0))
 
     def test_addremove_entity(self):
@@ -68,6 +70,28 @@ class tile(unittest.TestCase):
         self.assertEqual(self.bob.peeps_nearby, {self.tim, self.sword})
         self.assertEqual(self.tim.peeps_nearby, {self.bob})
         self.assertEqual(self.sword.peeps_nearby, {self.bob})
+
+    def test_get_symbol(self):
+        self.assertEqual(get_symbol(self.empty_tile), ".")
+
+        add_entity(self.empty_tile, self.sword)
+        self.assertEqual(get_symbol(self.empty_tile), "-")
+
+        add_entity(self.empty_tile, self.armour)
+        self.assertEqual(get_symbol(self.empty_tile), "-")
+
+        remove_entity(self.empty_tile, self.sword)
+        self.assertEqual(get_symbol(self.empty_tile), "&")
+
+        add_entity(self.empty_tile, self.dog)
+        self.assertEqual(get_symbol(self.empty_tile), "d")
+
+        remove_entity(self.empty_tile, self.armour)
+        self.assertEqual(get_symbol(self.empty_tile), "d")
+
+        remove_entity(self.empty_tile, self.dog)
+        self.assertEqual(get_symbol(self.empty_tile), ".")
+
         #self.assertTrue(False)
 
 

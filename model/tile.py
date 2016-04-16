@@ -53,6 +53,25 @@ def check_tile_new_entity(tile, searching_entity):
             #print("Saw {} at {}.".format(ent.name, coord))
 
 
+def get_symbol(tile):
+    """
+    Returns the symbol that represents the tile and the entity(ies) on the tile.
+    For now, just returns the symbol of the first living entity in the list.
+    If no living entities, returns the symbol of the first non-living entity.
+    If there are no entities, the default_symbol will be returned.
+    """
+    symbol = tile.default_symbol
+    living_symbol = None
+    if len(tile.entities) > 0:
+        symbol = tile.entities[0].symbol
+        # look through all the entities
+        for ent in tile.entities:
+            # if there's a living creature, use that
+            if ent.type == "living":
+                symbol = ent.symbol
+                break
+    return symbol
+
 class Tile:
 
     def __init__(self):
@@ -61,29 +80,4 @@ class Tile:
         self.ground = ""    # muddy, water, rough
         self.coord = (0, 0)
         self.default_symbol = "."
-
-    """
-    If there is an entity in the tile, it's symbol will be returned.
-    If there are no entities, the default_symbol will be returned.
-    """
-    def get_symbol(self):
-        symbol = None
-        living_symbol = None
-        if len(self.entities) > 0:
-            symbol = self.entities[0].symbol
-            # look through all the entities
-            for ent in self.entities:
-                # if there's a player, use that symbol first
-                if ent.type == "player":
-                    symbol = ent.symbol
-                    break
-                # if there's a living creature, use that
-                if (ent.type == "living") and not living_symbol:
-                    living_symbol = ent.symbol
-        if not symbol:
-            if living_symbol:
-                symbol = living_symbol
-            else:
-                symbol = self.default_symbol
-        return symbol
 

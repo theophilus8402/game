@@ -1,5 +1,7 @@
 #!/usr/bin/python3.4
 
+from model.tile import get_symbol
+
 def display_map(world, entity, center=None, dimension=None):
     if center == None:
         center = entity.coord
@@ -24,7 +26,7 @@ def display_map(world, entity, center=None, dimension=None):
                 for ent in world.tiles[coord].entities:
                     ents.append(ent.name)
                 """
-                row.append(world.tiles[coord].get_symbol())
+                row.append(get_symbol(world.tiles[coord]))
             except:
                 # the a tile doesn't exist in the corresponding coord
                 row.append(" ")
