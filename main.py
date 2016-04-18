@@ -28,7 +28,8 @@ if __name__ == "__main__":
 
     tim = play.make_tim()
     ai_tim = control.entity.ai.Simple_AI(tim)
-    tim.comms = control.comm.AI_IO(ai_name=tim.name)
+    ai_tim.run_cmds = ["n", "e", "s", "w", "hit bob"]
+    tim.comms = control.comm.AI_IO(ai_name=tim.name, from_server_file="tim.txt")
     tim.comms.send("Hey, Tim!")
     world.socket_entity_map[tim.comms.server_read_handle] = tim
     world.ai_entities = [ai_tim]
@@ -36,8 +37,10 @@ if __name__ == "__main__":
 
     dog = play.make_dog()
     ai_dog = control.entity.ai.Simple_AI(dog)
-    ai_dog.run_cmds = ["n", "ne", "e", "se", "s", "sw", "w", "nw", "say bark"]
-    dog.comms = control.comm.AI_IO(ai_name=dog.name)
+    ai_dog.cmd_interval = (5, 10)
+    #ai_dog.run_cmds = ["n", "ne", "e", "se", "s", "sw", "w", "nw", "say bark"]
+    ai_dog.run_cmds = ["say bark"]
+    dog.comms = control.comm.AI_IO(ai_name=dog.name, from_server_file="dog.txt")
     world.socket_entity_map[dog.comms.server_read_handle] = dog
     world.ai_entities.append(ai_dog)
     add_entity(get_tile(world, Coord(2, 3)), dog)

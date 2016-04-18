@@ -13,6 +13,8 @@ class Body(enum.Enum):
     right_leg = 6
     left_leg = 7
     torso = 8
+    ears = 9
+    eyes = 10
     # we could do things like:
     #   clear_headed    (for stupid, cursed, dizzy?)
 
@@ -26,6 +28,8 @@ class Afflictions(enum.Enum):
     dead = 5
     stupid = 6
     lost_balance = 7
+    deaf = 8
+    blind = 9
 
 
 afflictions_map = {
@@ -39,10 +43,11 @@ afflictions_map = {
     Afflictions.stupid : {Body.head},
     Afflictions.lost_balance : {Body.right_arm, Body.left_arm, Body.right_leg,
         Body.left_leg},
+    Afflictions.deaf : {Body.ears},
+    Afflictions.blind : {Body.eyes},
 }
 
 
-# tested
 def add_status_effect(entity, effect):
     '''
     Adds the effect to the entity's set of status_effects.  There will
@@ -50,7 +55,6 @@ def add_status_effect(entity, effect):
     '''
     entity.status_effects.add(effect)
 
-# tested
 def remove_status_effect(entity, effect):
     '''
     Removes the effect from the entity's set of status_effects.  If the

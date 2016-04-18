@@ -1,19 +1,11 @@
 #!/usr/bin/python3
 
 import os
+from select import select
 import sys
 import time
 from queue import Queue
 from io import StringIO
-
-"""
-class Msg(object):
-
-    def __init__(self, msg=None, entity=None):
-        self.msg = msg
-        self.time_recvd = time.time()   # time in float seconds from epoc
-        self.entity = entity
-"""
 
 
 class Communication(object):
@@ -52,22 +44,10 @@ class File_IO(Communication):
         return data.strip()
 
 
-"""
-#TODO:
-class Scripted_IO(Communication):
-
-If random=False, this IO class will read in a file and execute/send those
-commands in order but at random times.  This will allow for "live" testing
-or a series of tests to be conducted.
-
-If random=True, this class will read in a file that dictates all commands
-that I want tested (even random junk).  It will execute/send those
-commands at random intervals.  This class will keep on going until given
-a key word by the system to exit.
-"""
+#TODO: maybe have a way to read in a script file and run that to re-test sequences
 class AI_IO(Communication):
 
-    def __init__(self, ai_name="AI"):
+    def __init__(self, ai_name="AI", from_server_file=None):
         self.name = ai_name
         self.output_handle = sys.stdout     # not actual AI's output
         server_read_fd, client_write_fd = os.pipe()     # client -> server comms
@@ -76,12 +56,23 @@ class AI_IO(Communication):
         self.client_read_handle = os.fdopen(client_read_fd, "rt")
         self.server_write_handle = os.fdopen(server_write_fd, "wt")
         self.client_write_handle = os.fdopen(client_write_fd, "wt")
+        self.read_from_server_file = from_server_file
         
 
-    def send(self, msg):    # data being sent TO the AI
+    def send(self, msg):    # send data TO the AI
         #print("{} recv'd: {}".format(self.name, msg), file=self.output_handle)
         self.server_write_handle.write("{}\n".format(msg))
         self.server_write_handle.flush()
+
+    def read_from_server(self):     # read msgs that were sent to the AI
+        readable, writeable, executable = select([self.client_read_handle],[],[],.08)
+        msg = None
+        if readable:
+            msg = self.client_read_handle.readline()
+            if self.read_from_server_file:
+                with open(self.read_from_server_file, "at") as f:
+                    f.write(msg)
+        return msg
 
     def send_msg_to_server(self, msg):    
         self.client_write_handle.write("{}\n".format(msg))

@@ -39,4 +39,40 @@ got rid of entity.cur_loc and changed it to entity.coord
 moved control/admin.py to ../bak_game/control/admin
 moved all the db stuff to ../bak_game as well
 got rid of a bunch of stuff in model.world
-move a bunch of the control.sockets like things to ../bak_game/control/socks.py
+moved a bunch of the control.sockets like things to ../bak_game/control/socks.py
+
+model.world.find_entity                         x           _               _
+control.comm.*
+    Communication                               _           _               _
+    File_IO                                     x           _               _
+    File_IO.send                                x           _               _
+    File_IO.recv                                x           _               _
+    AI_IO                                       x           _               _
+    AI_IO.send                                  x           _               _
+    AI_IO.read_from_server                      x           _               _
+    AI_IO.send_msg_to_server                    x           _               _
+    AI_IO.recv                                  x           _               _
+control.mymap.display_map                       x           _               _
+control.entity.ai.*
+    simple_get_next_cmd                         x           _               _
+    simple_set_next_run_time                    x           _               _
+    simple_run                                  x           _               _
+    Simple_AI                                   x           _               _
+control.entity.living.*
+    get_input_from_entities                     x           _               _
+    handle_action_msgs                          x           _               _
+    run_ai                                      x           _               _
+    default_action                              x           _               _
+    action_move                                 x           _               _
+    action_look                                 x           _               _
+    action_hit                                  x           _               _
+    send_msg_third_party                        x           _               _
+    action_say                                  x           _               _
+
+To Clean-up/Look at:
+model.entity.living.*
+    add_status_msg
+    remove_status_msg
+    get_attack_bonus
+    check_successful_attack
+    determine_weapon_dmg

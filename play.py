@@ -212,7 +212,7 @@ if __name__ == "__main__":
     shoe = make_shoe()
     sword = make_sword()
     shield = make_shield()
-    plate = make_plate()
+    plate = make_armour()
     dog = make_dog()
     bob = make_bob()
     bob.wield("right", sword)
@@ -222,7 +222,7 @@ if __name__ == "__main__":
     print()
 
     for att_bonus in bob.get_attack_bonus(melee=True):
-        att_roll = model.roll.roll(1, 20, att_bonus)
+        att_roll = model.util.roll(1, 20, att_bonus)
         print("att_roll = {} + {} = {}".format(att_roll-att_bonus,
             att_bonus, att_roll))
     print()
@@ -242,7 +242,7 @@ if __name__ == "__main__":
     print()
 
     for att_bonus in bob.get_attack_bonus(melee=True):
-        att_roll = control.roll.attack_roll(att_bonus)
+        att_roll = model.util.roll(1, 20, att_bonus)
         print("att_roll = {} + {} = {}".format(att_roll-att_bonus,
             att_bonus, att_roll))
 

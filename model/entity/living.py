@@ -5,17 +5,8 @@ CMDS_BASIC_MOVEMENT = {"n", "ne", "e", "se", "s", "sw", "w", "nw"}
 CMDS_BASIC_ATTACK = {"hit", "fhit", "cast"}
 CMDS_BASIC_HUMANOID = {"get", "eat", "drink", "wear", "wield", "remove",
     "unwield", "l", "look", "quit", "exit", "say"}
-CMDS_DEBUG = {"dist"}
+CMDS_DEBUG = {}
 
-PARALYZED = "paralyzed"
-BROKEN_ARM = "broken_arm"
-ERROR_TARGET_DOESNT_EXIST = 2
-ERROR_INCORRECT_SYNTAX = 1
-ERROR_TARGET_TOO_FAR = 5
-ERRORS_STATUS = {
-    PARALYZED: 3,
-    BROKEN_ARM: 4,
-}
 
 def add_status_msg(entity, msg):
     entity.status_msgs.add(msg)
@@ -26,10 +17,6 @@ def remove_status_msg(entity, msg):
         entity.status_msgs.remove(msg)
     except:
         pass    # I don't think I want to do anything...
-
-
-def check_status_msgs(entity, bad_msgs):
-    return entity.status_msgs.intersection(bad_msgs)
 
 
 def get_attack_bonus(src_ent, melee=True, range_pen=0):
@@ -75,28 +62,4 @@ def determine_weapon_dmg(src_ent, dst_ent):
     #TODO: actually implement this
     dmg = -6
     return dmg
-
-
-def hit(world, src_ent, dst_ent, full_attack=False):
-    status = 0
-
-    bad_status_msgs = check_status_msgs(src_ent, {PARALYZED, BROKEN_ARM})
-    if bad_status_msgs == set():    # he doesn't have any bad status msgs 
-        src_ent.comms.send("Ok, you're clean to hit {}!".format(
-            dst_ent.name))
-    else:
-        src_ent.comms.send("Here's what's wrong with you: {}".format(
-            bad_status_msgs))
-        status = ERRORS_STATUS[bad_status_msgs.pop()] # just return one
-                                                      # bad status msg
-
-    # attack roll
-    attack_bonus_list = get_attack_bonus(src_ent, melee=True)
-    if not full_attack:
-        attack_bonus_list = attack_bonus_list[0:1]
-    for attack_bonus in attack_bonus_list:
-        d20 = model.roll.roll(1, 20)
-
-    # dmg
-    return status
 

@@ -72,6 +72,7 @@ def get_symbol(tile):
                 break
     return symbol
 
+
 class Tile:
 
     def __init__(self):

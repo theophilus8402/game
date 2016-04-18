@@ -3,6 +3,7 @@ import collections
 import control.mymap
 from model.entity.living import *
 from model.entity.entity import *
+from model.entity.status_effects import *
 from model.info import dir_coord_changes, Status
 from model.msg import ActionMsgs
 import model.world
@@ -145,12 +146,20 @@ def action_hit(world, msg):
     src_ent.comms.send("status: {}".format(status))
     return status
 
-def send_msg_third_party(entity, msg_to_send):
-    for nearby_entity in [ent for ent in entity.peeps_nearby if hasattr(ent, "comms")]:
-        #TODO: can do checks here to see if the peeps_nearby can actually hear
-        #  i.e. they can't hear because they are deaf
-        #  or they can't hear because the target is whispering and they're too far away
-        # may also need to keep track if the msg is visual or auditory
+def send_msg_third_party(src_entity, msg_to_send, ents_to_exclude=[], dist=5,
+    visual=True):
+    src_coord = src_entity.coord
+    for nearby_entity in [ent for ent in src_entity.peeps_nearby if hasattr(ent,
+        "comms") and ent not in ents_to_exclude]:
+        # check to see if the entity is too far away to properly recieve the msg
+        if distance_between_coords(src_coord, nearby_entity.coord) > dist:
+            break
+        # check to see if the entity cannot recieve the msg to do an affliction
+        if (visual is True) and not (check_health(nearby_entity, [Body.ears]) is None):
+            break
+        if (not visual) and not (check_health(nearby_entity, [Body.eyes]) is None):
+            break
+        # if we make it here, the entity should probably get the msg
         nearby_entity.comms.send(msg_to_send)
 
 def action_say(world, msg):
@@ -160,7 +169,8 @@ def action_say(world, msg):
     words_said = " ".join(words[1:])
 
     print("peeps nearby: {}".format(entity.peeps_nearby))
-    send_msg_third_party(entity, "{} said, \"{}\".".format(entity.name, words_said))
+    send_msg_third_party(entity, "{} said, \"{}\".".format(entity.name, words_said),
+        dist=3, visual=False)
 
 
 default_world_actions = collections.defaultdict(lambda: default_action)
