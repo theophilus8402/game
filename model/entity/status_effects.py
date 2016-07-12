@@ -67,7 +67,7 @@ def check_health(entity, body_parts):
     '''
     Returns the status of the entity's body_part in question.  If the entity has one
     or more afflictions that affect that body_part, the first affliction (in the set)
-    will be returned.
+    will be returned. Defaults to None if the body part is not affected.
     '''
     status = None
     for affliction in entity.status_effects:

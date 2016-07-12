@@ -17,29 +17,19 @@ class Communication(object):
         pass
 
 
-class File_IO(Communication):
+class Std_IO(Communication):
 
-    def __init__(self, input_handle=None, output_handle=None):
-        if input_handle:
-            self.input_handle = input_handle
-
-            if output_handle is None:
-                self.output_handle = input_handle  # output is same as in
-            else:
-                self.output_handle = output_handle
-        
-        else:       # using stdin/stdout
-            self.input_handle = sys.stdin
-
-            if output_handle is None:
-                self.output_handle = sys.stdout
-            else:
-                self.output_handle = output_handle
+    def __init__(self):
+        """Sets the input_handle and output_handle to sys.stdin and sys.stdout."""
+        self.input_handle = sys.stdin
+        self.output_handle = sys.stdout
 
     def send(self, msg):
+        """Sends a msg from the server to the entity's output_handle."""
         print(msg, file=self.output_handle)
 
     def recv(self):
+        """Recieves a msg sent from the entity to the server."""
         data = self.input_handle.readline()
         return data.strip()
 
@@ -48,6 +38,7 @@ class File_IO(Communication):
 class AI_IO(Communication):
 
     def __init__(self, ai_name="AI", from_server_file=None):
+        """Initializes all the pipes/handles."""
         self.name = ai_name
         self.output_handle = sys.stdout     # not actual AI's output
         server_read_fd, client_write_fd = os.pipe()     # client -> server comms
@@ -57,14 +48,22 @@ class AI_IO(Communication):
         self.server_write_handle = os.fdopen(server_write_fd, "wt")
         self.client_write_handle = os.fdopen(client_write_fd, "wt")
         self.read_from_server_file = from_server_file
-        
 
-    def send(self, msg):    # send data TO the AI
+    def __del__(self):
+        """Cleans up all the open handles to the pipes... Hopefully..."""
+        self.server_read_handle.close()
+        self.client_read_handle.close()
+        self.server_write_handle.close()
+        self.client_write_handle.close()
+
+    def send(self, msg):
+        """Sends a msg from the server to the AI via a pipe."""
         #print("{} recv'd: {}".format(self.name, msg), file=self.output_handle)
         self.server_write_handle.write("{}\n".format(msg))
         self.server_write_handle.flush()
 
-    def read_from_server(self):     # read msgs that were sent to the AI
+    def read_from_server(self):
+        """Reads a msg from the server to the AI via a pipe. Returns the msg."""
         readable, writeable, executable = select([self.client_read_handle],[],[],.08)
         msg = None
         if readable:
@@ -74,13 +73,15 @@ class AI_IO(Communication):
                     f.write(msg)
         return msg
 
-    def send_msg_to_server(self, msg):    
+    def send_msg_to_server(self, msg):
+        """Sends a msg from the AI to the server."""
         self.client_write_handle.write("{}\n".format(msg))
         self.client_write_handle.flush()
-        print("Server: {} .send_msg_to_server: {}".format(self.name, msg),
-            file=self.output_handle)
+        #print("Server: {} .send_msg_to_server: {}".format(self.name, msg),
+        #    file=self.output_handle)
 
-    def recv(self):         # data the AI has sent to the game
+    def recv(self):
+        """Reads a msg from the AI to the server. Returns the msg."""
         data = self.server_read_handle.readline()
         #print("Server: {} .recv: {}".format(self.name, data), file=self.output_handle)
         return data

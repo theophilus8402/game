@@ -2,12 +2,14 @@
 
 import collections
 import select
+import sys
 import queue
 
 from model.world import get_tile, area_entity_check
 from model.tile import Coord, add_entity
 import control.comm
 from model.entity.living import *
+from model.entity.status_effects import Body
 import control.entity.ai
 from control.entity.living import default_world_actions
 import play
@@ -21,7 +23,7 @@ if __name__ == "__main__":
     world.immediate_action_msgs = queue.Queue()
 
     bob = play.make_bob()
-    bob.comms = control.comm.File_IO()
+    bob.comms = control.comm.Std_IO()
     world.socket_entity_map[bob.comms.input_handle] = bob
     add_entity(get_tile(world, Coord(1, 0)), bob)
     print("bob's current coord: {}".format(bob.coord))
@@ -50,7 +52,8 @@ if __name__ == "__main__":
     world.living_ents[dog.name] = dog
 
     sword = play.make_sword()
-    add_entity(get_tile(world, Coord(1, 1)), sword)
+    #add_entity(get_tile(world, Coord(1, 1)), sword)
+    bob.eq[Body.right_arm] = sword
 
     area_entity_check(world, bob)
     print("peeps nearby: {}".format(bob.peeps_nearby))

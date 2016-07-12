@@ -12,7 +12,7 @@ x change entity to keep track of status_effects
 model.world.distance_between_coords             x               x               x
 
 _ clean up a lot of the old structures... get rid of junk
-_ clean up the tests in test/control/test_socks.py
+x clean up the tests in test/control/test_socks.py
 _ test the "new" way of handling entities and how to interact with them
 x integrate map3.py stuff into the game (see who's nearby)
 _ document/test all the ai stuff
@@ -41,17 +41,19 @@ moved all the db stuff to ../bak_game as well
 got rid of a bunch of stuff in model.world
 moved a bunch of the control.sockets like things to ../bak_game/control/socks.py
 
+function                                   written         tested      documented
+-------------------------------------------------------------------------------------
 model.world.find_entity                         x           _               _
 control.comm.*
     Communication                               _           _               _
-    File_IO                                     x           _               _
-    File_IO.send                                x           _               _
-    File_IO.recv                                x           _               _
-    AI_IO                                       x           _               _
-    AI_IO.send                                  x           _               _
-    AI_IO.read_from_server                      x           _               _
-    AI_IO.send_msg_to_server                    x           _               _
-    AI_IO.recv                                  x           _               _
+    Std_IO                                      x           x               x
+    Std_IO.send                                 x           x               x
+    Std_IO.recv                                 x           x               x
+    AI_IO                                       x           x               x
+    AI_IO.send                                  x           x               x
+    AI_IO.read_from_server                      x           x               x
+    AI_IO.send_msg_to_server                    x           x               x
+    AI_IO.recv                                  x           x               x
 control.mymap.display_map                       x           _               _
 control.entity.ai.*
     simple_get_next_cmd                         x           _               _
@@ -65,9 +67,8 @@ control.entity.living.*
     default_action                              x           _               _
     action_move                                 x           _               _
     action_look                                 x           _               _
-    action_hit                                  x           _               _
-    send_msg_third_party                        x           _               _
-    action_say                                  x           _               _
+    action_hit                                  x           x               _
+    action_say                                  x           x               _
 
 To Clean-up/Look at:
 model.entity.living.*
@@ -76,3 +77,26 @@ model.entity.living.*
     get_attack_bonus
     check_successful_attack
     determine_weapon_dmg
+
+!!! For control.entity.living.send_msg !!!
+    x   might start something in view
+    x   in stead of setting the messages in control, make them in view
+           for example, view.msgs.Msg.action_say_to
+    have view determine if the entity is a peep or an AI, give different msgs
+    munge the words if the sayer is drunk/drugged or is speaking a different language
+    ok, view is going to get the information about the msg
+        x   it will look at the information pertaining to the entity/entities
+        x   generate msgs as appropriate
+        x   then return a list of tuples (entity, msg) msg is the exact msg to send
+            to the entity
+        x   it will not make any changes to anything
+        x   it will not send any msgs to any entities
+
+!!! implement logging (like system debug stuff !!!
+
+
+clean up the way we format msgs (view.msgs)... might be able to combine a lot of stuff
+clean up control.entity.living.action_move
+    have it send msgs to nearby peeps about moving
+control.entity.living.action_get
+control.entity.living.action_wield

@@ -2,10 +2,13 @@
 
 import model.entity.entity
 from model.entity.living import *
+from model.entity.util import *
 from model.entity.status_effects import *
 from model.tile import *
 from model.info import Coord
 import model.util
+
+prof = Proficiency
 
 def mtile(uid, coord):
     tile = Tile()
@@ -32,7 +35,7 @@ def make_shoe():
     shoe.uid = 20
     shoe.name = "shoe"
     shoe.symbol = "*"
-    shoe.coord = Coord(1, 3)
+    shoe.coord = Coord(2, 3)
     shoe.cur_hp = 10
     shoe.max_hp = 10
     shoe.short_desc = "This is an old shoe."
@@ -43,16 +46,46 @@ def make_shoe():
     return shoe
 
 
+def make_bow():
+    bow = model.entity.entity.Weapon()
+    bow.uid = 28
+    bow.name = "short bow"
+    bow.symbol = "D"
+    bow.coord = Coord(-1, 3)
+    bow.cur_hp = 13
+    bow.max_hp = 13
+    bow.short_desc = "This is a spiffy short bow."
+    bow.long_desc = "This is a really spiffy short bow."
+    bow.weight = 6
+    bow.volume = 1
+    bow.friction = .3
+    bow.die_to_roll = 2
+    bow.dmg_modifier = 3
+    bow.critical_range = 19
+    bow.critical_dmg = 3
+    bow.range_increment = 0
+    bow.attack_bonus = 0
+    bow.base_cost = 10
+    bow.proficiency = Proficiency.simple_weapons
+    bow.properties = [Property.ammunition, Property.two_handed]
+    bow.melee = False
+    bow.weapon_type = "short_bow"
+    bow.dmg_type = "cutting"
+    bow.size = "medium"
+    bow.reach = False
+    return bow
+
+
 def make_sword():
     sword = model.entity.entity.Weapon()
     sword.uid = 21
-    sword.name = "sword"
+    sword.name = "short sword"
     sword.symbol = "-"
     sword.coord = Coord(1, 3)
     sword.cur_hp = 13
     sword.max_hp = 13
-    sword.short_desc = "This is a shiny sword."
-    sword.long_desc = "This is a really shiny sword. It is not floppy."
+    sword.short_desc = "This is a shiny short sword."
+    sword.long_desc = "This is a really shiny short sword. It is not floppy."
     sword.weight = 6
     sword.volume = 1
     sword.friction = .3
@@ -61,11 +94,12 @@ def make_sword():
     sword.critical_range = 19
     sword.critical_dmg = 3
     sword.range_increment = 0
-    sword.attack_bonus = 1
+    sword.attack_bonus = 0
     sword.base_cost = 10
-    sword.weapon_category = "martial"
+    sword.proficiency = Proficiency.martial_weapons
+    sword.properties = [Property.finesse, Property.light]
     sword.melee = True
-    sword.weapon_type = "sword"
+    sword.weapon_type = "short_sword"
     sword.dmg_type = "cutting"
     sword.size = "medium"
     sword.reach = False
@@ -93,7 +127,8 @@ def make_shield():
     shield.arcane_spell_fail = 5
     shield.speed = None
     shield.shield = True
-    shield.armour_type = "shield"
+    shield.proficiency = Proficiency.shields
+    shield.properties = []
     return shield
 
 
@@ -117,7 +152,8 @@ def make_armour():
     plate.arcane_spell_fail = 25
     plate.speed = (30, 20)
     plate.shield = False
-    plate.armour_type = "heavy"
+    plate.proficiency = Proficiency.heavy_armour
+    plate.properties = []
     return plate
 
 
@@ -139,6 +175,7 @@ def make_dog():
     add_status_effect(dog, Afflictions.stupid)
     add_status_effect(dog, Afflictions.lost_balance)
     dog.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_HUMANOID)
+    dog.male = True
     return dog
 
 
@@ -152,25 +189,29 @@ def make_bob():
     bob.max_hp = 10
     bob.short_desc = "This is Bob."
     bob.long_desc = "This is Bob. He's rugged looking."
+    bob.male = True
     bob.weight = 192
     bob.volume = 12
     bob.friction = 10
     bob.cur_mp = 10
     bob.max_mp = 10
+    bob.male = True
 
     bob.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
     bob.known_cmds = bob.known_cmds.union(CMDS_BASIC_HUMANOID)
     bob.known_cmds = bob.known_cmds.union(CMDS_DEBUG)
 
-    bob.pclass = "fighter"
+    bob.pclass = Class.fighter
     bob.level = 10
-    bob.set_attrib("str", 14)
-    bob.set_attrib("dex", 15)
-    bob.set_attrib("con", 13)
-    bob.set_attrib("int", 11)
-    bob.set_attrib("wis", 11)
-    bob.set_attrib("cha", 10)
-    bob.attack_bonus["base"] = model.util.get_bab(bob.pclass, bob.level)
+    bob.abilities = {}
+    set_ability(bob, Ability.strength, 14)
+    set_ability(bob, Ability.dexterity, 15)
+    set_ability(bob, Ability.constitution, 13)
+    set_ability(bob, Ability.intelligence, 11)
+    set_ability(bob, Ability.wisdom, 11)
+    set_ability(bob, Ability.charisma, 10)
+    bob.proficiencies = [prof.light_armour, prof.medium_armour, prof.heavy_armour,
+        prof.shields, prof.simple_weapons, prof.martial_weapons]
     bob.size = "small"
     return bob
 
@@ -185,26 +226,65 @@ def make_tim():
     tim.max_hp = 10
     tim.short_desc = "This is Tim."
     tim.long_desc = "This is Tim. He's not rugged looking."
+    tim.male = True
     tim.weight = 192
     tim.volume = 12
     tim.friction = 10
     tim.cur_mp = 10
     tim.max_mp = 10
     add_status_effect(tim, Afflictions.lost_balance)
+    tim.male = True
 
     tim.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
 
-    tim.pclass = "fighter"
+    tim.pclass = Class.wizard
     tim.level = 10
-    tim.set_attrib("str", 11)
-    tim.set_attrib("dex", 12)
-    tim.set_attrib("con", 10)
-    tim.set_attrib("int", 18)
-    tim.set_attrib("wis", 16)
-    tim.set_attrib("cha", 13)
-    tim.attack_bonus["base"] = model.util.get_bab(tim.pclass, tim.level)
+    tim.abilities = {}
+    set_ability(tim, Ability.strength, 11)
+    set_ability(tim, Ability.dexterity, 12)
+    set_ability(tim, Ability.constitution, 10)
+    set_ability(tim, Ability.intelligence, 18)
+    set_ability(tim, Ability.wisdom, 16)
+    set_ability(tim, Ability.charisma, 13)
+    tim.proficiencies = [prof.light_armour, prof.medium_armour, prof.heavy_armour,
+        prof.shields, prof.simple_weapons, prof.martial_weapons]
     tim.size = "small"
     return tim
+
+
+def make_alice():
+    alice = model.entity.entity.Humanoid()
+    alice.uid = 2
+    alice.name = "alice"
+    alice.symbol = "A"
+    alice.coord = Coord(3, -2)
+    alice.cur_hp = 10
+    alice.max_hp = 10
+    alice.short_desc = "This is Alice."
+    alice.long_desc = "This is Alice.  She is a woman."
+    alice.male = False
+    alice.weight = 142
+    alice.volume = 12
+    alice.friction = 10
+    alice.cur_mp = 10
+    alice.max_mp = 10
+    alice.male = False
+
+    alice.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
+
+    alice.level = 10
+    alice.pclass = Class.rogue
+    alice.abilities = {}
+    set_ability(alice, Ability.strength, 8)
+    set_ability(alice, Ability.dexterity, 18)
+    set_ability(alice, Ability.constitution, 11)
+    set_ability(alice, Ability.intelligence, 17)
+    set_ability(alice, Ability.wisdom, 14)
+    set_ability(alice, Ability.charisma, 16)
+    alice.proficiencies = [prof.light_armour, prof.medium_armour, prof.heavy_armour,
+        prof.shields, prof.simple_weapons, prof.martial_weapons]
+    alice.size = "small"
+    return alice
 
 
 if __name__ == "__main__":

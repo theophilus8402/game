@@ -1,4 +1,0 @@
-* a settings file with lists of items/strings to check for
-    * model.entity.attrib_options = ["str", "dex", "con...]
-* a strings file to get rid of all string literals in the code
-* super(Weapon, self).__init__(cur_hp=cur_hp) all over the place +++++++

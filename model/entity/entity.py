@@ -2,6 +2,7 @@
 
 import math
 import queue
+from time import time
 
 import model.util
 from model.info import Status
@@ -82,6 +83,19 @@ class Weapon(Entity):
                                     #   being wielded by a gnome
 
 
+class RoundInfo():
+
+    def __init__(self):
+        self.time_started = time()
+        self.feet_moved = 0
+        self.num_attacks = 0
+        #self.last_time_moved = None
+        #self.last_time_left_attacked = None
+        #self.last_time_right_attacked = None
+        self.interacted_obj = False
+        self.other_action = False
+
+
 # Basic armour:
 class Armour(Entity):
 
@@ -112,16 +126,14 @@ class Living(Entity):
         self.hit_dice = "2d4"
         self.race = "creature"
 
+        self.max_num_attacks = 1
+        self.main_hand = Body.right_arm
+        self.round_info = RoundInfo()
+
         # new
         self.status_effects = set()
 
-        self.attrib = {
-            "str": (10, 0),
-            "dex": (10, 0),
-            "con": (10, 0),
-            "int": (10, 0),
-            "wis": (10, 0),
-            "cha": (10, 0) }
+        self.abilities = {}
         self.fortitude = {
             "total": 0,
             "base": 0,
@@ -147,13 +159,8 @@ class Living(Entity):
         self.arcane_spell_failure = 0
         self.armour_check_penalty = -4
         self.speed = 20
-        self.attack_bonus = {
-            "total": 3,
-            "base": None,
-            "misc": (0, None),  # first num will be the total, then []
-                                #   of things that give the att bonus
-            }
-        self.ac = {
+        self.ac = 10
+        """{
         #AC = 10 + armour bonus + shield bonus + dex mod + size mod + other
             "total": 0,
             "base": 10,
@@ -162,11 +169,12 @@ class Living(Entity):
             "misc": (0, None),  # first num will be the total, then []
                                 #   of things that give the att bonus
             }
+        """
         self.eq = {
-            "left_hand": None,
-            "right_hand": None,
-            "armour": None,
-            "helm": None,
+            Body.right_arm  : None,
+            Body.left_arm   : None,
+            Body.torso      : None,
+            Body.head       : None,
             }
         self.skills = []
         self.spells = []
@@ -238,6 +246,7 @@ class Living(Entity):
         This will return a list of attack bonuses
         """
 
+        """
         if melee:
             attribute = "str"
         else:
@@ -259,10 +268,13 @@ class Living(Entity):
 
             attack_bonus_list.append(attack_bonus)
 
+        """
+        attack_bonus_list = []
         return attack_bonus_list
 
     def wield(self, hand, item):
         status = 0
+        """
         hand = "{}_hand".format(hand)
         if self.eq.get(hand) is None:
             # there's nothing in that hand, so we can go ahead and wield it
@@ -279,97 +291,23 @@ class Living(Entity):
         else:
             status = 4  # you already have something in that hand
         #TODO: gotta figure out two-handed weapons
-        return status
-
-    def add_attack_bonus(self, item):
-        total, misc_list = self.attack_bonus["misc"]
-        total += item.attack_bonus
-        if misc_list is None:
-            misc_list = []
-        misc_list.append(item)
-        self.attack_bonus["misc"] = (total, misc_list)
-
-    def remove_attack_bonus(self, item):
-        misc_attack_bonus, misc_list = self.attack_bonus["misc"]
-        misc_attack_bonus -= item.attack_bonus
-        misc_list.remove(item)
-        self.attack_bonus["misc"] = (misc_attack_bonus, misc_list)
-
-    def calculate_ac(self):
-        ac = self.ac
-        dex, dex_mod = self.attrib["dex"]
-        size_mod = model.util.size_modifiers[self.size]
-        misc_mod, items = ac["misc"]
-
-        # ac = 10 + armour_bonus + shield_bonus + dex_mod + size_mod + misc
-        self.ac["total"] = ac["base"] + ac["armour"] + ac["shield"] + \
-            dex_mod + size_mod + misc_mod
-
-    def add_armour_bonus(self, bonus_type, amt, item=None):
-        # types of bonus: total, base, armour, shield, misc
-        status = 0
-        if bonus_type in (set(self.ac.keys()) - set(["total", "base"])):
-            if bonus_type == "misc":
-                # misc (i.e. spells, rings/amulets...)
-                if item is None:
-                    status = 2
-                else:
-                    misc_amt, misc_list = self.ac["misc"]
-                    misc_amt += amt
-                    if misc_list is None:
-                        misc_list = []
-                    misc_list.append(item)
-                    self.ac["misc"] = (misc_amt, misc_list)
-            else:
-                # handle everything else
-                self.ac[bonus_type] = amt
-        else:
-            status = 1 # wrong/unknown bonus_type
-
-        if status == 0:
-            self.calculate_ac()
-
-        return status
-
-    def remove_armour_bonus(self, bonus_type, amt, item=None):
-        # types of bonus: total, base, armour, shield, misc
-        status = 0
-        if bonus_type in (set(self.ac.keys()) - set(["total", "base"])):
-            if bonus_type == "misc":
-                # misc (i.e. spells, rings/amulets...)
-                if item is None:
-                    status = 2      # no item given when trying to add a "misc" armour bonus
-                else:
-                    misc_amt, misc_list = self.ac["misc"]
-                    misc_amt -= amt
-                    if item in misc_list:
-                        misc_list.remove(item)
-                    self.ac["misc"] = (misc_amt, misc_list)
-            else:
-                # handle everything else
-                self.ac[bonus_type] = 0
-        else:
-            status = 1 # wrong/unknown bonus_type
-
-        if status == 0:
-            self.calculate_ac()
-
+        """
         return status
 
     def unwield(self, hand):
         status = 0
+        """
         hand = "{}_hand".format(hand)
         if self.eq.get(hand) is not None:
             item = self.eq[hand]
             self.eq[hand] = None
-            if hasattr(item, "attack_bonus"):
-                self.remove_attack_bonus(item)
-            if hasattr(item, "armour_bonus"):
+            if hasattr(item, "attack_bonus"): self.remove_attack_bonus(item) if hasattr(item, "armour_bonus"):
                 # currently, I'm assuming shield are the only thing you
                 #   can wield that will give AC bonus
                 self.remove_armour_bonus("shield", item.armour_bonus, item)
         else:
             status = 5      # there's nothing in that hand
+        """
         return status
                 
     def die(self):
