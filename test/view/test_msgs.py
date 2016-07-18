@@ -1,5 +1,6 @@
 #!/usr/bin/python3.4
 
+from collections import defaultdict
 import unittest
 import sys
 
@@ -8,6 +9,101 @@ from model.entity.status_effects import *
 from view.msgs import *
 from view.info import ViewStatus
 import play
+
+
+class MakeFormatStringDict(unittest.TestCase):
+
+    def setUp(self):
+        self.bob = play.make_bob()
+        self.bob.comms = AI_IO(ai_name=self.bob.name, from_server_file="test_bob.txt")
+
+        self.tim = play.make_tim()
+        self.tim.comms = AI_IO(ai_name=self.tim.name, from_server_file="test_tim.txt")
+
+        self.alice = play.make_alice()
+        self.alice.comms = AI_IO(ai_name=self.alice.name,
+            from_server_file="test_alice.txt")
+
+    def test_make_format_string_dict(self):
+        normal_hit_msg = "{Actor} maliciously {action_hit} {recip}!"
+        fail_sound_msg = "You see {actor} moving {actor_poss} lips but can't hear anything."
+        fail_sight_msg = "You hear someone say, '{msg}'"
+        normal_say_to_msg = "{Actor} {action_say} to {recip}, '{msg}'"
+        normal_say_msg = "{Actor} {action_say}, '{msg}'"
+
+        info = defaultdict(lambda: None)
+        info["actor"] = self.bob
+        info["recip"] = self.tim
+
+        ents = [self.bob, self.tim, self.alice]
+        for ent in ents:
+            result_dict = make_format_string_dict(info, ent)
+            if ent == self.bob:
+                self.assertEqual(normal_hit_msg.format(**result_dict),
+                    "You maliciously hit Tim!")
+            elif ent == self.tim:
+                self.assertEqual(normal_hit_msg.format(**result_dict),
+                    "Bob maliciously hits you!")
+            elif ent == self.alice:
+                self.assertEqual(normal_hit_msg.format(**result_dict),
+                    "Bob maliciously hits Tim!")
+
+        for ent in ents:
+            result_dict = make_format_string_dict(info, ent)
+            if ent == self.bob:
+                self.assertEqual(fail_sound_msg.format(**result_dict),
+                    "You see you moving your lips but can't hear anything.")
+            elif ent == self.tim:
+                self.assertEqual(fail_sound_msg.format(**result_dict),
+                    "You see Bob moving his lips but can't hear anything.")
+            elif ent == self.alice:
+                self.assertEqual(fail_sound_msg.format(**result_dict),
+                    "You see Bob moving his lips but can't hear anything.")
+
+
+        info["msg"] = "Howdy!"
+        for ent in ents:
+            result_dict = make_format_string_dict(info, ent)
+            if ent == self.bob:
+                self.assertEqual(normal_say_to_msg.format(**result_dict),
+                    "You say to Tim, 'Howdy!'")
+            elif ent == self.tim:
+                self.assertEqual(normal_say_to_msg.format(**result_dict),
+                    "Bob says to you, 'Howdy!'")
+            elif ent == self.alice:
+                self.assertEqual(normal_say_to_msg.format(**result_dict),
+                    "Bob says to Tim, 'Howdy!'")
+
+
+class GetUnformattedMsg(unittest.TestCase):
+
+    def setUp(self):
+        self.bob = play.make_bob()
+        self.bob.comms = AI_IO(ai_name=self.bob.name, from_server_file="test_bob.txt")
+
+        self.tim = play.make_tim()
+        self.tim.comms = AI_IO(ai_name=self.tim.name, from_server_file="test_tim.txt")
+
+        self.alice = play.make_alice()
+        self.alice.comms = AI_IO(ai_name=self.alice.name,
+            from_server_file="test_alice.txt")
+
+    def possible_msgs(self, msg_type, health=None):
+        msgs = []
+        if health:
+            msgs = unformatted_msgs[msg_type][health]
+        else:
+            for val in unformatted_msgs[msg_type].values():
+                if isinstance(val, list):
+                    msgs.extend(val)
+        return msgs
+
+    def test_get_unform_msg_healthy_hit(self):
+        msg_type = MsgType.action_hit
+        health=None
+        self.assertTrue(get_unformatted_msg(msg_type, self.bob) in
+            self.possible_msgs(msg_type, health))
+
 
 class Format_Action_Say_Msg(unittest.TestCase):
 
@@ -38,7 +134,7 @@ class Format_Action_Say_Msg(unittest.TestCase):
         msg_info["recipients"] = []
         msg_info["words"] = "Hey!"
         msg_info["entities"] = [self.bob]
-        self.assertEqual(format_action_say_msg(msg_info), View_Status.missing_msg_info)
+        self.assertEqual(format_action_say_msg(msg_info), ViewStatus.missing_msg_info)
 
         msg_info = {}
         #msg_info["say_to"] = True
@@ -47,7 +143,7 @@ class Format_Action_Say_Msg(unittest.TestCase):
         msg_info["words"] = "Hey!"
         msg_info["entities"] = [self.bob]
         self.assertEqual(format_action_say_msg(msg_info),
-            View_Status.too_many_recipients)
+            ViewStatus.too_many_recipients)
 
         msg_info = {}
         msg_info["say_to"] = True
@@ -65,7 +161,7 @@ class Format_Action_Say_Msg(unittest.TestCase):
         msg_info["words"] = "Hey!"
         msg_info["entities"] = [self.bob]
         self.assertEqual(format_action_say_msg(msg_info),
-            View_Status.too_many_recipients)
+            ViewStatus.too_many_recipients)
 
     def test_multiple_entities(self):
         msg_info = {}
@@ -76,8 +172,8 @@ class Format_Action_Say_Msg(unittest.TestCase):
         msg_info["entities"] = [self.bob, self.tim, self.alice]
         self.assertEqual(format_action_say_msg(msg_info), [
             (self.bob, "You say, 'Hey!'"),
-            (self.tim, "bob says, 'Hey!'"),
-            (self.alice, "bob says, 'Hey!'"),
+            (self.tim, "Bob says, 'Hey!'"),
+            (self.alice, "Bob says, 'Hey!'"),
             ])
 
         msg_info = {}
@@ -88,8 +184,8 @@ class Format_Action_Say_Msg(unittest.TestCase):
         msg_info["entities"] = [self.bob, self.tim, self.alice]
         self.assertEqual(format_action_say_msg(msg_info), [
             (self.bob, "You say, 'Hey!'"),
-            (self.tim, "bob says, 'Hey!'"),
-            (self.alice, "bob says, 'Hey!'"),
+            (self.tim, "Bob says, 'Hey!'"),
+            (self.alice, "Bob says, 'Hey!'"),
             ])
 
         msg_info = {}
@@ -99,9 +195,9 @@ class Format_Action_Say_Msg(unittest.TestCase):
         msg_info["words"] = "Hey!"
         msg_info["entities"] = [self.bob, self.tim, self.alice]
         self.assertEqual(format_action_say_msg(msg_info), [
-            (self.bob, "You say to tim, 'Hey!'"),
-            (self.tim, "bob says to you, 'Hey!'"),
-            (self.alice, "bob says to tim, 'Hey!'"),
+            (self.bob, "You say to Tim, 'Hey!'"),
+            (self.tim, "Bob says to you, 'Hey!'"),
+            (self.alice, "Bob says to Tim, 'Hey!'"),
             ])
 
     def test_gender(self):
@@ -113,8 +209,8 @@ class Format_Action_Say_Msg(unittest.TestCase):
         msg_info["entities"] = [self.bob, self.tim, self.alice]
         self.assertEqual(format_action_say_msg(msg_info), [
             (self.bob, "You say to yourself, 'Hey!'"),
-            (self.tim, "bob says to himself, 'Hey!'"),
-            (self.alice, "bob says to himself, 'Hey!'"),
+            (self.tim, "Bob says to himself, 'Hey!'"),
+            (self.alice, "Bob says to himself, 'Hey!'"),
             ])
 
         msg_info = {}
@@ -124,8 +220,8 @@ class Format_Action_Say_Msg(unittest.TestCase):
         msg_info["words"] = "Hey!"
         msg_info["entities"] = [self.bob, self.tim, self.alice]
         self.assertEqual(format_action_say_msg(msg_info), [
-            (self.bob, "alice says to herself, 'Hey!'"),
-            (self.tim, "alice says to herself, 'Hey!'"),
+            (self.bob, "Alice says to herself, 'Hey!'"),
+            (self.tim, "Alice says to herself, 'Hey!'"),
             (self.alice, "You say to yourself, 'Hey!'"),
             ])
 
@@ -137,17 +233,17 @@ class Format_Action_Say_Msg(unittest.TestCase):
         msg_info["words"] = "Hey!"
         msg_info["entities"] = [self.bob, self.tim, self.alice]
         self.assertEqual(format_action_say_msg(msg_info), [
-            (self.bob, "You say to tim, 'Hey!'"),
-            (self.tim, "bob says to you, 'Hey!'"),
-            (self.alice, "bob says to tim, 'Hey!'"),
+            (self.bob, "You say to Tim, 'Hey!'"),
+            (self.tim, "Bob says to you, 'Hey!'"),
+            (self.alice, "Bob says to Tim, 'Hey!'"),
             ])
 
         # Alice shouldn't hear anything
         add_status_effect(self.alice, Afflictions.deaf)
         self.assertEqual(format_action_say_msg(msg_info), [
-            (self.bob, "You say to tim, 'Hey!'"),
-            (self.tim, "bob says to you, 'Hey!'"),
-            (self.alice, "You see bob moving his lips but can't hear anything."),
+            (self.bob, "You say to Tim, 'Hey!'"),
+            (self.tim, "Bob says to you, 'Hey!'"),
+            (self.alice, "You see Bob moving his lips but can't hear anything."),
             ])
 
     def test_cant_see(self):
@@ -158,16 +254,16 @@ class Format_Action_Say_Msg(unittest.TestCase):
         msg_info["words"] = "Hey!"
         msg_info["entities"] = [self.bob, self.tim, self.alice]
         self.assertEqual(format_action_say_msg(msg_info), [
-            (self.bob, "You say to tim, 'Hey!'"),
-            (self.tim, "bob says to you, 'Hey!'"),
-            (self.alice, "bob says to tim, 'Hey!'"),
+            (self.bob, "You say to Tim, 'Hey!'"),
+            (self.tim, "Bob says to you, 'Hey!'"),
+            (self.alice, "Bob says to Tim, 'Hey!'"),
             ])
 
         # Alice shouldn't hear anything
         add_status_effect(self.alice, Afflictions.blind)
         self.assertEqual(format_action_say_msg(msg_info), [
-            (self.bob, "You say to tim, 'Hey!'"),
-            (self.tim, "bob says to you, 'Hey!'"),
+            (self.bob, "You say to Tim, 'Hey!'"),
+            (self.tim, "Bob says to you, 'Hey!'"),
             (self.alice, "You hear someone say, 'Hey!'"),
             ])
 
@@ -179,20 +275,20 @@ class Format_Action_Say_Msg(unittest.TestCase):
         msg_info["words"] = "Hey!"
         msg_info["entities"] = [self.bob, self.tim, self.alice]
         self.assertEqual(format_action_say_msg(msg_info), [
-            (self.bob, "You say to tim, 'Hey!'"),
-            (self.tim, "bob says to you, 'Hey!'"),
-            (self.alice, "bob says to tim, 'Hey!'"),
+            (self.bob, "You say to Tim, 'Hey!'"),
+            (self.tim, "Bob says to you, 'Hey!'"),
+            (self.alice, "Bob says to Tim, 'Hey!'"),
             ])
 
         # Alice shouldn't hear anything
         add_status_effect(self.alice, Afflictions.blind)
         add_status_effect(self.alice, Afflictions.deaf)
         self.assertEqual(format_action_say_msg(msg_info), [
-            (self.bob, "You say to tim, 'Hey!'"),
-            (self.tim, "bob says to you, 'Hey!'"),
+            (self.bob, "You say to Tim, 'Hey!'"),
+            (self.tim, "Bob says to you, 'Hey!'"),
             ])
 
-class Format_Msg(unittest.TestCase):
+class FormatMsg(unittest.TestCase):
 
     def setUp(self):
         self.bob = play.make_bob()
@@ -205,28 +301,17 @@ class Format_Msg(unittest.TestCase):
         self.alice.comms = AI_IO(ai_name=self.alice.name,
             from_server_file="test_alice.txt")
 
-    def test_status_msg(self):
-        msg_info = {}
-        msg_info["msg_type"] = MsgType.action_say
-        msg_info["say_to"] = True
-        msg_info["actor"] = self.bob
-        msg_info["recipients"] = []
-        msg_info["words"] = "Hey!"
-        msg_info["entities"] = [self.bob, self.tim, self.alice]
-        self.assertEqual(format_msg(msg_info), View_Status.missing_msg_info)
-
     def test_uppercase_msg(self):
         msg_info = {}
-        msg_info["msg_type"] = MsgType.action_say
-        msg_info["say_to"] = True
+        msg_info["msg_type"] = MsgType.action_say_to
         msg_info["actor"] = self.bob
         msg_info["recipients"] = [self.tim]
         msg_info["words"] = "Hey!"
         msg_info["entities"] = [self.bob, self.tim, self.alice]
         self.assertEqual(format_msg(msg_info), [
-            (self.bob, "You say to tim, 'Hey!'"),
+            (self.bob, "You say to Tim, 'Hey!'"),
             (self.tim, "Bob says to you, 'Hey!'"),
-            (self.alice, "Bob says to tim, 'Hey!'"),
+            (self.alice, "Bob says to Tim, 'Hey!'"),
             ])
 
 

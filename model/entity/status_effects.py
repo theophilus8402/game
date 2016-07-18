@@ -21,6 +21,7 @@ class Body(enum.Enum):
 
 @enum.unique
 class Afflictions(enum.Enum):
+    none = 0
     paralysis = 1
     broken_left_leg = 2
     silenced = 3

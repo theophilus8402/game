@@ -182,7 +182,7 @@ def make_dog():
 def make_bob():
     bob = model.entity.entity.Humanoid()
     bob.uid = 1
-    bob.name = "bob"
+    bob.name = "Bob"
     bob.symbol = "B"
     bob.coord = Coord(1, 2)
     bob.cur_hp = 10
@@ -219,7 +219,7 @@ def make_bob():
 def make_tim():
     tim = model.entity.entity.Humanoid()
     tim.uid = 2
-    tim.name = "tim"
+    tim.name = "Tim"
     tim.symbol = "T"
     tim.coord = Coord(2, 2)
     tim.cur_hp = 10
@@ -255,7 +255,7 @@ def make_tim():
 def make_alice():
     alice = model.entity.entity.Humanoid()
     alice.uid = 2
-    alice.name = "alice"
+    alice.name = "Alice"
     alice.symbol = "A"
     alice.coord = Coord(3, -2)
     alice.cur_hp = 10

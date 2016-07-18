@@ -188,8 +188,9 @@ def send_error_msg(msg_info, error):
 
 def format_and_send_msg(msg_info):
     formatted_msgs = format_msg(msg_info)
-    for entity, msg in formatted_msgs:
-        entity.comms.send(msg)
+    if formatted_msgs:
+        for entity, msg in formatted_msgs:
+            entity.comms.send(msg)
 
 
 def action_hit(world, msg):

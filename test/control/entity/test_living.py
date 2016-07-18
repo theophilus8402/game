@@ -166,11 +166,11 @@ class FormatAndSendMsg(unittest.TestCase):
         msg_info["dmg"] = 5
         format_and_send_msg(msg_info)
         self.assertEqual(self.bob.comms.read_from_server(),
-            "You maliciously hit tim!\n")
+            "You maliciously hit Tim!\n")
         self.assertEqual(self.tim.comms.read_from_server(),
-            "Bob maliciously hit you!\n")
+            "Bob maliciously hits you!\n")
         self.assertEqual(self.alice.comms.read_from_server(),
-            "Bob maliciously hit tim!\n")
+            "Bob maliciously hits Tim!\n")
 
     def test_send_error_msg(self):
         peeps_nearby = [self.bob]
@@ -239,9 +239,9 @@ class ActionHit(unittest.TestCase):
            from_server_file="test_alice.txt")
         add_entity(get_tile(self.world, Coord(2, 3)), self.alice)
 
-        self.world.living_ents[self.bob.name] = self.bob
-        self.world.living_ents[self.tim.name] = self.tim
-        self.world.living_ents[self.alice.name] = self.alice
+        self.world.living_ents[self.bob.name.lower()] = self.bob
+        self.world.living_ents[self.tim.name.lower()] = self.tim
+        self.world.living_ents[self.alice.name.lower()] = self.alice
 
         area_entity_check(self.world, self.bob)
         area_entity_check(self.world, self.tim)
