@@ -11,7 +11,7 @@ from model.world import *
 import play
 from view import *
 
-class Action_Say(unittest.TestCase):
+class ActionSay(unittest.TestCase):
 
     def setUp(self):
         self.world = play.make_world()
@@ -213,8 +213,8 @@ class FormatAndSendMsg(unittest.TestCase):
         for pmsg in possible_msgs:
             formatted_possible_msgs.append(pmsg.format(**msg_info))
         msg = self.bob.comms.read_from_server().strip()
-        print(msg)
-        print(formatted_possible_msgs)
+        #print(msg)
+        #print(formatted_possible_msgs)
         self.assertTrue(msg in formatted_possible_msgs)
 
 

@@ -232,7 +232,7 @@ def make_tim():
     tim.friction = 10
     tim.cur_mp = 10
     tim.max_mp = 10
-    add_status_effect(tim, Afflictions.lost_balance)
+    #add_status_effect(tim, Afflictions.lost_balance)
     tim.male = True
 
     tim.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)

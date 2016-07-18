@@ -5,7 +5,7 @@ from model.entity.entity import *
 from model.entity.living import *
 from model.entity.status_effects import *
 from model.entity.util import *
-from model.info import dir_coord_changes, Status
+from model.info import dir_coord_changes, Status, get_dir_word
 from model.msg import ActionMsgs
 import model.world
 from model.util import distance_between_coords, roll
@@ -32,10 +32,10 @@ def handle_action_msgs(world):
     while not msg_queue.empty():
         msg = msg_queue.get()
         msg_text = msg.msg
-        src_ent = msg.src_entity
+        entity = msg.src_entity
         if msg_text == "exit":
             continue_loop = False
-            src_ent.comms.send("Goodbye!  We'll miss you!")
+            entity.comms.send("Goodbye!  We'll miss you!")
         else:
             action = world.actions[msg.cmd_word]
             action(world, msg)
@@ -53,7 +53,6 @@ def default_action(world, msg):
 
 
 def action_move(world, msg):
-
 
     status = Status.all_good
     entity = msg.src_entity
@@ -73,7 +72,7 @@ def action_move(world, msg):
         return status
 
     direction = get_dir_word(words[0])
-    msg_info["direction"] = direction
+    msg_info["dir"] = direction
     if not direction:
         status = Status.incorrect_syntax
         send_error_msg(msg_info, status)
@@ -86,11 +85,11 @@ def action_move(world, msg):
 
     #TODO: Make sure we can move into the room
     delta_coord = dir_coord_changes[direction]
-    dst_coord = src_ent.coord + delta_coord
+    dst_coord = entity.coord + delta_coord
 
-    right_leg_aff = check_health(entity, Body.right_leg)
-    left_leg_aff = check_health(entity, Body.left_leg)
-    if right_leg and left_leg:
+    right_leg_aff = check_health(entity, {Body.right_leg})
+    left_leg_aff = check_health(entity, {Body.left_leg})
+    if right_leg_aff and left_leg_aff:
         # TODO cannot move
         msg_info["afflictions"] = {right_leg_aff, left_leg_aff}
         status = Status.impeding_affliction
@@ -258,7 +257,7 @@ def action_hit(world, msg):
     affliction = check_health(entity, required_parts)
     if affliction:
         status = Status.impeding_affliction
-        msg_info["affliction"] = affliction
+        msg_info["afflictions"] = {affliction}
         send_error_msg(msg_info, Status.impeding_affliction)
         return status
 

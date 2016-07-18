@@ -47,20 +47,20 @@ if __name__ == "__main__":
     world.ai_entities.append(ai_dog)
     add_entity(get_tile(world, Coord(2, 3)), dog)
 
-    world.living_ents[bob.name] = bob
-    world.living_ents[tim.name] = tim
-    world.living_ents[dog.name] = dog
+    world.living_ents[bob.name.lower()] = bob
+    world.living_ents[tim.name.lower()] = tim
+    world.living_ents[dog.name.lower()] = dog
 
     sword = play.make_sword()
     #add_entity(get_tile(world, Coord(1, 1)), sword)
     bob.eq[Body.right_arm] = sword
 
     area_entity_check(world, bob)
-    print("peeps nearby: {}".format(bob.peeps_nearby))
+    #print("peeps nearby: {}".format(bob.peeps_nearby))
     area_entity_check(world, tim)
-    print("peeps nearby: {}".format(tim.peeps_nearby))
+    #print("peeps nearby: {}".format(tim.peeps_nearby))
     area_entity_check(world, dog)
-    print("peeps nearby: {}".format(dog.peeps_nearby))
+    #print("peeps nearby: {}".format(dog.peeps_nearby))
 
     timeout = .1
     continue_loop = True

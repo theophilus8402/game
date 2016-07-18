@@ -28,8 +28,8 @@ error_code_msgs = {
     Status.incorrect_syntax : ["Syntax is incorrect."],
     Status.target_too_far_away : ["Sorry, your target is too far away."],
     Status.impeding_affliction : [
-        "You can't do that while you are afflicted with: {affliction}.",
-        "Ack! While you still have {affliction} you can't do that."],
+        "You can't do that while you are afflicted with: {afflictions}.",
+        "Ack! While you still have {afflictions} you can't do that."],
     Status.attack_missed : ["Doh! you missed!", "You swing and miss!"],
     Status.tile_doesnt_exist : [
         "You might not want to go there.  There doesn't appear to exist."],
@@ -72,7 +72,11 @@ def make_format_string_dict(info, entity):
 
     if "recip" in info:
         recipient = info["recip"]
-        if entity == recipient:
+        if actor and (entity == recipient) and (entity == actor):
+            md["recip"] = "yourself"
+            md["Recip"] = "Yourself"
+            md["recip_poss"] = "your"
+        elif entity == recipient:
             md["recip"] = "you"
             md["Recip"] = "You"
             md["recip_poss"] = "your"
@@ -90,109 +94,6 @@ def make_format_string_dict(info, entity):
             md[key] = value
 
     return md
-
-
-def format_action_move_msg(msg_info):
-    actor = msg_info.get("actor")
-    recipients = msg_info.get("recipients")
-    entities = msg_info.get("entities")
-
-
-
-def format_action_hit_msg(msg_info):
-    actor = msg_info.get("actor")
-    recipients = msg_info.get("recipients")
-    entities = msg_info.get("entities")
-
-    normal_msg = "{actor} maliciously hit {recip}!"
-
-    if len(recipients) != 1:
-        return ViewStatus.too_many_recipients
-
-    recipient = recipients[0]
-
-    personalized_msg_info = {}
-    msgs_to_send = []
-    entities = (ent for ent in entities if isinstance(ent, Living))
-    for entity in entities:
-        if entity == actor:
-            personalized_msg_info["actor"] = "You"
-        else:
-            personalized_msg_info["actor"] = actor.name
-
-        if entity == recipient:
-            personalized_msg_info["recip"] = "you"
-        else:
-            personalized_msg_info["recip"] = recipient.name
-
-        msgs_to_send.append((entity, normal_msg.format(**personalized_msg_info)))
-
-    return msgs_to_send
-
-
-def format_action_say_msg(msg_info):
-    # every action_say msg_info should contain at least the following:
-    say_to = msg_info.get("say_to")
-    actor = msg_info.get("actor")
-    recipients = msg_info.get("recipients")
-    words = msg_info.get("words")
-    entities = msg_info.get("entities")
-
-    if len(recipients) > 1:
-        #print("ERROR: there are too many recipients listed in {}.".format(msg_info))
-        return ViewStatus.too_many_recipients
-
-    fail_sound_msg = "You see {actor} moving {his} lips but can't hear anything."
-    fail_sight_msg = "You hear someone say, '{msg}'"
-
-    if say_to and recipients:
-        normal_msg = "{actor} {say} to {recip}, '{msg}'"
-        recipient = recipients[0]
-    elif say_to and not recipients:
-        #print("ERROR: missing recipient info in {msg}.".format(msg=msg_info))
-        return ViewStatus.missing_msg_info
-    else:
-        normal_msg = "{actor} {say}, '{msg}'"
-
-    msgs_to_send = []
-    personalized_msg_info = {}
-    personalized_msg_info["his"] = "his" if actor.male else "her"
-    entities = (ent for ent in entities if isinstance(ent, Living))
-    for entity in entities:
-        if entity == actor:
-            personalized_msg_info["actor"] = "You"
-            personalized_msg_info["say"] = "say"
-        else:
-            personalized_msg_info["actor"] = actor.name
-            personalized_msg_info["say"] = "says"
-
-        if say_to:
-            if (entity == recipient) and (entity == actor):
-                personalized_msg_info["recip"] = "yourself"
-            elif entity == recipient:
-                personalized_msg_info["recip"] = "you"
-            elif actor == recipient:
-                personalized_msg_info["recip"] = "himself" if actor.male else "herself"
-            else:
-                personalized_msg_info["recip"] = recipient.name
-        personalized_msg_info["msg"] = words
-
-        # determine if their blind or deaf and send the appropriate msg
-        unformatted_msg = normal_msg
-        if entity != actor:
-            # the actor should know if he said the words regardless of being deaf
-            deaf = check_health(entity, {Body.ears})
-            blind = check_health(entity, {Body.eyes})
-            if deaf and blind:
-                # no msg should be sent to the entity
-                continue
-            elif blind:
-                unformatted_msg = fail_sight_msg
-            elif deaf:
-                unformatted_msg = fail_sound_msg
-        msg = unformatted_msg.format(**personalized_msg_info)
-        msgs_to_send.append((entity, msg))
-    return msgs_to_send
 
 
 def format_action_msg(msg_info):
@@ -215,8 +116,6 @@ def format_action_msg(msg_info):
 handle_msgs = defaultdict(lambda: format_action_msg)
 handle_msgs[MsgType.system] = format_system_msg
 handle_msgs[MsgType.error] = format_error_msg
-#MsgType.action_hit : format_action_hit_msg,
-#MsgType.action_say : format_action_say_msg,
 
 
 @enum.unique
@@ -289,7 +188,7 @@ def get_unformatted_msg(msg_type, entity, actor=None, recip=None):
             choices = unformatted_msgs[msg_type][EntStatus.healthy]
     else:
         choices = unformatted_msgs[msg_type][EntStatus.healthy]
-    if len(choices) > 0:
+    if isinstance(choices, list) and len(choices) > 0:
         unformatted_msg = random.choice(choices)
     else:
         unformatted_msg = None
