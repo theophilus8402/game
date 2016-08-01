@@ -5,7 +5,7 @@ import unittest
 import sys
 
 from control.comm import *
-from model.entity.status_effects import *
+from model.entity.living.status_effects import *
 from view.msgs import *
 from view.info import ViewStatus
 import play
@@ -15,14 +15,14 @@ class MakeFormatStringDict(unittest.TestCase):
 
     def setUp(self):
         self.bob = play.make_bob()
-        self.bob.comms = AI_IO(ai_name=self.bob.name, from_server_file="test_bob.txt")
+        self.bob.comms = AI_IO(ai_name=self.bob.name, from_server_file="test/output/test_bob.txt")
 
         self.tim = play.make_tim()
-        self.tim.comms = AI_IO(ai_name=self.tim.name, from_server_file="test_tim.txt")
+        self.tim.comms = AI_IO(ai_name=self.tim.name, from_server_file="test/output/test_tim.txt")
 
         self.alice = play.make_alice()
         self.alice.comms = AI_IO(ai_name=self.alice.name,
-            from_server_file="test_alice.txt")
+            from_server_file="test/output/test_alice.txt")
 
     def test_make_format_string_dict(self):
         normal_hit_msg = "{Actor} maliciously {action_hit} {recip}!"
@@ -79,14 +79,14 @@ class GetUnformattedMsg(unittest.TestCase):
 
     def setUp(self):
         self.bob = play.make_bob()
-        self.bob.comms = AI_IO(ai_name=self.bob.name, from_server_file="test_bob.txt")
+        self.bob.comms = AI_IO(ai_name=self.bob.name, from_server_file="test/output/test_bob.txt")
 
         self.tim = play.make_tim()
-        self.tim.comms = AI_IO(ai_name=self.tim.name, from_server_file="test_tim.txt")
+        self.tim.comms = AI_IO(ai_name=self.tim.name, from_server_file="test/output/test_tim.txt")
 
         self.alice = play.make_alice()
         self.alice.comms = AI_IO(ai_name=self.alice.name,
-            from_server_file="test_alice.txt")
+            from_server_file="test/output/test_alice.txt")
 
     def possible_msgs(self, msg_type, health=None):
         msgs = []
@@ -109,14 +109,14 @@ class FormatActionMsg(unittest.TestCase):
 
     def setUp(self):
         self.bob = play.make_bob()
-        self.bob.comms = AI_IO(ai_name=self.bob.name, from_server_file="test_bob.txt")
+        self.bob.comms = AI_IO(ai_name=self.bob.name, from_server_file="test/output/test_bob.txt")
 
         self.tim = play.make_tim()
-        self.tim.comms = AI_IO(ai_name=self.tim.name, from_server_file="test_tim.txt")
+        self.tim.comms = AI_IO(ai_name=self.tim.name, from_server_file="test/output/test_tim.txt")
 
         self.alice = play.make_alice()
         self.alice.comms = AI_IO(ai_name=self.alice.name,
-            from_server_file="test_alice.txt")
+            from_server_file="test/output/test_alice.txt")
 
     def test_multiple_entities(self):
         msg_info = {}
@@ -248,14 +248,14 @@ class FormatMsg(unittest.TestCase):
 
     def setUp(self):
         self.bob = play.make_bob()
-        self.bob.comms = AI_IO(ai_name=self.bob.name, from_server_file="test_bob.txt")
+        self.bob.comms = AI_IO(ai_name=self.bob.name, from_server_file="test/output/test_bob.txt")
 
         self.tim = play.make_tim()
-        self.tim.comms = AI_IO(ai_name=self.tim.name, from_server_file="test_tim.txt")
+        self.tim.comms = AI_IO(ai_name=self.tim.name, from_server_file="test/output/test_tim.txt")
 
         self.alice = play.make_alice()
         self.alice.comms = AI_IO(ai_name=self.alice.name,
-            from_server_file="test_alice.txt")
+            from_server_file="test/output/test_alice.txt")
 
     def test_uppercase_msg(self):
         msg_info = {}

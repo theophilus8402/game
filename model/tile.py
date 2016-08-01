@@ -4,11 +4,11 @@ import math
 import queue
 import sys
 
-import model.entity
+from model.entity.living.living import Living
 from model.info import Status, Coord
 
 
-def add_entity(tile, entity):
+def tile_add_entity(tile, entity):
     """
     Checks if the entity can be added to the tile.
     Adds the entity to the tile, and updates the entity's coord.
@@ -23,7 +23,7 @@ def add_entity(tile, entity):
     return status
 
 
-def remove_entity(tile, entity):
+def tile_remove_entity(tile, entity):
     """
     Removes the entity from the tile.  Returns Status.entity_not_in_tile if
     the entity is not there.
@@ -47,7 +47,7 @@ def check_tile_new_entity(tile, searching_entity):
     a message is sent if the entity can see the message.
     """
     for ent in tile.entities:
-        if ent.name != searching_entity.name:
+        if isinstance(ent, Living) and (ent.name != searching_entity.name):
             searching_entity.peeps_nearby.add(ent)
             ent.peeps_nearby.add(searching_entity)
             #print("Saw {} at {}.".format(ent.name, coord))
@@ -71,6 +71,15 @@ def get_symbol(tile):
                 symbol = ent.symbol
                 break
     return symbol
+
+
+def tile_get_entity(tile, name):
+    found_entity = Status.target_doesnt_exist
+    for ent in tile.entities:
+        if ent.name.lower() == name.lower():
+            found_entity = ent
+            break
+    return found_entity
 
 
 class Tile:

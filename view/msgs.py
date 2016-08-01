@@ -4,9 +4,10 @@ import random
 from collections import defaultdict
 
 from view.info import ViewStatus
-from model.entity.entity import Living
-from model.entity.status_effects import Body, check_health
+from model.entity.living.status_effects import Body, check_health, get_affliction_name
 from model.info import Status
+
+TAB = "    "
 
 @enum.unique
 class MsgType(enum.Enum):
@@ -16,6 +17,8 @@ class MsgType(enum.Enum):
     action_hit = 3
     action_move = 4
     action_say_to = 5
+    action_look_here = 6
+    action_get = 7
 
 error_code_msgs = {
     Status.saying_nothing : ["Erm... you didn't actually say anything.",
@@ -33,6 +36,8 @@ error_code_msgs = {
     Status.attack_missed : ["Doh! you missed!", "You swing and miss!"],
     Status.tile_doesnt_exist : [
         "You might not want to go there.  There doesn't appear to exist."],
+    Status.getting_nothing : [
+        "You should specify something to get before trying to get 'it'."],
     }
 
 
@@ -42,7 +47,8 @@ def format_error_msg(msg_info):
     code = msg_info["error_code"]
     entity = msg_info["actor"]
     msg = random.choice(error_code_msgs[code])
-    formatted_msg = msg.format(**msg_info)
+    formatted_info = make_format_string_dict(msg_info, entity)
+    formatted_msg = msg.format(**formatted_info)
     return [(entity, formatted_msg)]
 
 
@@ -65,6 +71,7 @@ def make_format_string_dict(info, entity):
         md["action_skip"] = "skip" if entity == actor else "skips"
         md["action_say"] = "say" if entity == actor else "says"
         md["action_hit"] = "hit" if entity == actor else "hits"
+        md["action_get"] = "get" if entity == actor else "gets"
         if entity == actor:
             md["actor_poss"] = "your"
         else:
@@ -88,6 +95,23 @@ def make_format_string_dict(info, entity):
             md["recip"] = recipient.name
             md["Recip"] = recipient.name
             md["recip_poss"] = "his" if recipient.male else "her"
+
+    if "tile_entities" in info:
+        tile_entities = info["tile_entities"]
+        if len(tile_entities) > 0:
+            lines = ["{}{}".format(TAB, ent.name) for ent in tile_entities]
+            md["tile_entities"] = "\n".join(lines)
+        else:
+            md["tile_entities"] = "{}Nothing.".format(TAB)
+
+    if "afflictions" in info:
+        aff_names = []
+        for aff in info["afflictions"]:
+            aff_names.append(get_affliction_name(aff))
+        md["afflictions"] = ", ".join(aff_names)
+
+    if "item" in info:
+        md["item"] = "a {}".format(info["item"].name)
 
     for key, value in info.items():
         if key not in md:
@@ -160,6 +184,18 @@ unformatted_msgs = {
         EntStatus.blind :   [ "You hear someone nearby move."],
         EntStatus.deaf :    [ "{Actor} {action_move} to the {dir}.",
                               "{Actor} {action_skip} to the {dir}."],
+        },
+    MsgType.action_look_here : {
+        EntStatus.healthy : ["You see the following:\n{tile_entities}"],
+        EntStatus.deaf : ["You see the following:\n{tile_entities}"],
+        EntStatus.blind : None,
+        EntStatus.blind_and_deaf : None,
+        },
+    MsgType.action_get : {
+        EntStatus.healthy : ["{Actor} {action_get} {item} from the floor."],
+        EntStatus.deaf : ["{Actor} {action_get} {item} from the floor."],
+        EntStatus.blind : None,
+        EntStatus.blind_and_deaf : None,
         },
     }
 

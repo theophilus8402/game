@@ -1,9 +1,12 @@
 #!/usr/bin/python3.4
 
-import model.entity.entity
-from model.entity.living import *
+from model.entity.basic_entity import Entity
+from model.entity.weapons import Weapon
+from model.entity.armour import Armour
+from model.entity.living.humanoid import Humanoid
+from model.entity.living.living import *
 from model.entity.util import *
-from model.entity.status_effects import *
+from model.entity.living.status_effects import *
 from model.tile import *
 from model.info import Coord
 import model.util
@@ -30,7 +33,7 @@ def make_world():
 
 
 def make_shoe():
-    shoe = model.entity.entity.Entity()
+    shoe = Entity()
     shoe.type = "entity"
     shoe.uid = 20
     shoe.name = "shoe"
@@ -47,7 +50,7 @@ def make_shoe():
 
 
 def make_bow():
-    bow = model.entity.entity.Weapon()
+    bow = Weapon()
     bow.uid = 28
     bow.name = "short bow"
     bow.symbol = "D"
@@ -77,7 +80,7 @@ def make_bow():
 
 
 def make_sword():
-    sword = model.entity.entity.Weapon()
+    sword = Weapon()
     sword.uid = 21
     sword.name = "short sword"
     sword.symbol = "-"
@@ -108,7 +111,7 @@ def make_sword():
 
 
 def make_shield():
-    shield = model.entity.entity.Armour()
+    shield = Armour()
     shield.uid = 24
     shield.name = "shield"
     shield.symbol = "o"
@@ -133,7 +136,7 @@ def make_shield():
 
 
 def make_armour():
-    plate = model.entity.entity.Armour()
+    plate = Armour()
     plate.uid = 23
     plate.name = "plate"
     plate.symbol = "&"
@@ -158,7 +161,7 @@ def make_armour():
 
 
 def make_dog():
-    dog = model.entity.entity.Living()
+    dog = Living()
     dog.uid = 44
     dog.name = "dog"
     dog.symbol = "d"
@@ -180,7 +183,7 @@ def make_dog():
 
 
 def make_bob():
-    bob = model.entity.entity.Humanoid()
+    bob = Humanoid()
     bob.uid = 1
     bob.name = "Bob"
     bob.symbol = "B"
@@ -217,7 +220,7 @@ def make_bob():
 
 
 def make_tim():
-    tim = model.entity.entity.Humanoid()
+    tim = Humanoid()
     tim.uid = 2
     tim.name = "Tim"
     tim.symbol = "T"
@@ -253,7 +256,7 @@ def make_tim():
 
 
 def make_alice():
-    alice = model.entity.entity.Humanoid()
+    alice = Humanoid()
     alice.uid = 2
     alice.name = "Alice"
     alice.symbol = "A"

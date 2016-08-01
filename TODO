@@ -100,3 +100,14 @@ clean up control.entity.living.action_move
     have it send msgs to nearby peeps about moving
 control.entity.living.action_get
 control.entity.living.action_wield
+
+
+
+x rename model.tile.add_entity and remove_entity to tile_add_entity tile_remove entity
+x re-organize model.entity
+    x split up the giant that is model.entity.entity
+    x create model/entity/living folder
+    x move some stuff in control/entity/living.py to model/entity/living/*
+    x make model/entity/basic.py
+    x make model/entity/weapons.py armour.py
+_ document/test model.entity.inventory

@@ -2,7 +2,7 @@
 
 import unittest
 import model.entity
-from model.entity.status_effects import *
+from model.entity.living.status_effects import *
 import play
 
 class util(unittest.TestCase):

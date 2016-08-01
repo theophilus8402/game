@@ -18,39 +18,39 @@ class tile(unittest.TestCase):
 
         self.bob = play.make_bob()
         self.bob_tile = get_tile(self.world, Coord(1, 2))
-        add_entity(self.bob_tile, self.bob)
+        tile_add_entity(self.bob_tile, self.bob)
 
         self.sword = play.make_sword()
         self.sword_tile = get_tile(self.world, Coord(1, 3))
-        add_entity(self.sword_tile, self.sword)
+        tile_add_entity(self.sword_tile, self.sword)
 
         self.tim = play.make_tim()
         self.tim_tile = get_tile(self.world, Coord(2, 2))
-        add_entity(self.tim_tile, self.tim)
+        tile_add_entity(self.tim_tile, self.tim)
 
         self.dog = play.make_dog()
         self.dog_tile = get_tile(self.world, Coord(-1, 2))
-        add_entity(self.dog_tile, self.dog)
+        tile_add_entity(self.dog_tile, self.dog)
 
         self.armour = play.make_armour()
 
         self.empty_tile = get_tile(self.world, Coord(0, 0))
 
-    def test_addremove_entity(self):
-        add_entity(self.tile, self.bob)
+    def test_addtile_remove_entity(self):
+        tile_add_entity(self.tile, self.bob)
         self.assertEqual(self.tile.entities, [self.bob])
 
-        add_entity(self.tile, self.sword)
+        tile_add_entity(self.tile, self.sword)
         self.assertEqual(self.tile.entities, [self.bob, self.sword])
 
-        remove_entity(self.tile, self.bob)
+        tile_remove_entity(self.tile, self.bob)
         self.assertEqual(self.tile.entities, [self.sword])
 
-        self.assertEqual(remove_entity(self.tile, self.sword), 
+        self.assertEqual(tile_remove_entity(self.tile, self.sword), 
             Status.all_good)
         self.assertEqual(self.tile.entities, [])
 
-        self.assertEqual(remove_entity(self.tile, self.sword), 
+        self.assertEqual(tile_remove_entity(self.tile, self.sword), 
             Status.entity_not_in_tile)
 
     def test_check_tile_new_entity(self):
@@ -67,29 +67,29 @@ class tile(unittest.TestCase):
         self.assertEqual(self.tim.peeps_nearby, {self.bob})
 
         check_tile_new_entity(self.sword_tile, self.bob)
-        self.assertEqual(self.bob.peeps_nearby, {self.tim, self.sword})
+        self.assertEqual(self.bob.peeps_nearby, {self.tim})
         self.assertEqual(self.tim.peeps_nearby, {self.bob})
-        self.assertEqual(self.sword.peeps_nearby, {self.bob})
+        #self.assertEqual(self.sword.peeps_nearby, {self.bob})
 
     def test_get_symbol(self):
         self.assertEqual(get_symbol(self.empty_tile), ".")
 
-        add_entity(self.empty_tile, self.sword)
+        tile_add_entity(self.empty_tile, self.sword)
         self.assertEqual(get_symbol(self.empty_tile), "-")
 
-        add_entity(self.empty_tile, self.armour)
+        tile_add_entity(self.empty_tile, self.armour)
         self.assertEqual(get_symbol(self.empty_tile), "-")
 
-        remove_entity(self.empty_tile, self.sword)
+        tile_remove_entity(self.empty_tile, self.sword)
         self.assertEqual(get_symbol(self.empty_tile), "&")
 
-        add_entity(self.empty_tile, self.dog)
+        tile_add_entity(self.empty_tile, self.dog)
         self.assertEqual(get_symbol(self.empty_tile), "d")
 
-        remove_entity(self.empty_tile, self.armour)
+        tile_remove_entity(self.empty_tile, self.armour)
         self.assertEqual(get_symbol(self.empty_tile), "d")
 
-        remove_entity(self.empty_tile, self.dog)
+        tile_remove_entity(self.empty_tile, self.dog)
         self.assertEqual(get_symbol(self.empty_tile), ".")
 
         #self.assertTrue(False)

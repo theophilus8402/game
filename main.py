@@ -6,10 +6,10 @@ import sys
 import queue
 
 from model.world import get_tile, area_entity_check
-from model.tile import Coord, add_entity
+from model.tile import Coord, tile_add_entity
 import control.comm
 from model.entity.living import *
-from model.entity.status_effects import Body
+from model.entity.living.status_effects import Body
 import control.entity.ai
 from control.entity.living import default_world_actions
 import play
@@ -25,7 +25,7 @@ if __name__ == "__main__":
     bob = play.make_bob()
     bob.comms = control.comm.Std_IO()
     world.socket_entity_map[bob.comms.input_handle] = bob
-    add_entity(get_tile(world, Coord(1, 0)), bob)
+    tile_add_entity(get_tile(world, Coord(1, 0)), bob)
     print("bob's current coord: {}".format(bob.coord))
 
     tim = play.make_tim()
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     tim.comms.send("Hey, Tim!")
     world.socket_entity_map[tim.comms.server_read_handle] = tim
     world.ai_entities = [ai_tim]
-    add_entity(get_tile(world, Coord(0, 0)), tim)
+    tile_add_entity(get_tile(world, Coord(0, 0)), tim)
 
     dog = play.make_dog()
     ai_dog = control.entity.ai.Simple_AI(dog)
@@ -45,14 +45,18 @@ if __name__ == "__main__":
     dog.comms = control.comm.AI_IO(ai_name=dog.name, from_server_file="dog.txt")
     world.socket_entity_map[dog.comms.server_read_handle] = dog
     world.ai_entities.append(ai_dog)
-    add_entity(get_tile(world, Coord(2, 3)), dog)
+    tile_add_entity(get_tile(world, Coord(2, 3)), dog)
 
     world.living_ents[bob.name.lower()] = bob
     world.living_ents[tim.name.lower()] = tim
     world.living_ents[dog.name.lower()] = dog
 
     sword = play.make_sword()
-    #add_entity(get_tile(world, Coord(1, 1)), sword)
+    armour = play.make_armour()
+    tile_add_entity(get_tile(world, Coord(-1, -1)), armour)
+    shoe = play.make_shoe()
+    tile_add_entity(get_tile(world, Coord(-1, -1)), shoe)
+    #tile_add_entity(get_tile(world, Coord(1, 1)), sword)
     bob.eq[Body.right_arm] = sword
 
     area_entity_check(world, bob)

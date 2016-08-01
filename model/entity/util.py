@@ -2,7 +2,7 @@
 import enum
 from math import floor
 
-from model.entity.status_effects import Body
+from model.entity.living.status_effects import Body
 
 @enum.unique
 class Proficiency(enum.Enum):

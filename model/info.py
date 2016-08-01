@@ -18,6 +18,9 @@ class Status(enum.Enum):
     saying_nothing = 10
     cant_do_this_round = 11
     attack_hit = 12
+    getting_nothing = 13
+    item_too_big = 14
+    item_too_heavy = 15
 
 
 class Coord(namedtuple("Coord", "x y")):
@@ -54,7 +57,7 @@ dir_coord_changes = {
 dir_words = defaultdict(lambda: None)
 dir_words["n"] = "north"
 dir_words["north"] = "north"
-dir_words["ne"] = "northeast",
+dir_words["ne"] = "northeast"
 dir_words["northeast"] = "northeast"
 dir_words["e"] = "east"
 dir_words["east"] = "east"

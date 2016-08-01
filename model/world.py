@@ -2,7 +2,6 @@ from copy import copy
 from math import sqrt
 import sys
 
-import model.entity.entity
 from model.info import Status, Coord
 from model.tile import *
 from model.util import distance_between_coords
@@ -58,10 +57,10 @@ def move_entity(world, entity, dst_loc):
     if ((status == Status.all_good) and (entity in cur_tile.entities)):
 
         # remove entity from cur_tile
-        remove_entity(cur_tile, entity)
+        tile_remove_entity(cur_tile, entity)
 
         # add entity to dest_tile
-        add_entity(dst_tile, entity)
+        tile_add_entity(dst_tile, entity)
 
         # update peeps_nearby
         dist_travelled = distance_between_coords(cur_loc, dst_loc)
@@ -162,5 +161,18 @@ def check_entities_out_of_range(entity, check_x, check_y):
             entity.peeps_nearby.discard(ent)
             ent.peeps_nearby.discard(entity)
 
+
+def entities_within_distance(center_coord, entities, distance):
+    """
+    Takes a center_coord, a list of entities, and a distance.
+    It tests each entity to see if it's close enough to the center_coord.
+    If so, the entity get's appended to a new list which is returned
+    at the end of the function.  Defaults to sending an empty list.
+    """
+    ents_within_distance = []
+    for entity in entities:
+        if distance_between_coords(center_coord, entity.coord) <= distance:
+            ents_within_distance.append(entity)
+    return ents_within_distance
 
 

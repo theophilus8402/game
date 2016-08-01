@@ -59,7 +59,9 @@ class AI_IO(Communication):
     def send(self, msg):
         """Sends a msg from the server to the AI via a pipe."""
         #print("{} recv'd: {}".format(self.name, msg), file=self.output_handle)
-        self.server_write_handle.write("{}\n".format(msg))
+        #self.server_write_handle.write("{}\n".format(msg))
+        #TODO gotta go back to the line above, but I don't know how to fix multi-lines
+        self.server_write_handle.write("{}\n".format(msg.replace("\n", "")))
         self.server_write_handle.flush()
 
     def read_from_server(self):

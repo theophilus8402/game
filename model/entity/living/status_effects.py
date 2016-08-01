@@ -33,6 +33,19 @@ class Afflictions(enum.Enum):
     blind = 9
 
 
+affliction_names = {
+    Afflictions.paralysis : "paralysis",
+    Afflictions.broken_left_leg : "broken left leg",
+    Afflictions.silenced : "silence",
+    Afflictions.webbed : "webbed", 
+    Afflictions.dead : "death",
+    Afflictions.stupid : "stupidity",
+    Afflictions.lost_balance : "no balance",
+    Afflictions.deaf : "deafness",
+    Afflictions.blind : "blindness",
+    }
+
+
 afflictions_map = {
     Afflictions.paralysis : {Body.right_arm, Body.left_arm, Body.right_leg,
         Body.left_leg, Body.head, Body.torso},
@@ -47,6 +60,10 @@ afflictions_map = {
     Afflictions.deaf : {Body.ears},
     Afflictions.blind : {Body.eyes},
 }
+
+
+def get_affliction_name(affliction):
+    return affliction_names[affliction]
 
 
 def add_status_effect(entity, effect):

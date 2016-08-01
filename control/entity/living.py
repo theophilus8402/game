@@ -1,13 +1,16 @@
 import collections
 
 import control.mymap
-from model.entity.entity import *
-from model.entity.living import *
-from model.entity.status_effects import *
+from model.entity.basic_entity import change_hp
+from model.entity.living.living import *
+from model.entity.living.actions import *
+from model.entity.inventory import inventory_add_item, inventory_remove_item
+from model.entity.living.status_effects import *
 from model.entity.util import *
 from model.info import dir_coord_changes, Status, get_dir_word
 from model.msg import ActionMsgs
-import model.world
+from model.world import get_tile, move_entity, entities_within_distance
+from model.tile import tile_get_entity, tile_remove_entity
 from model.util import distance_between_coords, roll
 from view.msgs import *
 
@@ -100,7 +103,7 @@ def action_move(world, msg):
         msg_info["afflictions"] = {right_leg_aff, left_leg_aff}
         # should force entity to hobble
 
-    status = model.world.move_entity(world, entity, dst_coord)
+    status = move_entity(world, entity, dst_coord)
     if status == Status.tile_doesnt_exist:
         send_error_msg(msg_info, status)
         return status
@@ -118,72 +121,12 @@ def action_look(world, msg):
     control.mymap.display_map(world, msg.src_entity)
 
 
-# time defaults
-#MOVE_WAIT = .3
-#ATTACK_WAIT = 1
-ROUND_LENGTH = 4
-
-def allowed_to_attack(entity):
-    # This will check to see if the entity is allowed to attack this round
-    #   for this particular round.  Does not check health status of entity
-    #   such as being paralyzed or stunned.
-    # Returns True if the action can be taken, False otherwise
-    #   can be made.
-    # I'm not going to worry about pauses between commands for now.  I will still
-    #   be keeping track of rounds, however.
-
-    info = entity.round_info
-    take_action = True
-    current_time = time()
-
-    # check to see if we're starting a new round
-    if (current_time >= (info.time_started + ROUND_LENGTH)):
-        # restart the round
-        info = RoundInfo()
-        entity.round_info = info
-
-    if info.num_attacks >= entity.max_num_attacks:
-        # exceeded the number of attacks limit
-        return False
-
-    if info.feet_moved > entity.speed:
-        # moved farther than normal in a round
-        return False
-
-    if info.other_action == True:
-        # entity has already done something else that precludes the ability to attack
-        return False
-
-    return take_action
-
-
-def allowed_to_move(entity, distance=0):
-    # This will check to see if the entity is allowed to move the given distance
-    #   for this particular round.  Does not check health status of entity
-    #   such as being paralyzed or stunned.
-
-    info = entity.round_info
-    take_action = True
-    current_time = time()
-
-    # check to see if we're starting a new round
-    if (current_time >= (info.time_started + ROUND_LENGTH)):
-        # restart the round
-        info = RoundInfo()
-
-    if (info.feet_moved + distance) > entity.speed:
-        # would move farther than normal
-        #TODO: need to figure out stuff like charging and flying
-        take_action = False
-
-    return take_action
-
-
 def send_error_msg(msg_info, error):
     msg_info["msg_type"] = MsgType.error
     msg_info["error_code"] = error
     msg_info["entities"] = [msg_info["actor"]]
     format_and_send_msg(msg_info)
+
 
 def format_and_send_msg(msg_info):
     formatted_msgs = format_msg(msg_info)
@@ -251,7 +194,7 @@ def action_hit(world, msg):
 
     msg_info["recipients"] = [target]
 
-    # check the apropriate arm/hand to see if it's healthy enough to attack
+    # check the appropriate arm/hand to see if it's healthy enough to attack
     hand_to_use = entity.main_hand
     required_parts = {hand_to_use}
     affliction = check_health(entity, required_parts)
@@ -288,18 +231,28 @@ def action_hit(world, msg):
 
     return status
 
-def entities_within_distance(center_coord, entities, distance):
-    """
-    Takes a center_coord, a list of entities, and a distance.
-    It tests each entity to see if it's close enough to the center_coord.
-    If so, the entity get's appended to a new list which is returned
-    at the end of the function.  Defaults to sending an empty list.
-    """
-    ents_within_distance = []
-    for entity in entities:
-        if distance_between_coords(center_coord, entity.coord) <= distance:
-            ents_within_distance.append(entity)
-    return ents_within_distance
+
+def action_look_here(world, msg):
+    entity = msg.src_entity
+    cur_tile = get_tile(world, entity.coord)
+    status = Status.all_good
+
+    msg_info = {}
+    msg_info["msg_type"] = MsgType.action_look_here
+    msg_info["actor"] = entity
+    tile_entities = [ent for ent in cur_tile.entities if ent != entity]
+    msg_info["tile_entities"] = tile_entities
+    msg_info["entities"] = [entity]
+
+    sight_aff = check_health(entity, {Body.eyes})
+    if sight_aff:
+        status = Status.impeding_affliction
+        msg_info["afflictions"] = {sight_aff}
+        send_error_msg(msg_info, Status.impeding_affliction)
+    else:
+        format_and_send_msg(msg_info)
+    return status
+
 
 def action_say(world, msg):
     entity = msg.src_entity
@@ -348,6 +301,58 @@ def action_say(world, msg):
     format_and_send_msg(msg_info)
 
 
+def action_get(world, msg):
+    entity = msg.src_entity
+    words = msg.msg.split()
+    status = Status.all_good
+
+    entities_nearby = list(entity.peeps_nearby) + [entity]
+
+    msg_info = {
+        "msg_type"  :   MsgType.action_get,
+        "actor"     :   entity,
+        "recipients":   [],
+        "entities"  :   entities_nearby,
+        }
+
+    # make sure the entity specified an item
+    if len(words) == 1:
+        status = Status.getting_nothing
+        send_error_msg(msg_info, status)
+        return status
+
+    # make sure the item exists and is in the same tile as the entity
+    name = " ".join(words[1:])
+    tile = get_tile(world, entity.coord)
+    item = tile_get_entity(tile, name)
+    msg_info["item"] = item
+    if item == Status.target_doesnt_exist:
+        status = item
+        send_error_msg(msg_info, status)
+        return status
+
+    # make sure the entity can get the item
+    status = entity_can_get_item(entity, item)
+    if status != Status.all_good:
+        if isinstance(status, tuple):
+            status, afflictions = status
+            msg_info["afflictions"] = afflictions
+        send_error_msg(msg_info, status)
+        return status
+
+    # get the item
+    tile_remove_entity(tile, item)
+    inventory_add_item(entity.inventory, item)
+    # TODO: test for return code??
+
+    # set the flag in the round info
+    round_info_entity_interacted_w_obj(entity)
+
+    format_and_send_msg(msg_info)
+
+    return status
+
+
 default_world_actions = collections.defaultdict(lambda: default_action)
 default_world_actions["hit"] = action_hit
 default_world_actions["n"] = action_move
@@ -360,5 +365,7 @@ default_world_actions["sw"] = action_move
 default_world_actions["w"] = action_move
 default_world_actions["l"] = action_look
 default_world_actions["look"] = action_look
+default_world_actions["get"] = action_get
+default_world_actions["lh"] = action_look_here
 default_world_actions["say"] = action_say
 

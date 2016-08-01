@@ -2,8 +2,8 @@
 
 import unittest
 
-from model.entity.entity import change_hp
-from model.entity.status_effects import *
+from model.entity.basic_entity import change_hp
+from model.entity.living.status_effects import *
 import play
 
 class util(unittest.TestCase):
