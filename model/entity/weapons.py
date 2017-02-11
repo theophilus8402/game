@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from model.entity.basic_entity import Entity
+from model.entity.living.equip import EqSlots
 
 # Basic weapon:
 class Weapon(Entity):
@@ -8,11 +9,12 @@ class Weapon(Entity):
     def __init__(self, cur_hp=0):
         super(Weapon, self).__init__(cur_hp=cur_hp)
         self.type = "weapon"      # the different entity classes
+        self.eq_slot = EqSlots.hand
+        self.attack_possibilities = {}
+
         # weapon dmg (2d6)
         self.die_to_roll = 0
         self.dmg_modifier = 0
-        self.attack_bonus = 0
-        self.critical_range = 20    # can be 19-20
         self.critical_dmg = 2       # x2
         self.range_increment = 0    # stuff for projectiles
         self.base_cost = 0          # can be modified

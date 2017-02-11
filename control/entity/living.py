@@ -4,7 +4,10 @@ import control.mymap
 from model.entity.basic_entity import change_hp
 from model.entity.living.living import *
 from model.entity.living.actions import *
-from model.entity.inventory import inventory_add_item, inventory_remove_item
+from model.entity.living.equip import *
+from control.entity.blob import handle_blob_input
+from control.entity.send_msg import format_and_send_msg, send_error_msg
+from model.entity.inventory import *
 from model.entity.living.status_effects import *
 from model.entity.util import *
 from model.info import dir_coord_changes, Status, get_dir_word
@@ -12,21 +15,7 @@ from model.msg import ActionMsgs
 from model.world import get_tile, move_entity, entities_within_distance
 from model.tile import tile_get_entity, tile_remove_entity
 from model.util import distance_between_coords, roll
-from view.msgs import *
-
-
-def get_input_from_entities(world, readable):
-    for s in readable:
-        entity = world.socket_entity_map[s]
-        data = entity.comms.recv()
-        if data:
-            command = data.split()[0]
-            if command in entity.known_cmds:
-                new_msg = ActionMsgs(cmd_word=command,
-                    msg=data, src_entity=entity)
-                world.immediate_action_msgs.put(new_msg)
-            else:
-                entity.comms.send("Huh? What is {}".format(command))
+from view.msgs.basic import MsgType
 
 
 def handle_action_msgs(world):
@@ -36,9 +25,12 @@ def handle_action_msgs(world):
         msg = msg_queue.get()
         msg_text = msg.msg
         entity = msg.src_entity
-        if msg_text == "exit":
+        if msg_text == "exit" and entity_has_status_effect(entity,
+            Blessings.game_master):
             continue_loop = False
             entity.comms.send("Goodbye!  We'll miss you!")
+        elif getattr(entity, "blob_state", False):
+            handle_blob_input(world, msg)
         else:
             action = world.actions[msg.cmd_word]
             action(world, msg)
@@ -119,20 +111,6 @@ def action_look(world, msg):
     on being able to view the map.
     """
     control.mymap.display_map(world, msg.src_entity)
-
-
-def send_error_msg(msg_info, error):
-    msg_info["msg_type"] = MsgType.error
-    msg_info["error_code"] = error
-    msg_info["entities"] = [msg_info["actor"]]
-    format_and_send_msg(msg_info)
-
-
-def format_and_send_msg(msg_info):
-    formatted_msgs = format_msg(msg_info)
-    if formatted_msgs:
-        for entity, msg in formatted_msgs:
-            entity.comms.send(msg)
 
 
 def action_hit(world, msg):
@@ -353,6 +331,80 @@ def action_get(world, msg):
     return status
 
 
+def action_wear(world, msg):
+    entity = msg.src_entity
+    words = msg.msg.split()
+    status = Status.all_good
+    cmd_word = words[0]
+
+    entities_nearby = list(entity.peeps_nearby) + [entity]
+    if cmd_word == "wear" or cmd_word == "equip":
+        msg_type = MsgType.action_wear
+    else:
+        msg_type = MsgType.action_wield
+    msg_info = {
+        "msg_type"  :   msg_type,
+        "actor"     :   entity,
+        "recipients":   [],
+        "entities"  :   entities_nearby,
+        }
+
+    # example syntax:
+    # wield short sword
+    # wield right short sword
+    # wield left shield
+    # equip armour
+    # wear shirt
+    # wear right ring
+    side = None
+    if (len(words) > 2) and (words[1] in ["right", "left"]):
+        # correct syntax and specified a side
+        side = words[1]
+        item_name = " ".join(words[2:])
+    elif (len(words) > 1) and (words[1] not in ["right", "left"]):
+        # correct syntax and did not specify a side
+        item_name = " ".join(words[1:])
+    else:
+        # incorrect syntax
+        status = Status.incorrect_syntax
+        send_error_msg(msg_info, status)
+        return status
+
+    # find the item in the inventory
+    inv = entity.inventory
+    item = inventory_find_item(inv, item_name)
+    if not item:
+        status = Status.item_not_in_inventory
+        msg_info["item_name"] = item_name
+        send_error_msg(msg_info, status)
+        return status
+
+    # determine the equipment slot
+    eq_slot = determine_eq_slot(entity, item, side)
+    if ((side and item.eq_slot not in [EqSlots.hand, EqSlots.ring_finger]) or 
+        (cmd_word == "wield" and item.eq_slot is not EqSlots.hand) or
+        (cmd_word in ["equip", "wear"] and item.eq_slot is EqSlots.hand)):
+        # basically, you wields stuff in your hands and wear/equip stuff elsewhere
+        status = Status.incorrect_syntax
+        send_error_msg(msg_info, status)
+        return status
+    if not eq_slot:
+        status = Status.equipment_slot_not_free
+        send_error_msg(msg_info, status)
+        return status
+
+    # equip the item
+    status = entity_equip_item(entity, item, eq_slot)
+    if status != Status.all_good:
+        send_error_msg(msg_info, status)
+
+    msg_info["item"] = item
+    msg_info["eq_slot"] = eq_slot
+    format_and_send_msg(msg_info)
+
+    return status
+
+
 default_world_actions = collections.defaultdict(lambda: default_action)
 default_world_actions["hit"] = action_hit
 default_world_actions["n"] = action_move
@@ -368,4 +420,7 @@ default_world_actions["look"] = action_look
 default_world_actions["get"] = action_get
 default_world_actions["lh"] = action_look_here
 default_world_actions["say"] = action_say
+default_world_actions["wear"] = action_wear
+default_world_actions["wield"] = action_wear
+default_world_actions["equip"] = action_wear
 

@@ -2,6 +2,7 @@
 
 import os
 from select import select
+from socket import socket, AF_INET, SOCK_STREAM
 import sys
 import time
 from queue import Queue
@@ -32,6 +33,9 @@ class Std_IO(Communication):
         """Recieves a msg sent from the entity to the server."""
         data = self.input_handle.readline()
         return data.strip()
+
+    def get_input_handle(self):
+        return self.input_handle
 
 
 #TODO: maybe have a way to read in a script file and run that to re-test sequences
@@ -88,6 +92,9 @@ class AI_IO(Communication):
         #print("Server: {} .recv: {}".format(self.name, data), file=self.output_handle)
         return data
 
+    def get_input_handle(self):
+        return self.server_read_handle
+
 """
 #TODO:
 class Server_IO(Communication):
@@ -100,7 +107,6 @@ need to make the server have some "commands" to add new sockets/players.
 """
 
 
-#TODO:
 class Socket_IO(Communication):
 
     def __init__(self, s=None):
@@ -108,10 +114,24 @@ class Socket_IO(Communication):
             self.socket = s
 
     def send(self, msg):
-        pass
+        if isinstance(msg, str):
+            msg += "\n"
+            msg = msg.encode("utf-8")
+        self.socket.send(msg)
 
     def recv(self):
-        pass
+        data = self.socket.recv(1024).decode("utf-8").strip()
+        return data
+
+    def get_input_handle(self):
+        return self.socket
+
+def start_server(world, ip, port):
+    server_socket = socket(AF_INET, SOCK_STREAM)
+    server_socket.bind((ip, port))
+    server_socket.listen(10)
+    world.server_socket = server_socket
+    world.socket_entity_map[server_socket] = None
 
 
 if __name__ == "__main__":

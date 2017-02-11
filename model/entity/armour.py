@@ -17,4 +17,4 @@ class Armour(Entity):
         self.shield = False         # armour or shield
         self.armour_type = ""       # light, medium, heavy
 
-
+        self.defence_possibilities = dict()

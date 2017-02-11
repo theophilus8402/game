@@ -22,7 +22,7 @@ class TestInventory(unittest.TestCase):
         self.sword = play.make_sword()
         self.shield = play.make_shield()
         self.bow = play.make_bow()
-        self.shoe = play.make_shoe()
+        self.shoes = play.make_shoes()
         self.armour = play.make_armour()
         self.dog = play.make_dog()
 
@@ -47,7 +47,7 @@ class TestInventory(unittest.TestCase):
         self.assertEqual(inventory_get_current_capacity(self.inv), (2, 12))
 
     def test_inventory_can_add_item(self):
-        for item in [self.sword, self.shield, self.bow, self.shoe]:
+        for item in [self.sword, self.shield, self.bow, self.shoes]:
             self.assertEqual(inventory_can_add_item(self.inv, item), Status.all_good)
             inventory_add_item(self.inv, item)
         # should be at vol=5.5 and weight=18
@@ -62,7 +62,7 @@ class TestInventory(unittest.TestCase):
     def test_inventory_find_item(self):
         self.assertEqual(inventory_find_item(self.inv, "short sword"), None)
 
-        for item in [self.sword, self.shield, self.bow, self.shoe]:
+        for item in [self.sword, self.shield, self.bow, self.shoes]:
             inventory_add_item(self.inv, item)
 
         self.assertEqual(inventory_find_item(self.inv, "short sword"), self.sword)
@@ -72,13 +72,13 @@ class TestInventory(unittest.TestCase):
     def test_inventory_remove_item(self):
 
         self.assertEqual(inventory_remove_item(self.inv, self.bow),
-            Status.target_doesnt_exist)
+            Status.item_not_in_inventory)
 
-        for item in [self.sword, self.shield, self.bow, self.shoe]:
+        for item in [self.sword, self.shield, self.bow, self.shoes]:
             inventory_add_item(self.inv, item)
 
         self.assertEqual(inventory_get_items(self.inv),
-            {self.sword, self.shield, self.bow, self.shoe})
+            {self.sword, self.shield, self.bow, self.shoes})
         # should be at vol=5.5 and weight=18
         self.assertEqual(inventory_get_current_capacity(self.inv), (5.5, 18))
 
@@ -86,15 +86,15 @@ class TestInventory(unittest.TestCase):
         # should be at vol=4.5 and weight=12
         self.assertEqual(inventory_get_current_capacity(self.inv), (4.5, 12))
         self.assertEqual(inventory_remove_item(self.inv, self.bow),
-            Status.target_doesnt_exist)
+            Status.item_not_in_inventory)
 
         self.assertEqual(inventory_remove_item(self.inv, self.sword), Status.all_good)
         # should be at vol=3.5 and weight=6
         self.assertEqual(inventory_get_current_capacity(self.inv), (3.5, 6))
-        self.assertEqual(inventory_get_items(self.inv), {self.shield, self.shoe})
+        self.assertEqual(inventory_get_items(self.inv), {self.shield, self.shoes})
 
         self.assertEqual(inventory_remove_item(self.inv, self.shield), Status.all_good)
-        self.assertEqual(inventory_remove_item(self.inv, self.shoe), Status.all_good)
+        self.assertEqual(inventory_remove_item(self.inv, self.shoes), Status.all_good)
         # should be at vol=0 and weight=0
         self.assertEqual(inventory_get_current_capacity(self.inv), (0.0, 0))
         self.assertEqual(inventory_get_items(self.inv), set())

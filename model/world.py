@@ -18,6 +18,7 @@ class World:
         self.socket_entity_map = {}
         self.ai_entities = []
         self.actions = None
+        self.server_socket = None
 
         # these max uids are the current highest uid
         # so, to create a new uid, return max_uid++
@@ -176,3 +177,18 @@ def entities_within_distance(center_coord, entities, distance):
     return ents_within_distance
 
 
+def world_add_entity(world, entity):
+    """
+    Adds the entity to the world.  Adds the entity to the appropriate tile and the
+    appropriate list of entities within the world.
+    """
+    tile = get_tile(world, entity.coord)
+    tile_add_entity(tile, entity)
+    input_handle = entity.comms.get_input_handle()
+    world.socket_entity_map[input_handle] = entity
+    if isinstance(entity, Living):
+        #world.living_ents[entity.name.lower()] = entity
+        area_entity_check(world, entity)
+    else:
+        #TODO: add the other types
+        pass

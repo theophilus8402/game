@@ -21,6 +21,12 @@ class Status(enum.Enum):
     getting_nothing = 13
     item_too_big = 14
     item_too_heavy = 15
+    eqslot_not_free = 16
+    improper_eq_slot = 17
+    item_not_in_inventory = 18
+    item_not_in_equipment = 19
+    invalid_eqslot = 20
+    eqslot_empty = 21
 
 
 class Coord(namedtuple("Coord", "x y")):

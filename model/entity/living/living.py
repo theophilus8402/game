@@ -1,8 +1,14 @@
+
+from collections import defaultdict
+
 import model.util
 from model.entity.basic_entity import Entity
 from model.entity.living.status_effects import *
+from model.entity.living.equip import possible_equipment_slots
 from model.entity.living.round_info import RoundInfo
 from model.entity.inventory import Inventory
+from model.info import Status
+
 
 CMDS_BASIC_MOVEMENT = {"n", "ne", "e", "se", "s", "sw", "w", "nw"}
 CMDS_BASIC_ATTACK = {"hit", "fhit", "cast"}
@@ -53,9 +59,50 @@ def get_attack_bonus(src_ent, melee=True, range_pen=0):
     return attack_bonus_list
 
 
+def get_attack_roll_possibilities(person):
+    attack_info = defaultdict(lambda: 0)
+    # Get critical_miss, miss, hit, critical_hit info from person
+    # get race info
+    for attack_type, value in person.race.attack_possibilities.items():
+        attack_info[attack_type] += value
+
+    # get class info
+    for attack_type, value in person.class_type.attack_possibilities.items():
+        attack_info[attack_type] += value
+
+    # get equipment info
+    # we'll do this somewhere else?
+    #for attack_type, value in weapon.attack_possibilities:
+    #    attack_info[attack_type] += value
+
+    # get status info (spells, physical ailments)
+
+    return attack_info
+
+
+def get_defence_roll_possibilities(person):
+    def_info = defaultdict(lambda: 0)
+
+    # Get critical_miss, miss, hit, critical_hit info from person
+    # get race defences
+    for def_type, value in person.race.defence_possibilities.items():
+        def_info[def_type] += value
+
+    # class info
+    for def_type, value in person.class_type.defence_possibilities.items():
+        def_info[def_type] += value
+
+    # get equipment info
+    for def_type, value in person.equipment.defence_possibilities.items():
+        def_info[def_type] += value
+    
+    return def_info
+
+
 def check_successful_attack(src_ent, dst_ent, info=None):
     #TODO: actually implement this
     return True
+
 
 def determine_weapon_dmg(src_ent, dst_ent):
     """
@@ -67,11 +114,88 @@ def determine_weapon_dmg(src_ent, dst_ent):
     return dmg
 
 
+class NewLiving():
+
+    def __init__(self):
+        self.race = None
+        self.class_type = None
+        self.equipment = None   #TODO: change this because the eq slots depends
+                                # on the race (different arms...)
+        self.inventory = None
+        self.stats = {
+            "str": 0,
+            "dex": 0,
+            "con": 0,
+            "wis": 0,
+            "int": 0,
+            "cha": 0,
+        }
+
+    def equip(self, item, eqslot):
+        # make sure the item is in the inventory
+        if item not in self.inventory:
+            return Status.item_not_in_inventory
+
+        # make sure the eqslot is valid and empty
+        if eqslot not in self.equipment.allowed_eq_slots:
+            return Status.invalid_eq_slot
+
+        if self.equipment[eqslot] is not None:
+            return Status.eqslot_not_free
+
+        # TODO: make sure entity is physically healthy enough
+
+        # equip the item!
+        # remove the item from the inventory
+        self.inventory.remove(item)
+
+        # add the item to the equipment slot
+        self.equipment[eqslot] = item
+
+        return Status.all_good
+
+    def unequip(self, eqslot=None, item=None):
+        if eqslot is not None:
+            # make sure there's an item in the eqslot
+            item = self.equipment[eqslot]
+            if item is None:
+                return Status.eqslot_empty
+
+        elif item is not None:
+            # make sure the item is in the equipment
+            if item not in self.equipment:
+                return Status.item_not_in_equipment
+
+            # find the corresponding eqslot
+            for slot, eq_item in self.equipment.items():
+                if item is eq_item:
+                    eqslot = slot
+                    break
+
+        else:
+            # nothing specified so, bale nicely?
+            return Status.all_good
+
+        # make sure there's room in the inventory to receive the item
+        can_add = self.inventory.can_add_item(item)
+        if can_add is not Status.all_good:
+            return can_add
+
+        # remove the item in the eqslot
+        del self.equipment[eqslot]
+        
+        # add the item to the inventory
+        self.inventory.add_item(item)
+
+        return Status.all_good
+
+
 # Basic living:
 class Living(Entity):
 
     def __init__(self):
         Entity.__init__(self)
+        self.equipment = {slot: None for slot in possible_equipment_slots}
         self.type = "living"      # the different entity classes
         self.pclass = "fighter"
         self.cur_mp = 0
@@ -81,6 +205,8 @@ class Living(Entity):
         self.level = 0
         self.hit_dice = "2d4"
         self.race = "creature"
+
+        self.blob_state = None
 
         self.max_num_attacks = 1
         self.main_hand = Body.right_arm

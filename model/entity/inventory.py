@@ -11,11 +11,66 @@ class Inventory():
     """
 
     def __init__(self, volume_capacity=20, weight_capacity=30):
-        self.items = {}
+        self._items = {}
         self.volume_capacity = volume_capacity
         self.weight_capacity = weight_capacity
         self.current_items_volume = 0
         self.current_items_weight = 0
+
+    def __len__(self):
+        return len(self._items)
+
+    def __contains__(self, item):
+        return item in self._items.values()
+
+    def add_item(self, item):
+        self._items[item.name.lower()] = item
+        volume, weight = entity_get_volume_weight(item)
+        self.current_items_volume += volume
+        self.current_items_weight += weight
+
+    def can_add_item(self, item):
+        """
+        Returns Status.all_good if item can fit,
+        Status.item_too_big if it doesn't fit by volume,
+        Status.item_too_heave if it doesn't fit by weight.
+        """
+        volume, weight = entity_get_volume_weight(item)
+        can_add = Status.all_good
+        if (volume + self.current_items_volume) > self.volume_capacity:
+            can_add = Status.item_too_big
+        elif (weight + self.current_items_weight) > self.weight_capacity:
+            can_add = Status.item_too_heavy
+        return can_add
+
+    def remove(self, item):
+        """
+        Removes the item from the inventory.  Reduces the inventory's
+        current_items_volume/weight as appropriate.
+        """
+        item_found = self._items.pop(item.name.lower(), False)
+        if item_found:
+            item_found = True
+            volume, weight = entity_get_volume_weight(item)
+            self.current_items_volume -= volume
+            self.current_items_weight -= weight
+        return item_found
+
+
+    def find_item(self, name):
+        """
+        Returns an item if its name or a keyword match the supplied name.
+        Returns None otherwise.
+        """
+        # this might be a generic name like sword, or more specific i.e. sword99
+        # first look to see if we can find it by it's name
+        item = self._items.get(name.lower())
+
+        # then, look through keywords of the name
+        if not item:
+            #TODO!!  maybe add something to item to see if name describes it
+            pass
+        return item
 
 
 def inventory_get_items(inventory):
@@ -29,57 +84,4 @@ def inventory_get_current_capacity(inventory):
     the sum total of all the items in the inventory volume and weight.
     """
     return inventory.current_items_volume, inventory.current_items_weight
-
-
-def inventory_can_add_item(inventory, item):
-    """
-    Returns information about the ability to fit the given item in the inventory.
-    Returns Status.all_good if the item can fit.
-    Returns Status.item_too_big if the item is to voluminous.
-    Returns Status.item_too_heavy if the item is too heavy for the inventory.
-    """
-    volume, weight = entity_get_volume_weight(item)
-    status = Status.all_good
-    if (volume + inventory.current_items_volume) > inventory.volume_capacity:
-        status = Status.item_too_big
-    elif (weight + inventory.current_items_weight) > inventory.weight_capacity:
-        status = Status.item_too_heavy
-    return status
-
-
-def inventory_add_item(inventory, item):
-    """
-    Adds the item to the inventory.  Does not check capacities.  Increases
-    the inventory's current_items_volume/weight as appropriate.
-    """
-    status = Status.all_good
-    inventory.items[item.name.lower()] = item
-    volume, weight = entity_get_volume_weight(item)
-    inventory.current_items_volume += volume
-    inventory.current_items_weight += weight
-    return status
-
-
-def inventory_remove_item(inventory, item):
-    """
-    Removes the item from the inventory.  Reduces the inventory's
-    current_items_volume/weight as appropriate.
-    """
-    status = inventory.items.pop(item.name.lower(), None)
-    if status == None:
-        status = Status.target_doesnt_exist
-    else:
-        status = Status.all_good
-        volume, weight = entity_get_volume_weight(item)
-        inventory.current_items_volume -= volume
-        inventory.current_items_weight -= weight
-    return status
-
-
-def inventory_find_item(inventory, name):
-    """
-    Returns an item based on a given name.  Returns None if no item found with
-    that name.
-    """
-    return inventory.items.get(name.lower(), None)
 

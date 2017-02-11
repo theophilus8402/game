@@ -3,13 +3,19 @@
 from model.entity.basic_entity import Entity
 from model.entity.weapons import Weapon
 from model.entity.armour import Armour
+from model.entity.classes.fighter import Fighter
+from model.entity.classes.mage import Mage
+from model.entity.inventory import Inventory
 from model.entity.living.humanoid import Humanoid
 from model.entity.living.living import *
-from model.entity.util import *
+from model.entity.living.equip import *
+from model.entity.living.blob import *
 from model.entity.living.status_effects import *
+from model.entity.races.human import Human
+from model.entity.util import *
 from model.tile import *
 from model.info import Coord
-import model.util
+from model.util import roll, RollType
 
 prof = Proficiency
 
@@ -32,21 +38,22 @@ def make_world():
     return world
 
 
-def make_shoe():
-    shoe = Entity()
-    shoe.type = "entity"
-    shoe.uid = 20
-    shoe.name = "shoe"
-    shoe.symbol = "*"
-    shoe.coord = Coord(2, 3)
-    shoe.cur_hp = 10
-    shoe.max_hp = 10
-    shoe.short_desc = "This is an old shoe."
-    shoe.long_desc = "This is a really old shoe. It's floppy."
-    shoe.weight = 1
-    shoe.volume = .5
-    shoe.friction = .1
-    return shoe
+def make_shoes():
+    shoes = Entity()
+    shoes.type = "entity"
+    shoes.eq_slot = EqSlots.feet
+    shoes.uid = 20
+    shoes.name = "shoes"
+    shoes.symbol = "*"
+    shoes.coord = Coord(2, 3)
+    shoes.cur_hp = 10
+    shoes.max_hp = 10
+    shoes.short_desc = "This is a pair of old shoes."
+    shoes.long_desc = "This is a  pair of really old shoes. They're floppy."
+    shoes.weight = 1
+    shoes.volume = .5
+    shoes.friction = .1
+    return shoes
 
 
 def make_bow():
@@ -54,6 +61,7 @@ def make_bow():
     bow.uid = 28
     bow.name = "short bow"
     bow.symbol = "D"
+    bow.eq_slot = EqSlots.hand
     bow.coord = Coord(-1, 3)
     bow.cur_hp = 13
     bow.max_hp = 13
@@ -83,21 +91,24 @@ def make_sword():
     sword = Weapon()
     sword.uid = 21
     sword.name = "short sword"
+    sword.eq_slot = EqSlots.hand
     sword.symbol = "-"
     sword.coord = Coord(1, 3)
     sword.cur_hp = 13
     sword.max_hp = 13
     sword.short_desc = "This is a shiny short sword."
     sword.long_desc = "This is a really shiny short sword. It is not floppy."
+
+    sword.attack_possibilities[RollType.hit] = 5
+    sword.attack_possibilities[RollType.critical_hit] = 5
+
     sword.weight = 6
     sword.volume = 1
     sword.friction = .3
     sword.die_to_roll = 2
     sword.dmg_modifier = 3
-    sword.critical_range = 19
     sword.critical_dmg = 3
     sword.range_increment = 0
-    sword.attack_bonus = 0
     sword.base_cost = 10
     sword.proficiency = Proficiency.martial_weapons
     sword.properties = [Property.finesse, Property.light]
@@ -115,11 +126,15 @@ def make_shield():
     shield.uid = 24
     shield.name = "shield"
     shield.symbol = "o"
+    shield.eq_slot = EqSlots.hand
     shield.coord = Coord(-2, -1)
     shield.cur_hp = 20
     shield.max_hp = 20
     shield.short_desc = "This is a small, wooden shield."
     shield.long_desc = "This is a nice, small, wooden shield."
+
+    shield.defence_possibilities[RollType.block] = 5
+
     shield.weight = 5
     shield.volume = 3
     shield.friction = 1
@@ -140,11 +155,15 @@ def make_armour():
     plate.uid = 23
     plate.name = "plate"
     plate.symbol = "&"
+    plate.eq_slot = EqSlots.torso
     plate.coord = Coord(-1, -1)
     plate.cur_hp = 20
     plate.max_hp = 20
     plate.short_desc = "This is a spiffy suite of plate mail armour."
     plate.long_desc = "This is a really spiffy suite of plate mail armour."
+
+    plate.defence_possibilities[RollType.block] = 5
+
     plate.weight = 19
     plate.volume = 6
     plate.friction = 1
@@ -200,9 +219,13 @@ def make_bob():
     bob.max_mp = 10
     bob.male = True
 
+    #bob.blob_state = BlobState(States.expect_login_name)
+
     bob.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
     bob.known_cmds = bob.known_cmds.union(CMDS_BASIC_HUMANOID)
     bob.known_cmds = bob.known_cmds.union(CMDS_DEBUG)
+
+    #add_status_effect(bob, Blessings.game_master)
 
     bob.pclass = Class.fighter
     bob.level = 10
@@ -290,30 +313,40 @@ def make_alice():
     return alice
 
 
+def make_new_bob():
+    new_bob = NewLiving()
+    new_bob.race = Human()
+    new_bob.class_type = Fighter()
+    new_bob.equipment = HumanoidEquipment()
+    new_bob.inventory = Inventory()
+    return new_bob
+
+
+def make_new_tim():
+    new_tim = NewLiving()
+    new_tim.race = Human()
+    new_tim.class_type = Mage()
+    return new_tim
+
+
 if __name__ == "__main__":
 
-    shoe = make_shoe()
+    shoe = make_shoes()
     sword = make_sword()
     shield = make_shield()
     plate = make_armour()
     dog = make_dog()
-    bob = make_bob()
-    bob.wield("right", sword)
-    print("Wield sword in right hand...")
-    bob.wield("left", shield)
-    print("Wield shield in left hand...")
-    print()
+    bob = make_new_bob()
+    tim = make_new_tim()
+    #bob.wield("right", sword)
+    #print("Wield sword in right hand...")
+    #bob.wield("left", shield)
+    #print("Wield shield in left hand...")
+    #print()
 
-    for att_bonus in bob.get_attack_bonus(melee=True):
-        att_roll = model.util.roll(1, 20, att_bonus)
-        print("att_roll = {} + {} = {}".format(att_roll-att_bonus,
-            att_bonus, att_roll))
-    print()
+    bobs_info = get_attack_roll_possibilities(bob)
 
-    from view.entity import info
-    bob.calculate_ac()
-    info.show_ac(bob)
-
+    """
     print()
     bob.unwield("right")
     print("Unwielding right hand...")
@@ -328,4 +361,5 @@ if __name__ == "__main__":
         att_roll = model.util.roll(1, 20, att_bonus)
         print("att_roll = {} + {} = {}".format(att_roll-att_bonus,
             att_bonus, att_roll))
+    """
 

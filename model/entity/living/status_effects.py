@@ -20,6 +20,12 @@ class Body(enum.Enum):
 
 
 @enum.unique
+class Blessings(enum.Enum):
+    none = 0
+    game_master = 1
+
+
+@enum.unique
 class Afflictions(enum.Enum):
     none = 0
     paralysis = 1
@@ -64,6 +70,11 @@ afflictions_map = {
 
 def get_affliction_name(affliction):
     return affliction_names[affliction]
+
+
+def entity_has_status_effect(entity, effect):
+    ''' Returns True if the entity has the effect False otherwise. '''
+    return effect in entity.status_effects
 
 
 def add_status_effect(entity, effect):

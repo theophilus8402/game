@@ -110,4 +110,16 @@ x re-organize model.entity
     x move some stuff in control/entity/living.py to model/entity/living/*
     x make model/entity/basic.py
     x make model/entity/weapons.py armour.py
-_ document/test model.entity.inventory
+x document/test model.entity.inventory
+_ control.entity.living.action_drop
+    _ implement
+    _ document
+    _ test
+_ model.entity.living.equip
+    _ implement
+    _ document
+    _ test
+_ control.entity.living.action_equip
+    _ implement
+    _ document
+    _ test
