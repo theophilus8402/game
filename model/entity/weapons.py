@@ -10,7 +10,7 @@ class Weapon(Entity):
         super(Weapon, self).__init__(cur_hp=cur_hp)
         self.type = "weapon"      # the different entity classes
         self.eq_slot = EqSlots.hand
-        self.attack_possibilities = {}
+        self.possibilities = {}
 
         # weapon dmg (2d6)
         self.die_to_roll = 0

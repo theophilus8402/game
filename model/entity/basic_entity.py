@@ -19,6 +19,8 @@ class Entity:
         self.cur_hp = 0
         self.max_hp = 10
 
+        self.special_effects = set()
+
         self.short_desc = ""
         self.long_desc = ""
         self.weight = 0

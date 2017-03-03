@@ -6,6 +6,7 @@ from model.entity.armour import Armour
 from model.entity.classes.fighter import Fighter
 from model.entity.classes.mage import Mage
 from model.entity.inventory import Inventory
+from model.entity.living.actions import hit
 from model.entity.living.humanoid import Humanoid
 from model.entity.living.living import *
 from model.entity.living.equip import *
@@ -13,8 +14,9 @@ from model.entity.living.blob import *
 from model.entity.living.status_effects import *
 from model.entity.races.human import Human
 from model.entity.util import *
-from model.tile import *
 from model.info import Coord
+from model.special_effect import Effect, SpecialEffect
+from model.tile import *
 from model.util import roll, RollType
 
 prof = Proficiency
@@ -41,7 +43,7 @@ def make_world():
 def make_shoes():
     shoes = Entity()
     shoes.type = "entity"
-    shoes.eq_slot = EqSlots.feet
+    shoes.eq_slot = EqSlots.right_leg
     shoes.uid = 20
     shoes.name = "shoes"
     shoes.symbol = "*"
@@ -99,14 +101,15 @@ def make_sword():
     sword.short_desc = "This is a shiny short sword."
     sword.long_desc = "This is a really shiny short sword. It is not floppy."
 
-    sword.attack_possibilities[RollType.hit] = 5
-    sword.attack_possibilities[RollType.critical_hit] = 5
+    sword.possibilities[RollType.hit] = 5
+    sword.possibilities[RollType.critical_hit] = 5
 
     sword.weight = 6
     sword.volume = 1
     sword.friction = .3
     sword.die_to_roll = 2
-    sword.dmg_modifier = 3
+    sword.dmg_per_die = 4
+    sword.dmg_modifier = 1
     sword.critical_dmg = 3
     sword.range_increment = 0
     sword.base_cost = 10
@@ -133,7 +136,10 @@ def make_shield():
     shield.short_desc = "This is a small, wooden shield."
     shield.long_desc = "This is a nice, small, wooden shield."
 
-    shield.defence_possibilities[RollType.block] = 5
+    shield.possibilities[RollType.block] = 5
+    block_effect = SpecialEffect(Effect.block)
+    block_effect.block_value = 2
+    shield.special_effects.add(block_effect)
 
     shield.weight = 5
     shield.volume = 3
@@ -162,7 +168,7 @@ def make_armour():
     plate.short_desc = "This is a spiffy suite of plate mail armour."
     plate.long_desc = "This is a really spiffy suite of plate mail armour."
 
-    plate.defence_possibilities[RollType.block] = 5
+    plate.possibilities[RollType.block] = 5
 
     plate.weight = 19
     plate.volume = 6
@@ -326,6 +332,8 @@ def make_new_tim():
     new_tim = NewLiving()
     new_tim.race = Human()
     new_tim.class_type = Mage()
+    new_tim.equipment = HumanoidEquipment()
+    new_tim.inventory = Inventory()
     return new_tim
 
 
@@ -344,7 +352,15 @@ if __name__ == "__main__":
     #print("Wield shield in left hand...")
     #print()
 
-    bobs_info = get_attack_roll_possibilities(bob)
+    bobs_info = get_roll_possibilities(bob)
+
+    bob.inventory.add_item(sword)
+    bob.equip(sword, EqSlots.right_hand)
+
+    tim.inventory.add_item(plate)
+    tim.inventory.add_item(shield)
+    tim.equip(plate, EqSlots.torso)
+    tim.equip(shield, EqSlots.left_hand)
 
     """
     print()

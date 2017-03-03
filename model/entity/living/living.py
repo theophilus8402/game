@@ -1,10 +1,10 @@
 
 from collections import defaultdict
 
-import model.util
+from model.util import roll, RollType
 from model.entity.basic_entity import Entity
 from model.entity.living.status_effects import *
-from model.entity.living.equip import possible_equipment_slots
+from model.entity.living.equip import possible_equipment_slots, EqSlots
 from model.entity.living.round_info import RoundInfo
 from model.entity.inventory import Inventory
 from model.info import Status
@@ -41,7 +41,7 @@ def get_attack_bonus(src_ent, melee=True, range_pen=0):
         attribute = "dex"
     attrib, ability_mod = src_ent.attrib[attribute]
 
-    size_mod = model.util.size_modifiers[src_ent.size]
+    #size_mod = model.util.size_modifiers[src_ent.size]
     misc_attack_bonus, misc_list = src_ent.attack_bonus["misc"]
 
     attack_bonus_list = []
@@ -59,44 +59,32 @@ def get_attack_bonus(src_ent, melee=True, range_pen=0):
     return attack_bonus_list
 
 
-def get_attack_roll_possibilities(person):
-    attack_info = defaultdict(lambda: 0)
-    # Get critical_miss, miss, hit, critical_hit info from person
-    # get race info
-    for attack_type, value in person.race.attack_possibilities.items():
-        attack_info[attack_type] += value
+def get_roll_possibilities(entity, eqslot=None, defence=False):
+    roll_possibs = defaultdict(lambda: 0)
 
-    # get class info
-    for attack_type, value in person.class_type.attack_possibilities.items():
-        attack_info[attack_type] += value
+    # determine if we attack or defence info from the entity
+    if defence is False:
+        poss_types = {RollType.critical_miss, RollType.miss, RollType.hit,
+            RollType.critical_hit}
+    else:
+        poss_types = {RollType.dodge, RollType.block}
 
-    # get equipment info
-    # we'll do this somewhere else?
-    #for attack_type, value in weapon.attack_possibilities:
-    #    attack_info[attack_type] += value
+    # see if we need to get info from a wielded item
+    if eqslot in {EqSlots.right_hand, EqSlots.left_hand}:
+        item = entity.equipment[eqslot]
+    else:
+        item = None
 
-    # get status info (spells, physical ailments)
+    # add up the possibilities
+    for poss_type in poss_types:
+        roll_possibs[poss_type] += entity.race.possibilities.get(poss_type, 0)
+        roll_possibs[poss_type] += entity.class_type.possibilities.get(poss_type, 0)
+        roll_possibs[poss_type] += entity.equipment.possibilities.get(poss_type, 0)
 
-    return attack_info
+        if item:
+            roll_possibs[poss_type] += item.possibilities.get(poss_type, 0)
 
-
-def get_defence_roll_possibilities(person):
-    def_info = defaultdict(lambda: 0)
-
-    # Get critical_miss, miss, hit, critical_hit info from person
-    # get race defences
-    for def_type, value in person.race.defence_possibilities.items():
-        def_info[def_type] += value
-
-    # class info
-    for def_type, value in person.class_type.defence_possibilities.items():
-        def_info[def_type] += value
-
-    # get equipment info
-    for def_type, value in person.equipment.defence_possibilities.items():
-        def_info[def_type] += value
-    
-    return def_info
+    return roll_possibs
 
 
 def check_successful_attack(src_ent, dst_ent, info=None):
@@ -104,13 +92,20 @@ def check_successful_attack(src_ent, dst_ent, info=None):
     return True
 
 
-def determine_weapon_dmg(src_ent, dst_ent):
+def determine_weapon_dmg(entity, eqslot):
     """
-    dmg will be returned as a negative number to indicate that health
-    should be subtracted from target.
+    Returns amount of damage based on item in eqslot
     """
-    #TODO: actually implement this
-    dmg = -6
+    if eqslot not in {EqSlots.left_hand, EqSlots.right_hand}:
+        return 0
+
+    weapon = entity.equipment[eqslot]
+    if not weapon:
+        return 0
+
+    # TODO: include strength bonus?
+    dmg = roll(weapon.die_to_roll, weapon.dmg_per_die, weapon.dmg_modifier)
+
     return dmg
 
 

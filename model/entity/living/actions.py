@@ -2,9 +2,12 @@
 
 from time import time
 
+from model.entity.living.equip import EqSlots
+from model.entity.living.living import get_roll_possibilities, determine_weapon_dmg
 from model.entity.living.round_info import *
 from model.entity.living.status_effects import *
 from model.info import Status
+from model.util import new_roll, RollType
 
 def allowed_to_attack(entity):
     # This will check to see if the entity is allowed to attack this round
@@ -74,4 +77,47 @@ def entity_can_get_item(entity, item):
     # TODO: make sure there's enough room in the inventory
     # TODO: make sure the entity can pickup the extra weight
     return status
+
+
+def hit(src_ent, dst_ent, eqslot):
+    """
+    At this point, we will assume the src_ent is capable of hitting the dst_ent.
+    Will determine if the eqslot is valid.
+    Determine attack/defence possibilities.
+    Roll.
+    Determine and apply damage if appropriate.
+    """
+    # determine if the eqslot is valid
+    if eqslot not in {EqSlots.left_hand, EqSlots.right_hand,
+        EqSlots.left_leg, EqSlots.right_leg}:
+        return Status.invalid_eqslot
+
+    # TODO: provide some amount of exp for even trying to hit
+    # this should be a relatively small amount of exp
+    # and, we might do exp for a particular branch of skills like physical combat
+
+    # determine attack possibilities
+    possibilities = get_roll_possibilities(src_ent, eqslot=eqslot)
+
+    # determine defence possibilities
+    # TODO: see if he has a shield?
+    possibilities.update(get_roll_possibilities(dst_ent, defence=True))
+
+    # determine level of success
+    roll_result, roll_num = new_roll(possibilities)
+
+    # determine initial damage if any amount of success
+    if roll_result in {RollType.hit, RollType.block, RollType.critical_hit}:
+        dmg_info = determine_weapon_dmg(src_ent, eqslot)
+
+    # determine damage reduction
+    if roll_result is RollType.block:
+        # TODO: reduce some of the damage
+        pass
+
+    # apply damage
+
+    # determine if target is still alive
+    
+    return roll_result, roll_num
 

@@ -5,6 +5,7 @@ import enum
 
 from model.info import Status
 from model.entity.inventory import *
+from model.special_effect import Effect
 from model.util import RollType
 
 @enum.unique
@@ -14,13 +15,14 @@ class EqSlots(enum.Enum):
     left_hand = 3
     torso = 4
     leggings = 5
-    feet = 6
-    right_ring_finger = 7
-    left_ring_finger = 8
-    necklace = 9
-    tunic = 10
-    ring_finger = 11
-    hand = 12
+    right_leg = 6
+    left_leg = 7
+    right_ring_finger = 8
+    left_ring_finger = 9
+    necklace = 10
+    tunic = 11
+    ring_finger = 12
+    hand = 13
 
 
 eq_slot_names = {
@@ -29,7 +31,8 @@ eq_slot_names = {
     EqSlots.left_hand : "left hand",
     EqSlots.torso : "torso",
     EqSlots.leggings : "legs",
-    EqSlots.feet : "feet",
+    EqSlots.right_leg : "right_leg",
+    EqSlots.left_leg : "left_leg",
     EqSlots.right_ring_finger : "right ring finger",
     EqSlots.left_ring_finger : "left ring finger",
     EqSlots.necklace : "around {actor_poss} neck",
@@ -42,25 +45,34 @@ class BaseEquipment():
     allowed_eq_slots = []
 
     def __init__(self):
-        self.attack_possibilities = defaultdict(lambda: 0)
-        self.defence_possibilities = defaultdict(lambda: 0)
-        self.special_effects = dict()
+        self.possibilities = defaultdict(lambda: 0)
+        self.special_effects = set()
         self._equipment = defaultdict(lambda: None)# keys: eqslot, value: eq
 
     def update_info(self):
-        self.attack_possibilities.clear()
-        self.defence_possibilities.clear()
+        self.possibilities.clear()
         self.special_effects.clear()
-        for eq in self._equipment.values():
-            # defensive bonuses
-            for attack_type, value in getattr(eq, "attack_possibilities", {}).items():
-                self.attack_possibilities[attack_type] += value
+        # don't keep track of possibilities based on stuff wielded, just worn
+        for slot, item in self._equipment.items():
 
-            # defensive bonuses
-            for def_type, value in getattr(eq, "defence_possibilities", {}).items():
-                self.defence_possibilities[def_type] += value
+            # skip if item is wielded
+            if slot in {EqSlots.left_hand, EqSlots.right_hand}:
+                continue
+
+            for roll_type, value in item.possibilities.items():
+                self.possibilities[roll_type] += value
 
             # special effects
+
+    def get_blocking_items(self):
+        # Returns a list of all items capable of blocking attacks
+        blocking_list = []
+        for eq in self._equipment.values():
+            for effect in eq.special_effects:
+                if effect.spec_type == Effect.block:
+                    blocking_list.append(eq)
+                    break
+        return blocking_list
 
     def __len__(self):
         return len(self._equipment)
@@ -96,7 +108,8 @@ class HumanoidEquipment(BaseEquipment):
             EqSlots.left_hand,
             EqSlots.torso,
             EqSlots.leggings,
-            EqSlots.feet,
+            EqSlots.right_leg,
+            EqSlots.left_leg,
             EqSlots.right_ring_finger,
             EqSlots.left_ring_finger,
             EqSlots.necklace,
@@ -118,7 +131,8 @@ possible_equipment_slots = [
         EqSlots.left_hand,
         EqSlots.torso,
         EqSlots.leggings,
-        EqSlots.feet,
+        EqSlots.right_leg,
+        EqSlots.left_leg,
         EqSlots.right_ring_finger,
         EqSlots.left_ring_finger,
         EqSlots.necklace,
