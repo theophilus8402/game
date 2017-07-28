@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from random import choice
 from time import time
 
 from model.entity.living.equip import EqSlots
@@ -100,7 +101,6 @@ def hit(src_ent, dst_ent, eqslot):
     possibilities = get_roll_possibilities(src_ent, eqslot=eqslot)
 
     # determine defence possibilities
-    # TODO: see if he has a shield?
     possibilities.update(get_roll_possibilities(dst_ent, defence=True))
 
     # determine level of success
@@ -108,16 +108,32 @@ def hit(src_ent, dst_ent, eqslot):
 
     # determine initial damage if any amount of success
     if roll_result in {RollType.hit, RollType.block, RollType.critical_hit}:
-        dmg_info = determine_weapon_dmg(src_ent, eqslot)
+        attacking_item = src_ent.equipment[eqslot]
+        dmg_info = determine_weapon_dmg(src_ent, attacking_item)
 
-    # determine damage reduction
-    if roll_result is RollType.block:
-        # TODO: reduce some of the damage
-        pass
+        # check if attack was blocked
+        if roll_result is RollType.block:
+            # determine the item that blocked the attack
+            blocking_items = dst_ent.equipment.get_blocking_items()
+            blocking_item = choice(blocking_items)
 
-    # apply damage
+            # figure out how much to reduce the dmg
+            block_amt = get_block_value(blocking_item)
+            dmg_info.add_block(blocking_item, block_amt)
 
-    # determine if target is still alive
+        # apply damage
+        # TODO: I should apply damage here, but I shouldn't give it a total.
+        #   I should give it a DmgInfo object.  That way, any method of giving
+        #   dmg can be handled by the entity, and I don't have to duplicate the
+        #   checking for resists.  Just let the entity check it's own resists
+        applied_dmg = dst_ent.apply_damage(dmg_info)
+        dmg_info.applied_dmg = applied_dmg
+
+        # determine if target is still alive
+        # TODO: or have something else check this?
+
+    else:
+        dmg_info = None
     
-    return roll_result, roll_num
+    return roll_result, roll_num, dmg_info
 

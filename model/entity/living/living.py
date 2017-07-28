@@ -7,6 +7,7 @@ from model.entity.living.status_effects import *
 from model.entity.living.equip import possible_equipment_slots, EqSlots
 from model.entity.living.round_info import RoundInfo
 from model.entity.inventory import Inventory
+from model.entity.damage import DmgInfo
 from model.info import Status
 
 
@@ -92,24 +93,22 @@ def check_successful_attack(src_ent, dst_ent, info=None):
     return True
 
 
-def determine_weapon_dmg(entity, eqslot):
+def determine_weapon_dmg(entity, weapon):
     """
     Returns amount of damage based on item in eqslot
     """
-    if eqslot not in {EqSlots.left_hand, EqSlots.right_hand}:
-        return 0
+    dmg_info = DmgInfo()
 
-    weapon = entity.equipment[eqslot]
-    if not weapon:
-        return 0
+    # TODO: include strength bonus
 
-    # TODO: include strength bonus?
-    dmg = roll(weapon.die_to_roll, weapon.dmg_per_die, weapon.dmg_modifier)
+    results = weapon.get_damage()
+    for dmg_type, amt in results.items():
+        dmg_info.add_dmg(dmg_type, amt)
 
-    return dmg
+    return dmg_info
 
 
-class NewLiving():
+class NewLiving(Entity):
 
     def __init__(self):
         self.race = None
@@ -125,6 +124,8 @@ class NewLiving():
             "int": 0,
             "cha": 0,
         }
+
+        self.cur_hp = 10
 
     def equip(self, item, eqslot):
         # make sure the item is in the inventory

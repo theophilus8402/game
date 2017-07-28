@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+from random import choice
+
 from model.entity.basic_entity import Entity
 from model.entity.living.equip import EqSlots
 
@@ -29,4 +31,9 @@ class Weapon(Entity):
                                     #   this doesn't handle large weapon
                                     #   being wielded by a gnome
 
-
+    def get_damage(self):
+        dmg_results = {}
+        for dmg_type, (base_amt, dmg_range) in self.damage.items():
+            result = choice(range(base_amt-dmg_range, base_amt+dmg_range+1))
+            dmg_results[dmg_type] = result
+        return dmg_results

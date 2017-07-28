@@ -1,10 +1,10 @@
 #!/usr/bin/python3.4
 
-from model.entity.basic_entity import Entity
-from model.entity.weapons import Weapon
 from model.entity.armour import Armour
+from model.entity.basic_entity import Entity
 from model.entity.classes.fighter import Fighter
 from model.entity.classes.mage import Mage
+from model.entity.damage import DmgType
 from model.entity.inventory import Inventory
 from model.entity.living.actions import hit
 from model.entity.living.humanoid import Humanoid
@@ -14,6 +14,7 @@ from model.entity.living.blob import *
 from model.entity.living.status_effects import *
 from model.entity.races.human import Human
 from model.entity.util import *
+from model.entity.weapons import Weapon
 from model.info import Coord
 from model.special_effect import Effect, SpecialEffect
 from model.tile import *
@@ -103,6 +104,7 @@ def make_sword():
 
     sword.possibilities[RollType.hit] = 5
     sword.possibilities[RollType.critical_hit] = 5
+    sword.damage = {DmgType.slashing: (6, 2)}
 
     sword.weight = 6
     sword.volume = 1

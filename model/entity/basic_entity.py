@@ -34,6 +34,37 @@ class Entity:
         # stuff not stored in db
         self.world = None
 
+    def apply_damage(self, dmg_info):
+        """
+        Given a DmgInfo object, with dmg info in it already, entity will
+        check it's own resists and apply dmg as appropriate.  This function
+        will be called by anything that can apply dmg (physical hit, spell cast,
+        trap...)  Thus, I don't have to duplicate the searching for and applying
+        of dmg resists in each of the other methods.
+        Applies the dmg to the entities health.
+        Returns the total amount of dmg applied to the entity.
+        """
+        # TODO: look for resists and apply them
+        # resists can come from race, class, spells/special effects
+
+        # apply the final amount
+        # TODO: this may look different after I figure out resists
+        final_amt = dmg_info.total
+
+        self.cur_hp -= final_amt
+
+        return final_amt
+
+
+def get_block_value(item):
+    # Returns the block value of an item, zero otherwise
+    block_value = 0
+    for effect in item.special_effects:
+        if effect.spec_type is Effect.blocking:
+            block_value = effect.block_value
+            break
+    return block_value
+
 
 def entity_get_volume_weight(entity):
     """Returns the volume and weight of the entity."""

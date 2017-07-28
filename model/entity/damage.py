@@ -25,6 +25,7 @@ class DmgInfo():
         self._reductions = []
         # _final[DmgType] = dmg_amount ... this is for final info
         self._final = {}
+        self._block_info = {"item": None, "amt": 0}
 
     def add_dmg(self, dmg_type, amount):
         self._orig_dmg[dmg_type] = amount
@@ -42,6 +43,10 @@ class DmgInfo():
             if self._final[dmg_type] < 0:
                 self._final[dmg_type] = 0
 
+    def add_block(self, item, block_amt):
+        self._block_info["item"] = item
+        self._block_info["amt"] = block_amt
+
     @property
     def amt(self):
         return self._final
@@ -51,4 +56,7 @@ class DmgInfo():
         total = 0
         for dmg_type, amount in self._final.items():
             total += amount
+        # For now, block dmg just reduces damage straight off the top
+        total -= self._block_info["amt"] 
+        return total if total >= 0 else 0
 
