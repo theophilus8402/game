@@ -51,6 +51,7 @@ class Class(enum.Enum):
     wizard = 3
 
 
+"""
 @enum.unique
 class Ability(enum.Enum):
     strength = 0
@@ -59,6 +60,7 @@ class Ability(enum.Enum):
     intelligence = 3
     wisdom = 4
     charisma = 5
+"""
 
 
 @enum.unique

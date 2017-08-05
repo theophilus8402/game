@@ -4,6 +4,8 @@ from collections import defaultdict
 from model.util import roll, RollType
 from model.entity.basic_entity import Entity
 from model.entity.living.status_effects import *
+from model.entity.living.ability_scores import Ability, AbilityScore, AbilityBonus
+from model.entity.living.skills import *
 from model.entity.living.equip import possible_equipment_slots, EqSlots
 from model.entity.living.round_info import RoundInfo
 from model.entity.inventory import Inventory
@@ -113,19 +115,31 @@ class NewLiving(Entity):
     def __init__(self):
         self.race = None
         self.class_type = None
-        self.equipment = None   #TODO: change this because the eq slots depends
-                                # on the race (different arms...)
+        self.equipment = None
         self.inventory = None
-        self.stats = {
-            "str": 0,
-            "dex": 0,
-            "con": 0,
-            "wis": 0,
-            "int": 0,
-            "cha": 0,
-        }
-
         self.cur_hp = 10
+        self.initialize_skills()
+
+    def set_ability_scores(self, ability_scores):
+        self.ability_scores = {}
+        for ability_score in ability_scores:
+            self.ability_scores[ability_score.ability] = ability_score
+
+    def add_race(self, race):
+        for bonus in race.bonuses:
+            self.add_bonus(bonus)
+        self.race = race
+
+    def add_bonus(self, bonus):
+        if isinstance(bonus, AbilityBonus):
+            self.ability_scores[bonus.type].add_bonus(bonus)
+        elif isinstance(bonus, SkillBonus):
+            self.skills[bonus.type].add_bonus(bonus)
+
+    def initialize_skills(self):
+        self.skills = {}
+        for skill_name in SkillName:
+            self.skills[skill_name] = Skill(skill_name)
 
     def equip(self, item, eqslot):
         # make sure the item is in the inventory

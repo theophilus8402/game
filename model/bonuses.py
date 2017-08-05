@@ -1,10 +1,13 @@
 
 from enum import unique, Enum
 
-@unique
-class BonusReason(Enum):
-    race = 0
-    entity_class = 1
+BonusReason = Enum("BonusReason", [
+    "race",
+    "entity_class",
+    "trained_skill",
+    "trained_class_skill",
+    "ability_modifier",
+])
 
 
 class Bonus():

@@ -7,6 +7,8 @@ from model.entity.classes.mage import Mage
 from model.entity.damage import DmgType
 from model.entity.inventory import Inventory
 from model.entity.living.actions import hit
+from model.entity.living.ability_scores import *
+from model.entity.living.races import *
 from model.entity.living.humanoid import Humanoid
 from model.entity.living.living import *
 from model.entity.living.equip import *
@@ -332,7 +334,16 @@ def make_new_bob():
 
 def make_new_tim():
     new_tim = NewLiving()
-    new_tim.race = Human()
+    ability_scores = [
+        AbilityScore(Ability.str, 10),
+        AbilityScore(Ability.dex, 14),
+        AbilityScore(Ability.con, 12),
+        AbilityScore(Ability.wis, 13),
+        AbilityScore(Ability.int, 8),
+        AbilityScore(Ability.cha, 16),
+        ]
+    new_tim.set_ability_scores(ability_scores)
+    new_tim.add_race(Halfling())
     new_tim.class_type = Mage()
     new_tim.equipment = HumanoidEquipment()
     new_tim.inventory = Inventory()
