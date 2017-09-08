@@ -1,16 +1,26 @@
 
 from collections import defaultdict
 
-from model.util import roll, RollType
+from model.bonuses import BonusReason
 from model.entity.basic_entity import Entity
-from model.entity.living.status_effects import *
+from model.entity.classes.util import ClassName, class_name_map
+from model.entity.classes.fighter import Fighter
+from model.entity.classes.wizard import Wizard
 from model.entity.living.ability_scores import Ability, AbilityScore, AbilityBonus
+from model.entity.living.armor_class import ArmorClass
+from model.entity.living.attack_bonus import BaseAttackBonus, AttackBonus
+from model.entity.living.status_effects import *
+from model.entity.inventory import Inventory
+from model.entity.living.equip import HumanoidEquipment
 from model.entity.living.skills import *
+from model.entity.living.size import SizeBonus,get_size_modifier,size_modifier_map
 from model.entity.living.equip import possible_equipment_slots, EqSlots
+from model.entity.living.races import Human
 from model.entity.living.round_info import RoundInfo
 from model.entity.inventory import Inventory
 from model.entity.damage import DmgInfo
 from model.info import Status
+from model.util import roll, RollType, RollInfo
 
 
 CMDS_BASIC_MOVEMENT = {"n", "ne", "e", "se", "s", "sw", "w", "nw"}
@@ -110,36 +120,136 @@ def determine_weapon_dmg(entity, weapon):
     return dmg_info
 
 
-class NewLiving(Entity):
+class Living(Entity):
 
-    def __init__(self):
-        self.race = None
-        self.class_type = None
-        self.equipment = None
-        self.inventory = None
-        self.cur_hp = 10
+    def __init__(self, ab_scores=None, race=None, class_name=ClassName.fighter):
+        self.name = ""
+        self.base_attack_bonus = BaseAttackBonus()
+        if not ab_scores:
+            ab_scores = [
+                AbilityScore(Ability.str, 10),
+                AbilityScore(Ability.dex, 10),
+                AbilityScore(Ability.con, 10),
+                AbilityScore(Ability.wis, 10),
+                AbilityScore(Ability.int, 10),
+                AbilityScore(Ability.cha, 10),
+            ]
+        self.set_ability_scores(ab_scores)
+        self.skills = {}
         self.initialize_skills()
+
+        self.ac = ArmorClass()
+        dex_mod = self.ability_scores[Ability.dex].modifier
+        self.ac.add_bonus(dex_mod)
+
+        if not race:
+            ability_bonus = AbilityBonus(AbilityName.str, 2, BonusReason.race)
+            race = Human(ability_bonus)
+        self.set_race(race)
+
+        self.classes = []
+        self.add_class(class_name)
+        self.equipment = HumanoidEquipment()
+        self.inventory = Inventory()
+        self.cur_hp = 10
+        self.sneaking = 0
+
+    def __repr__(self):
+        classes_str = ",".join(["{}:{}".format(ctype.name.name, ctype.level) for ctype in self.classes])
+        return "<{} - {} / {}>".format(self.name, self.race.name.name, classes_str)
 
     def set_ability_scores(self, ability_scores):
         self.ability_scores = {}
         for ability_score in ability_scores:
             self.ability_scores[ability_score.ability] = ability_score
 
-    def add_race(self, race):
+    def set_race(self, race):
         for bonus in race.bonuses:
             self.add_bonus(bonus)
         self.race = race
+        self.size_modifier = get_size_modifier(self.race.size)
+
+        # add size_modifier to things affected by size
+        self.base_attack_bonus.add_bonus(self.size_modifier)
+        self.ac.add_bonus(self.size_modifier)
+
+        self.set_size(self.race.size)
+
+    def set_size(self, size):
+        self.size = size
+        self.size_modifier.amount = size_modifier_map[size]
+
+        # update values that are affected by size
+        self.base_attack_bonus.calculate_total()
+        self.ac.calculate_total()
+
+    def add_class(self, class_name):
+        class_type = class_name_map[class_name]()
+        self.classes.append(class_type)
+
+        for bonus in class_type.bonuses:
+            self.add_bonus(bonus)
+
+        self.base_attack_bonus.add_bonus(class_type.class_bab)
 
     def add_bonus(self, bonus):
         if isinstance(bonus, AbilityBonus):
             self.ability_scores[bonus.type].add_bonus(bonus)
         elif isinstance(bonus, SkillBonus):
             self.skills[bonus.type].add_bonus(bonus)
+        elif isinstance(bonus, AttackBonus):
+            self.base_attack_bonus.add_bonus(bonus)
+        elif isinstance(bonus, SizeBonus):
+            self.base_attack_bonus.add_bonus(bonus)
+            self.ac.add_bonus(bonus)
+
+    def add_level(self, class_name):
+        found_class = False
+        for class_type in self.classes:
+            if class_type.name == class_name:
+                class_type.level_up()
+                found_class = True
+                break
+        if not found_class:
+            self.add_class(class_name)
+
+        # recalculate things that might have changed by the level up
+        self.base_attack_bonus.calculate_total()
 
     def initialize_skills(self):
-        self.skills = {}
         for skill_name in SkillName:
-            self.skills[skill_name] = Skill(skill_name)
+            ability = skill_ability_map[skill_name]["ability"]
+            ability_bonus = self.ability_scores[ability].modifier
+            self.skills[skill_name] = Skill(skill_name, ability_bonus)
+
+    def skill_check(self, skill_name):
+        return RollInfo(1, 20, bonuses=self.skills[skill_name].bonuses)
+
+    def roll_attack(self, full_hit=False, main_hand=True):
+        results = []
+
+        if full_hit == True:
+            # do a full hit for main_hand
+            for att_bonus in self.base_attack_bonus.main_hand:
+                results.append(RollInfo(1, 20, flat_bonus=att_bonus))
+        elif main_hand == True:
+            # roll for just the first main_hand attack
+            fbonus = self.base_attack_bonus.main_hand[0]
+            results.append(RollInfo(1, 20, flat_bonus=fbonus))
+        else:
+            # roll attack roll for just off-hand
+            pass
+
+        return results
+
+    def sneak(self, hide=True):
+        if hide:
+            result = self.skill_check(SkillName.stealth)
+        else:
+            # just want to return a RollInfo even though it's useless
+            result = RollInfo(0, 0, [])
+        self.sneaking = result.total
+        return result
 
     def equip(self, item, eqslot):
         # make sure the item is in the inventory
@@ -198,163 +308,5 @@ class NewLiving(Entity):
         self.inventory.add_item(item)
 
         return Status.all_good
-
-
-# Basic living:
-class Living(Entity):
-
-    def __init__(self):
-        Entity.__init__(self)
-        self.equipment = {slot: None for slot in possible_equipment_slots}
-        self.type = "living"      # the different entity classes
-        self.pclass = "fighter"
-        self.cur_mp = 0
-        self.max_mp = 10
-        self.status_msgs = set()
-        self.visual_range = 5
-        self.level = 0
-        self.hit_dice = "2d4"
-        self.race = "creature"
-
-        self.blob_state = None
-
-        self.max_num_attacks = 1
-        self.main_hand = Body.right_arm
-        self.round_info = RoundInfo()
-
-        # new
-        self.status_effects = set()
-
-        self.abilities = {}
-        self.fortitude = {
-            "total": 0,
-            "base": 0,
-            "magic": 0,
-            "tmp": 0 }
-        self.reflex = {
-            "total": 0,
-            "base": 0,
-            "magic": 0,
-            "tmp": 0 }
-        self.will = {
-            "total": 0,
-            "base": 0,
-            "magic": 0,
-            "tmp": 0 }
-        self.alignment = "neutral good"
-        self.diety = "none"
-        self.size = "medium"
-        self.age = 21
-        self.gender = "male"
-        self.height = "6'2\""
-        self.subdual_msg = 0
-        self.arcane_spell_failure = 0
-        self.armour_check_penalty = -4
-        self.speed = 20
-        self.ac = 10
-        """{
-        #AC = 10 + armour bonus + shield bonus + dex mod + size mod + other
-            "total": 0,
-            "base": 10,
-            "armour": 0,
-            "shield": 0,
-            "misc": (0, None),  # first num will be the total, then []
-                                #   of things that give the att bonus
-            }
-        """
-        self.eq = {
-            Body.right_arm  : None,
-            Body.left_arm   : None,
-            Body.torso      : None,
-            Body.head       : None,
-            }
-        self.skills = []
-        self.spells = []
-        self.feats = []
-        self.ammunition = []
-        self.inventory = Inventory()
-        self.lift = {
-            "over_head": 200,
-            "off_ground": 600,
-            "push_drag": 1000 }
-        self.carrying = 0   # how much weight we are carrying
-                            #   this will include items wielded and eq
-                            # this will only be modified when we pick
-                            #   stuff up or when we drop it
-                            # we may have to modify it when we cast a
-                            #   feather spell on something...
-        self.carry_max = 0
-        self.exp = 0
-        self.money = 10
-
-    def drop_item(self, item):
-        # check to make sure the item is in the inventory or being wielded
-        #   won't drop worn items... must remove them first
-        # "drop" the item
-        #   add the item to the tile's entity list
-        #   remove the weight from self.carrying
-        #   item.carried_by = None
-        #   set the item's current location
-        #   remove the item from our inventory/wielded stuff
-        pass
-
-    def set_attrib(self, name, value):
-        mod = math.floor((value - 10) / 2)
-        self.attrib[name] = (value, mod)
-
-    def can_move(self):
-        can_move = True
-        required_parts = {Body.left_leg, Body.right_leg}
-        status = check_health(self, required_parts)
-        if status:
-            can_move = False
-        return (can_move, status)
-
-    #TODO: I think I'm gonna get rid of mp and have some kind of time thing
-    def change_mp(self, mp_delta):
-        self.cur_mp += mp_delta
-        if self.cur_mp > self.max_mp:
-            self.cur_mp = self.max_mp
-
-    def wield(self, hand, item):
-        status = 0
-        """
-        hand = "{}_hand".format(hand)
-        if self.eq.get(hand) is None:
-            # there's nothing in that hand, so we can go ahead and wield it
-            self.eq[hand] = item
-            # need to check if the item even has an attack bonus
-            if hasattr(item, "attack_bonus"):
-                self.add_attack_bonus(item)
-            # check to see if it has an AC bonus
-            if hasattr(item, "armour_bonus") and \
-                (item.armour_bonus is not None):
-                # currently, I'm assuming shield are the only thing you
-                #   can wield that will give AC bonus
-                self.add_armour_bonus("shield", item.armour_bonus)
-        else:
-            status = 4  # you already have something in that hand
-        #TODO: gotta figure out two-handed weapons
-        """
-        return status
-
-    def unwield(self, hand):
-        status = 0
-        """
-        hand = "{}_hand".format(hand)
-        if self.eq.get(hand) is not None:
-            item = self.eq[hand]
-            self.eq[hand] = None
-            if hasattr(item, "attack_bonus"): self.remove_attack_bonus(item) if hasattr(item, "armour_bonus"):
-                # currently, I'm assuming shield are the only thing you
-                #   can wield that will give AC bonus
-                self.remove_armour_bonus("shield", item.armour_bonus, item)
-        else:
-            status = 5      # there's nothing in that hand
-        """
-        return status
-                
-    def die(self):
-        add_status_effect(self, Afflictions.dead)
 
 

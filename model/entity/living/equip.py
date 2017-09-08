@@ -42,7 +42,7 @@ eq_slot_names = {
 
 class BaseEquipment():
 
-    allowed_eq_slots = []
+    allowed_eq_slots = set()
 
     def __init__(self):
         self.possibilities = defaultdict(lambda: 0)

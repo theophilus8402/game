@@ -1,9 +1,102 @@
 #!/usr/bin/python3
 
+from enum import Enum,unique
 from random import choice
 
 from model.entity.basic_entity import Entity
 from model.entity.living.equip import EqSlots
+
+WeaponType = Enum("WeaponName", [
+    "gauntlet",
+    "unarmed_strike",
+    "dagger",
+    "punching_dagger",
+    "spiked_gauntlet",
+    "light_mace",
+    "sickle",
+    "club",
+    "heavy_mace",
+    "morningstar",
+    "shortspear",
+    "longspear",
+    "quarterstaff",
+    "spear",
+    "blowgun",
+    "heavy_crossbow",
+    "light_crossbow",
+    "dart",
+    "javelin",
+    "sling",
+    "throwing_axe",
+    "light_hammer",
+    "handaxe",
+    "kukri",
+    "light_pick",
+    "sap",
+    "spiked_armor",
+    "starknife",
+    "short_sword",
+    "battleaxe",
+    "flail",
+    "longsword",
+    "heavy_pick",
+    "rapier",
+    "scimitar",
+    "trident",
+    "warhammer",
+    "falchion",
+    "glaive",
+    "greataxe",
+    "greatclub",
+    "heavy_flail",
+    "greatsword",
+    "guisarme",
+    "halberd",
+    "lance",
+    "ranseur",
+    "scythe",
+    "longbow",
+    "composite_longbow",
+    "shortbow",
+    "composite_shortbow",
+    "kama",
+    "nunchaku",
+    "sai",
+    "siangham",
+    "bastard_sword",
+    "dwarven_waraxe",
+    "whip",
+    "orc_double_axe",
+    "spiked_chain",
+    "elven_curve_blade",
+    "dire_flail",
+    "gnome_hooked_hammer",
+    "two_bladed_sword",
+    "dwarven_urgrosh",
+    "bolas",
+    "hand_crossbow",
+    "repeating_heavy_crossbow",
+    "repeating_light_crossbow",
+    "net",
+    "shuriken",
+    "halfling_sling_staff",
+     ])
+
+DmgType = Enum("DmgType", [
+    "bludgeoning",
+    "piercing",
+    "slashing",
+    ])
+
+WeaponSpecial = Enum("WeaponSpecial", [
+    "brace",
+    "disarm",
+    "double",
+    "monk",
+    "nonlethal",
+    "reach",
+    "trip",
+    ])
 
 # Basic weapon:
 class Weapon(Entity):

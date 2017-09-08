@@ -28,6 +28,34 @@ def roll(num_die, sides, modifier=0):
     return total
 
 
+class RollInfo():
+
+    def __init__(self, num_die, sides, flat_bonus=0, bonuses=[]):
+        self.bonuses = bonuses
+        self.flat_bonus = flat_bonus
+        self.roll_result = roll(num_die, sides)
+        self.calculate_total()
+
+    def calculate_total(self):
+        bonus_total = sum([bonus.amount for bonus in self.bonuses])
+        self.total = self.flat_bonus + bonus_total + self.roll_result
+
+    def __repr__(self):
+        # 20+2-3+1
+        if self.flat_bonus > 0:
+            roll_str = ["{}+{}".format(self.roll_result, self.flat_bonus)]
+        elif self.flat_bonus < 0:
+            roll_str = ["{}-{}".format(self.roll_result, self.flat_bonus)]
+        else:
+            roll_str = ["{}".format(self.roll_result)]
+        for bonus in self.bonuses:
+            if bonus.amount >= 0:
+                roll_str.append("+{}".format(bonus.amount))
+            else:
+                roll_str.append("{}".format(bonus.amount))
+        return "{}={}".format("".join(roll_str), self.total)
+
+
 @enum.unique
 class RollType(enum.Enum):
     critical_miss = 0

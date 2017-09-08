@@ -2,24 +2,25 @@
 
 from model.entity.armour import Armour
 from model.entity.basic_entity import Entity
-from model.entity.classes.fighter import Fighter
-from model.entity.classes.mage import Mage
+from model.entity.classes.util import ClassName
 from model.entity.damage import DmgType
 from model.entity.inventory import Inventory
 from model.entity.living.actions import hit
 from model.entity.living.ability_scores import *
+from model.entity.living.armor_class import ArmorBonus,ArmorClass
+from model.entity.living.attack_bonus import AttackBonus,BaseAttackBonus
 from model.entity.living.races import *
 from model.entity.living.humanoid import Humanoid
 from model.entity.living.living import *
 from model.entity.living.equip import *
 from model.entity.living.blob import *
 from model.entity.living.status_effects import *
-from model.entity.races.human import Human
 from model.entity.util import *
 from model.entity.weapons import Weapon
 from model.info import Coord
 from model.special_effect import Effect, SpecialEffect
 from model.tile import *
+from model.world import World
 from model.util import roll, RollType
 
 prof = Proficiency
@@ -35,7 +36,7 @@ def make_world():
     # create the temporary world (it is a 4x4 world)
     dim = 4
     uuid = 0
-    world = model.world.World()
+    world = World()
     for y in range(-dim, dim+1):
         for x in range(-dim, dim+1):
             world.tiles[Coord(x,y)] = mtile(uuid, Coord(x,y))
@@ -188,152 +189,48 @@ def make_armour():
     plate.properties = []
     return plate
 
-
-def make_dog():
-    dog = Living()
-    dog.uid = 44
-    dog.name = "dog"
-    dog.symbol = "d"
-    dog.coord = Coord(-1, 2)
-    dog.cur_hp = 7
-    dog.max_hp = 7
-    dog.short_desc = "This dog is annoying."
-    dog.long_desc = "This is a mangy mut."
-    dog.weight = 41
-    dog.volume = 4
-    dog.friction = 5
-    dog.cur_mp = 0
-    dog.max_mp = 0
-    add_status_effect(dog, Afflictions.stupid)
-    add_status_effect(dog, Afflictions.lost_balance)
-    dog.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_HUMANOID)
-    dog.male = True
-    return dog
-
+#
+#def make_dog():
+#    dog = Living()
+#    dog.uid = 44
+#    dog.name = "dog"
+#    dog.symbol = "d"
+#    dog.coord = Coord(-1, 2)
+#    dog.cur_hp = 7
+#    dog.max_hp = 7
+#    dog.short_desc = "This dog is annoying."
+#    dog.long_desc = "This is a mangy mut."
+#    dog.weight = 41
+#    dog.volume = 4
+#    dog.friction = 5
+#    dog.cur_mp = 0
+#    dog.max_mp = 0
+#    add_status_effect(dog, Afflictions.stupid)
+#    add_status_effect(dog, Afflictions.lost_balance)
+#    dog.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_HUMANOID)
+#    dog.male = True
+#    return dog
+#
 
 def make_bob():
-    bob = Humanoid()
-    bob.uid = 1
-    bob.name = "Bob"
-    bob.symbol = "B"
-    bob.coord = Coord(1, 2)
-    bob.cur_hp = 10
-    bob.max_hp = 10
-    bob.short_desc = "This is Bob."
-    bob.long_desc = "This is Bob. He's rugged looking."
-    bob.male = True
-    bob.weight = 192
-    bob.volume = 12
-    bob.friction = 10
-    bob.cur_mp = 10
-    bob.max_mp = 10
-    bob.male = True
+    str_bonus = AbilityBonus(Ability.str, 2, BonusReason.race)
+    ability_scores = [
+        AbilityScore(Ability.str, 17),
+        AbilityScore(Ability.dex, 14),
+        AbilityScore(Ability.con, 13),
+        AbilityScore(Ability.wis, 12),
+        AbilityScore(Ability.int, 8),
+        AbilityScore(Ability.cha, 12),
+        ]
+    human = Human(str_bonus)
+    fighter = ClassName.fighter
+    bob = Living(ab_scores=ability_scores, race=human, class_name=fighter)
+    bob.name = "bob"
 
-    #bob.blob_state = BlobState(States.expect_login_name)
-
-    bob.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
-    bob.known_cmds = bob.known_cmds.union(CMDS_BASIC_HUMANOID)
-    bob.known_cmds = bob.known_cmds.union(CMDS_DEBUG)
-
-    #add_status_effect(bob, Blessings.game_master)
-
-    bob.pclass = Class.fighter
-    bob.level = 10
-    bob.abilities = {}
-    set_ability(bob, Ability.strength, 14)
-    set_ability(bob, Ability.dexterity, 15)
-    set_ability(bob, Ability.constitution, 13)
-    set_ability(bob, Ability.intelligence, 11)
-    set_ability(bob, Ability.wisdom, 11)
-    set_ability(bob, Ability.charisma, 10)
-    bob.proficiencies = [prof.light_armour, prof.medium_armour, prof.heavy_armour,
-        prof.shields, prof.simple_weapons, prof.martial_weapons]
-    bob.size = "small"
     return bob
 
 
 def make_tim():
-    tim = Humanoid()
-    tim.uid = 2
-    tim.name = "Tim"
-    tim.symbol = "T"
-    tim.coord = Coord(2, 2)
-    tim.cur_hp = 10
-    tim.max_hp = 10
-    tim.short_desc = "This is Tim."
-    tim.long_desc = "This is Tim. He's not rugged looking."
-    tim.male = True
-    tim.weight = 192
-    tim.volume = 12
-    tim.friction = 10
-    tim.cur_mp = 10
-    tim.max_mp = 10
-    #add_status_effect(tim, Afflictions.lost_balance)
-    tim.male = True
-
-    tim.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
-
-    tim.pclass = Class.wizard
-    tim.level = 10
-    tim.abilities = {}
-    set_ability(tim, Ability.strength, 11)
-    set_ability(tim, Ability.dexterity, 12)
-    set_ability(tim, Ability.constitution, 10)
-    set_ability(tim, Ability.intelligence, 18)
-    set_ability(tim, Ability.wisdom, 16)
-    set_ability(tim, Ability.charisma, 13)
-    tim.proficiencies = [prof.light_armour, prof.medium_armour, prof.heavy_armour,
-        prof.shields, prof.simple_weapons, prof.martial_weapons]
-    tim.size = "small"
-    return tim
-
-
-def make_alice():
-    alice = Humanoid()
-    alice.uid = 2
-    alice.name = "Alice"
-    alice.symbol = "A"
-    alice.coord = Coord(3, -2)
-    alice.cur_hp = 10
-    alice.max_hp = 10
-    alice.short_desc = "This is Alice."
-    alice.long_desc = "This is Alice.  She is a woman."
-    alice.male = False
-    alice.weight = 142
-    alice.volume = 12
-    alice.friction = 10
-    alice.cur_mp = 10
-    alice.max_mp = 10
-    alice.male = False
-
-    alice.known_cmds = CMDS_BASIC_MOVEMENT.union(CMDS_BASIC_ATTACK)
-
-    alice.level = 10
-    alice.pclass = Class.rogue
-    alice.abilities = {}
-    set_ability(alice, Ability.strength, 8)
-    set_ability(alice, Ability.dexterity, 18)
-    set_ability(alice, Ability.constitution, 11)
-    set_ability(alice, Ability.intelligence, 17)
-    set_ability(alice, Ability.wisdom, 14)
-    set_ability(alice, Ability.charisma, 16)
-    alice.proficiencies = [prof.light_armour, prof.medium_armour, prof.heavy_armour,
-        prof.shields, prof.simple_weapons, prof.martial_weapons]
-    alice.size = "small"
-    return alice
-
-
-def make_new_bob():
-    new_bob = NewLiving()
-    new_bob.race = Human()
-    new_bob.class_type = Fighter()
-    new_bob.equipment = HumanoidEquipment()
-    new_bob.inventory = Inventory()
-    return new_bob
-
-
-def make_new_tim():
-    new_tim = NewLiving()
     ability_scores = [
         AbilityScore(Ability.str, 10),
         AbilityScore(Ability.dex, 14),
@@ -342,12 +239,14 @@ def make_new_tim():
         AbilityScore(Ability.int, 8),
         AbilityScore(Ability.cha, 16),
         ]
-    new_tim.set_ability_scores(ability_scores)
-    new_tim.add_race(Halfling())
-    new_tim.class_type = Mage()
-    new_tim.equipment = HumanoidEquipment()
-    new_tim.inventory = Inventory()
-    return new_tim
+    wizard = ClassName.wizard
+    tim = Living(ab_scores=ability_scores, race=Halfling(), class_name=wizard)
+    tim.name = "tim"
+
+    armor_bonus = ArmorBonus(10, BonusReason.armor_bonus)
+    tim.add_bonus(armor_bonus)
+
+    return tim
 
 
 if __name__ == "__main__":
@@ -356,16 +255,14 @@ if __name__ == "__main__":
     sword = make_sword()
     shield = make_shield()
     plate = make_armour()
-    dog = make_dog()
-    bob = make_new_bob()
-    tim = make_new_tim()
+    #dog = make_dog()
+    bob = make_bob()
+    tim = make_tim()
     #bob.wield("right", sword)
     #print("Wield sword in right hand...")
     #bob.wield("left", shield)
     #print("Wield shield in left hand...")
     #print()
-
-    bobs_info = get_roll_possibilities(bob)
 
     bob.inventory.add_item(sword)
     bob.equip(sword, EqSlots.right_hand)
@@ -375,20 +272,8 @@ if __name__ == "__main__":
     tim.equip(plate, EqSlots.torso)
     tim.equip(shield, EqSlots.left_hand)
 
-    """
-    print()
-    bob.unwield("right")
-    print("Unwielding right hand...")
-    bob.unwield("left")
-    print("Unwielding shield in left hand...")
-    print()
+    world = make_world()
+    world.living_ents[tim.name] = tim
+    world.living_ents[bob.name] = bob
 
-    info.show_ac(bob)
-    print()
-
-    for att_bonus in bob.get_attack_bonus(melee=True):
-        att_roll = model.util.roll(1, 20, att_bonus)
-        print("att_roll = {} + {} = {}".format(att_roll-att_bonus,
-            att_bonus, att_roll))
-    """
 

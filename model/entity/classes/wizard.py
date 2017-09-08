@@ -7,14 +7,14 @@ from model.entity.living.attack_bonus import AttackBonus
 from collections import defaultdict
 
 
-fighter_bab_map = {
-    1 : [1],
-    2 : [2],
-    3 : [3],
-    4 : [4],
-    5 : [5],
-    6 : [6, 1],
-    7 : [7, 2],
+wizard_bab_map = {
+    1 : [0],
+    2 : [1],
+    3 : [1],
+    4 : [2],
+    5 : [2],
+    6 : [3],
+    7 : [3],
     8 : [8, 3],
     9 : [9, 4],
     10 : [10, 5],
@@ -31,22 +31,21 @@ fighter_bab_map = {
 }
 
 
-class Fighter():
+class Wizard():
 
-    name = ClassName.fighter
+    name = ClassName.wizard
 
     def __init__(self):
         self.bonuses = []
         self.level = 1
-        self.class_bab = AttackBonus(fighter_bab_map[self.level], BonusReason.entity_class)
+        self.class_bab = AttackBonus(wizard_bab_map[self.level], BonusReason.entity_class)
 
     def __repr__(self):
         return "<{} : {}>".format(self.name.name, self.level)
 
     def level_up(self):
         self.level += 1
-        # do other things like set class_attack_bonus, feats, abilities
-        self.class_bab.amount = fighter_bab_map[self.level]
+        self.class_bab.amount = wizard_bab_map[self.level]
 
 
-class_name_map[ClassName.fighter] = Fighter
+class_name_map[ClassName.wizard] = Wizard

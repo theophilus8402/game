@@ -2,7 +2,7 @@
 import enum
 from math import floor
 
-from model.bonuses import Bonus
+from model.bonuses import Bonus, BonusReason
 
 
 @enum.unique
@@ -22,6 +22,7 @@ class AbilityScore():
         self.base_score = score
         self.total = score
         self.bonuses = []
+        self.modifier = AbilityBonus(ability, 0, BonusReason.ability_modifier)
         self.calculate_modifier()
 
     def add_bonus(self, bonus):
@@ -44,11 +45,12 @@ class AbilityScore():
 
     def calculate_modifier(self):
         # (total - 10)/2
-        self.modifier = floor((self.total - 10)/2)
+        self.modifier.amount = floor((self.total - 10)/2)
 
     def __repr__(self):
-        sign = "+" if self.modifier > 0 else ""
-        return "<{} {}, {}{}>".format(self.ability, self.total, sign, self.modifier)
+        sign = "+" if self.modifier.amount > 0 else ""
+        return "<{} {}, {}{}>".format(self.ability, self.total, sign,
+            self.modifier.amount)
 
 
 class AbilityBonus(Bonus):

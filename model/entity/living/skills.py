@@ -84,21 +84,14 @@ skill_ability_map = {
 
 class Skill():
 
-    def __init__(self, skill, ability_scores):
+    def __init__(self, skill, ability_modifier):
         self.skill = skill
         # total will be the total not including circumstantial bonuses
         self.total = 0
         self.class_skill = False
-        self.bonuses = []
-        self.set_ability_bonus(ability_scores)
+        self.bonuses = [ability_modifier]
         self.circumstantial_bonuses = []
-
-    def set_ability_bonus(self, ability_scores):
-        # uses self.skill to determine the ability modifier to add
-        ability = skill_ability_map[self.skill]["ability"]
-        ability_modifier = ability_scores[ability].modifier
-        ability_bonus = SkillBonus(self.skill, ability_modifier, BonusReason.ability_modifier)
-        self.add_bonus(ability_bonus)
+        self.calculate_total()
 
     def set_class_skill(self, class_skill):
         # sets class_skill to true or false
@@ -119,7 +112,7 @@ class Skill():
                 found_trained_skill = True
             elif bonus.reason == BonusReason.trained_class_skill:
                 found_trained_class_skill = True
-        if found_trained_skill and not found_trained_class_skill:
+        if self.class_skill and found_trained_skill and not found_trained_class_skill:
             new_bonus = SkillBonus(self.skill, 3,
                 BonusReason.trained_class_skill)
             self.add_bonus(new_bonus)
@@ -134,6 +127,10 @@ class Skill():
         # remove the bonus if it was in the list
         if bonus in self.bonuses:
             self.bonuses.remove(bonus)
+            self.calculate_total()
+
+    def __repr__(self):
+        return "<{}: {}>".format(self.skill.name, self.total)
 
 
 class SkillBonus(Bonus):

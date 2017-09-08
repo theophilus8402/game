@@ -5,6 +5,7 @@ import sys
 from model.info import Status, Coord
 from model.tile import *
 from model.util import distance_between_coords
+from model.entity.living.skills import SkillName
 
 class World:
 
@@ -35,6 +36,27 @@ class World:
         if not entity:
             entity = self.basic_ents.get(name)
         return entity
+
+    def action_search(self, searcher):
+        search_result = searcher.skill_check(SkillName.perception)
+        total = search_result.total
+        found_entities = []
+        for ent in self.living_ents.values():
+            if ent.sneaking and total >= ent.sneaking:
+                found_entities.append(ent)
+        return search_result, found_entities
+
+    def action_hit(self, attacker, defender, full_hit=False):
+
+        # determine if we're doing a two weapon attack
+        # TODO: not gonna do this yet
+        #attacker.roll_attack(full_hit=full_hit, main_hand=False)
+
+        # figure out attacks from main hand
+        attacker.roll_attack(full_hit=full_hit, main_hand=True)
+
+        # determine ac of defender
+        # TODO: determine if defender is flat footed
 
 
 def move_entity(world, entity, dst_loc):

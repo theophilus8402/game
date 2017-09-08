@@ -7,6 +7,10 @@ BonusReason = Enum("BonusReason", [
     "trained_skill",
     "trained_class_skill",
     "ability_modifier",
+    "size",
+    "spell_bless",
+    "base_armor_class",
+    "armor_bonus",
 ])
 
 
