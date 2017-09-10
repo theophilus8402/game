@@ -1,6 +1,6 @@
 #!/usr/bin/python3.4
 
-from model.entity.armour import Armour
+from model.entity.armor import Armor
 from model.entity.basic_entity import Entity
 from model.entity.classes.util import ClassName
 from model.entity.damage import DmgType
@@ -130,7 +130,7 @@ def make_sword():
 
 
 def make_shield():
-    shield = Armour()
+    shield = Armor()
     shield.uid = 24
     shield.name = "shield"
     shield.symbol = "o"
@@ -162,7 +162,7 @@ def make_shield():
 
 
 def make_armour():
-    plate = Armour()
+    plate = Armor()
     plate.uid = 23
     plate.name = "plate"
     plate.symbol = "&"

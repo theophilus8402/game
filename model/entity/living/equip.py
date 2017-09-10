@@ -48,6 +48,8 @@ class BaseEquipment():
         self.possibilities = defaultdict(lambda: 0)
         self.special_effects = set()
         self._equipment = defaultdict(lambda: None)# keys: eqslot, value: eq
+        # keep a list of all bonuses/penalties due to spells/skills/items...
+        self.bonuses = {slot : [] for slot in self.allowed_eq_slots}
 
     def update_info(self):
         self.possibilities.clear()

@@ -88,6 +88,12 @@ DmgType = Enum("DmgType", [
     "slashing",
     ])
 
+dmg_type_str_map = {
+    DmgType.bludgeoning : "B",
+    DmgType.piercing : "P",
+    DmgType.slashing : "S",
+    }
+
 WeaponSpecial = Enum("WeaponSpecial", [
     "brace",
     "disarm",
@@ -98,35 +104,40 @@ WeaponSpecial = Enum("WeaponSpecial", [
     "trip",
     ])
 
+WeaponCategory = Enum("WeaponCategory", [
+    "light_melee",
+    "one_handed_melee",
+    "two_handed_melee",
+    "ranged",
+    ])
+
 # Basic weapon:
 class Weapon(Entity):
 
-    def __init__(self, cur_hp=0):
+    def __init__(self, weapon_type=WeaponType.gauntlet, category=WeaponCategory.light_melee, cost=100, dmg="0d0", crit="20x0", weapon_range=0, weight=0, dmg_types=[DmgType.bludgeoning], specials=[], cur_hp=0):
         super(Weapon, self).__init__(cur_hp=cur_hp)
-        self.type = "weapon"      # the different entity classes
+        self.weapon_type = weapon_type
         self.eq_slot = EqSlots.hand
-        self.possibilities = {}
+
+        self.cost = cost
 
         # weapon dmg (2d6)
-        self.die_to_roll = 0
-        self.dmg_modifier = 0
-        self.critical_dmg = 2       # x2
-        self.range_increment = 0    # stuff for projectiles
-        self.base_cost = 0          # can be modified
-        self.weapon_category = ""   # simple, martial, exotic
-        self.melee = True           # melee or ranged
-        self.weapon_type = ""       # sword, mace
-        self.dmg_type = []          # blunt, pierce (can be a combo of em)
-        self.size = ""              # tiny, small, medium, large
-        self.reach = False          # i.e. glaive can hit 10ft away but not
-                                    #   right infront
-        self.two_handed = False     # this is only for absolute reqs
-                                    #   this doesn't handle large weapon
-                                    #   being wielded by a gnome
+        self.num_dice,self.num_side = map(int, dmg.split("d"))
+        self.dmg_types = dmg_types
 
-    def get_damage(self):
-        dmg_results = {}
-        for dmg_type, (base_amt, dmg_range) in self.damage.items():
-            result = choice(range(base_amt-dmg_range, base_amt+dmg_range+1))
-            dmg_results[dmg_type] = result
-        return dmg_results
+        # crit info, crit_range is lowest number
+        self.crit_range,self.crit_dmg = map(int, crit.split("x"))
+
+        self.weapon_range = weapon_range
+        self.weight = weight
+        self.specials = specials
+
+    def __repr__(self):
+        dmg_types = [dmg_type_str_map[dtype] for dtype in self.dmg_types]
+        spec_strs = [spec.name for spec in self.specials]
+        spec_strs = ["-"] if len(spec_strs) == 0 else spec_strs
+        return "<{} {}gp {}d{} {}x{} {}ft {}lb. {} {} >".format(
+            self.weapon_type.name, self.cost, self.num_dice, self.num_side,
+            self.crit_range, self.crit_dmg, self.weapon_range,
+            self.weight, ",".join(dmg_types), ",".join(spec_strs))
+

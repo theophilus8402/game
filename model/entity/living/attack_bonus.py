@@ -5,32 +5,6 @@ from model.bonuses import *
 from model.entity.classes.util import ClassName
 
 
-class HandAttackBonus(BaseAttackBonus):
-
-    def __init__(self):
-        self.total = 0
-        self.bonuses = []
-
-    def add_bonus(self, bonus, main_hand=True, off_hand=False):
-        self.bonuses.append(bonus)
-        self.calculate_total()
-
-    def remove_bonus(self, bonus):
-        if bonus in self.bonuses:
-            self.bonuses.remove(bonus)
-            self.calculate_total()
-
-    def calculate_total(self):
-        # first, determine individual bonuses
-        self.total = 0
-        for bonus in self.bonuses:
-            self.total += bonus.amount
-
-    def __repr__(self):
-        return "<HandAttackBonus: {}>".format(self.total)
-
-
-
 class BaseAttackBonus():
 
     def __init__(self):
