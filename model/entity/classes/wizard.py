@@ -3,6 +3,7 @@
 from model.bonuses import BonusReason
 from model.entity.classes.util import ClassName, class_name_map
 from model.entity.living.attack_bonus import AttackBonus
+from model.entity.weapons import WeaponType
 
 from collections import defaultdict
 
@@ -34,6 +35,14 @@ wizard_bab_map = {
 class Wizard():
 
     name = ClassName.wizard
+
+    proficiencies = {
+        WeaponType.club,
+        WeaponType.dagger,
+        WeaponType.heavy_crossbow,
+        WeaponType.light_crossbow,
+        WeaponType.quarterstaff,
+    }
 
     def __init__(self):
         self.bonuses = []

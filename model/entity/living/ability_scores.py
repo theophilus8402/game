@@ -64,3 +64,13 @@ class AbilityBonus(Bonus):
         sign = "+" if self.amount > 0 else ""
         return "<{} {}{}>".format(self.type, sign, self.amount)
 
+
+class TwoHandedBonus(AbilityBonus):
+
+    def __init__(self, ability_modifier):
+        self.orig_modifier = ability_modifier
+
+    @property
+    def amount(self):
+        return self.orig_modifier.amount * 1.5
+

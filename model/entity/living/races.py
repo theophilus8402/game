@@ -37,6 +37,7 @@ class Dwarf(Race):
                         AbilityBonus(Ability.wis, 2, BonusReason.race),
                         AbilityBonus(Ability.cha, -2, BonusReason.race),
                         ]
+        self.proficiencies = set()
 
 
 class Elf(Race):
@@ -49,6 +50,7 @@ class Elf(Race):
                         AbilityBonus(Ability.int, 2, BonusReason.race),
                         AbilityBonus(Ability.con, -2, BonusReason.race),
                         ]
+        self.proficiencies = set()
 
 
 class Gnome(Race):
@@ -61,6 +63,7 @@ class Gnome(Race):
                         AbilityBonus(Ability.cha, 2, BonusReason.race),
                         AbilityBonus(Ability.str, -2, BonusReason.race),
                         ]
+        self.proficiencies = set()
 
 
 class HalfElf(Race):
@@ -71,6 +74,7 @@ class HalfElf(Race):
         self.size = Size.medium
         self.bonuses = [ability_bonus,
                         ]
+        self.proficiencies = set()
 
 
 class HalfOrc(Race):
@@ -81,6 +85,7 @@ class HalfOrc(Race):
         self.size = Size.medium
         self.bonuses = [ability_bonus,
                         ]
+        self.proficiencies = set()
 
 
 class Halfling(Race):
@@ -94,6 +99,7 @@ class Halfling(Race):
                         AbilityBonus(Ability.str, -2, BonusReason.race),
                         SkillBonus(SkillName.stealth, 4, BonusReason.race),
                         ]
+        self.proficiencies = set()
 
 
 class Human(Race):
@@ -104,4 +110,5 @@ class Human(Race):
         self.size = Size.medium
         self.bonuses = [ability_bonus,
                         ]
+        self.proficiencies = set()
 

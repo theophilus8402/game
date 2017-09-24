@@ -53,10 +53,25 @@ class World:
         #attacker.roll_attack(full_hit=full_hit, main_hand=False)
 
         # figure out attacks from main hand
-        attacker.roll_attack(full_hit=full_hit, main_hand=True)
+        roll_results = attacker.roll_attack(full_hit=full_hit, main_hand=True)
 
         # determine ac of defender
         # TODO: determine if defender is flat footed
+        flat_footed = False
+        ac = defender.ac.total if not flat_footed else defender.ac.flat_footed
+
+        # roll dmg when appropriate
+        final_results = []
+        for att_roll in roll_results:
+            if att_roll.total >= ac:
+                dmg_result = attacker.roll_damage(main_hand=True)
+                # TODO: apply the dmg
+            else:
+                dmg_result = None
+            final_results.append((att_roll, dmg_result))
+
+
+        return final_results
 
 
 def move_entity(world, entity, dst_loc):

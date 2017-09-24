@@ -11,6 +11,7 @@ BonusReason = Enum("BonusReason", [
     "spell_bless",
     "base_armor_class",
     "armor_bonus",
+    "not_weapon_proficient",
 ])
 
 

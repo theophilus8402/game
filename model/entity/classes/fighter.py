@@ -39,6 +39,7 @@ class Fighter():
         self.bonuses = []
         self.level = 1
         self.class_bab = AttackBonus(fighter_bab_map[self.level], BonusReason.entity_class)
+        self.proficiencies = set()
 
     def __repr__(self):
         return "<{} : {}>".format(self.name.name, self.level)

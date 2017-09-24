@@ -45,7 +45,7 @@ class RollInfo():
         if self.flat_bonus > 0:
             roll_str = ["{}+{}".format(self.roll_result, self.flat_bonus)]
         elif self.flat_bonus < 0:
-            roll_str = ["{}-{}".format(self.roll_result, self.flat_bonus)]
+            roll_str = ["{}{}".format(self.roll_result, self.flat_bonus)]
         else:
             roll_str = ["{}".format(self.roll_result)]
         for bonus in self.bonuses:

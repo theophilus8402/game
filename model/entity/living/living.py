@@ -19,6 +19,7 @@ from model.entity.living.races import Human
 from model.entity.living.round_info import RoundInfo
 from model.entity.inventory import Inventory
 from model.entity.damage import DmgInfo
+from model.entity.weapons import Weapon,UnarmedStrike,WeaponCategory
 from model.info import Status
 from model.util import roll, RollType, RollInfo
 
@@ -28,96 +29,6 @@ CMDS_BASIC_ATTACK = {"hit", "fhit", "cast"}
 CMDS_BASIC_HUMANOID = {"get", "eat", "drink", "wear", "wield", "remove",
     "unwield", "l", "look", "lh", "quit", "exit", "say"}
 CMDS_DEBUG = {}
-
-
-def add_status_msg(entity, msg):
-    entity.status_msgs.add(msg)
-
-
-def remove_status_msg(entity, msg):
-    try:
-        entity.status_msgs.remove(msg)
-    except:
-        pass    # I don't think I want to do anything...
-
-
-def get_attack_bonus(src_ent, melee=True, range_pen=0):
-    """
-    att_bonus = base_att_bonus + ability_mod + size_mod + misc
-    we'll do the d20 roll somehwere else
-    This will return a list of attack bonuses
-    """
-
-    if melee:
-        attribute = "str"
-    else:
-        attribute = "dex"
-    attrib, ability_mod = src_ent.attrib[attribute]
-
-    #size_mod = model.util.size_modifiers[src_ent.size]
-    misc_attack_bonus, misc_list = src_ent.attack_bonus["misc"]
-
-    attack_bonus_list = []
-    for base_attack_bonus in src_ent.attack_bonus["base"]:
-        # attack_bonus (melee) = base_attack_bonus + str_mod + size_mod
-        attack_bonus = (base_attack_bonus + ability_mod + size_mod 
-            + misc_attack_bonus)
-        # attack_bonus (ranged) = base_attack_bonus + dex_mod + size_mod
-        # + range_penalty
-        if not melee:
-            attack_bonus += range_pen
-
-        attack_bonus_list.append(attack_bonus)
-
-    return attack_bonus_list
-
-
-def get_roll_possibilities(entity, eqslot=None, defence=False):
-    roll_possibs = defaultdict(lambda: 0)
-
-    # determine if we attack or defence info from the entity
-    if defence is False:
-        poss_types = {RollType.critical_miss, RollType.miss, RollType.hit,
-            RollType.critical_hit}
-    else:
-        poss_types = {RollType.dodge, RollType.block}
-
-    # see if we need to get info from a wielded item
-    if eqslot in {EqSlots.right_hand, EqSlots.left_hand}:
-        item = entity.equipment[eqslot]
-    else:
-        item = None
-
-    # add up the possibilities
-    for poss_type in poss_types:
-        roll_possibs[poss_type] += entity.race.possibilities.get(poss_type, 0)
-        roll_possibs[poss_type] += entity.class_type.possibilities.get(poss_type, 0)
-        roll_possibs[poss_type] += entity.equipment.possibilities.get(poss_type, 0)
-
-        if item:
-            roll_possibs[poss_type] += item.possibilities.get(poss_type, 0)
-
-    return roll_possibs
-
-
-def check_successful_attack(src_ent, dst_ent, info=None):
-    #TODO: actually implement this
-    return True
-
-
-def determine_weapon_dmg(entity, weapon):
-    """
-    Returns amount of damage based on item in eqslot
-    """
-    dmg_info = DmgInfo()
-
-    # TODO: include strength bonus
-
-    results = weapon.get_damage()
-    for dmg_type, amt in results.items():
-        dmg_info.add_dmg(dmg_type, amt)
-
-    return dmg_info
 
 
 class Living(Entity):
@@ -192,6 +103,15 @@ class Living(Entity):
 
         self.base_attack_bonus.add_bonus(class_type.class_bab)
 
+    def is_proficient(self, weapon_type):
+        for class_ in self.classes:
+            if weapon_type in class_.proficiencies:
+                return True
+        if weapon_type in self.race.proficiencies:
+            return True
+        # couldn't find the proficiency
+        return False
+
     def add_bonus(self, bonus):
         if isinstance(bonus, AbilityBonus):
             self.ability_scores[bonus.type].add_bonus(bonus)
@@ -228,19 +148,40 @@ class Living(Entity):
     def roll_attack(self, full_hit=False, main_hand=True):
         results = []
 
+        bonuses = self.base_attack_bonus.bonuses
         if full_hit == True:
             # do a full hit for main_hand
-            for att_bonus in self.base_attack_bonus.main_hand:
-                results.append(RollInfo(1, 20, flat_bonus=att_bonus))
+            hbonus = self.base_attack_bonus.main_hand.total
+            for att_bonus in self.base_attack_bonus.total:
+                results.append(RollInfo(1, 20, flat_bonus=att_bonus+hbonus))
         elif main_hand == True:
             # roll for just the first main_hand attack
-            fbonus = self.base_attack_bonus.main_hand[0]
-            results.append(RollInfo(1, 20, flat_bonus=fbonus))
+            hbonus = self.base_attack_bonus.main_hand.total
+            first_bonus = self.base_attack_bonus.total[0]
+            results.append(RollInfo(1, 20, flat_bonus=first_bonus+hbonus))
         else:
             # roll attack roll for just off-hand
             pass
 
         return results
+
+    def roll_damage(self, main_hand=True):
+
+        # find the weapon
+        hand_slot = EqSlots.right_hand if main_hand else EqSlots.left_hand
+        weapon = self.equipment[hand_slot]
+        if not weapon:
+            weapon = UnarmedStrike(self.size)
+
+        # TODO: determine dmg modifiers
+        dmg_bonus = 1
+
+        # roll damage
+        dice = weapon.num_dice
+        sides = weapon.num_side
+        roll_result = RollInfo(dice, sides, flat_bonus=dmg_bonus)
+
+        return roll_result
 
     def sneak(self, hide=True):
         if hide:
@@ -250,6 +191,57 @@ class Living(Entity):
             result = RollInfo(0, 0, [])
         self.sneaking = result.total
         return result
+
+    def get_feat_bonuses(self, item):
+        # Returns a list of attack/dmg bonuses based on feat related to the item
+        feat_bonuses = []
+
+        # check if proficient
+        if not self.is_proficient(item.weapon_type):
+            reason = BonusReason.not_weapon_proficient
+            bonus = AttackBonus(amt=-4, reason=reason)
+            feat_bonuses.append(bonus)
+
+        # check for weapon focuses
+        #TODO
+
+        return feat_bonuses
+
+    def get_ability_bonuses(self, item):
+        # Returns a list of attack/dmg bonuses based on ability_modifiers
+        ability_bonuses = []
+
+        # Notes:
+        #   one_handed melee could be wielded w/ two hands
+        #       it would get 1.5 dmg bonus from str
+        #   two_handed_melee will get 1.5 dmg bonus
+        #   light_melee can be wielded two handed but just get's 1x str
+        #   thrown weapons get str bonus
+        #   ranged weapons get no str bonus if positive
+        #       but, they can lose points based on -str modifier
+        #       composite bows change this how
+        #   normally, all melee attack bonuses are based on str
+        #       however, weapon finesse can change this to dex
+        #       there's a limited set of weapons that can be used in this way
+
+        # check to see if it's ranged or melee/thrown
+        if item.category in [WeaponCategory.light_melee,
+            WeaponCategory.one_handed_melee]:
+            # melee/thrown usually uses str
+            # TODO: check to see if should use dex w/ weapon_finess
+            str_mod = self.ability_scores[Ability.str].modifier
+            ability_bonuses.append(str_mod)
+        elif item.category == WeaponCategory.two_handed_melee:
+            str_mod = self.ability_scores[Ability.str].modifier
+
+            # should use two handed str bonus 1.5
+            two_handed_mod = TwoHandedBonus(str_mod)
+            ability_bonuses.append(two_handed_mod)
+        else:
+            # ranged/ray usually uses dex
+            pass
+
+        return ability_bonuses
 
     def equip(self, item, eqslot):
         # make sure the item is in the inventory
@@ -272,16 +264,39 @@ class Living(Entity):
         # add the item to the equipment slot
         self.equipment[eqslot] = item
 
+        # deal with all the bonuses and what not by equiping the item
+        if isinstance(item, Weapon):
+            if eqslot == EqSlots.right_hand:
+                hand_bonuses = self.base_attack_bonus.main_hand
+            else:
+                hand_bonuses = self.base_attack_bonus.off_hand
+
+            # get feat attack bonuses
+            bonuses = self.get_feat_bonuses(item)
+
+            # get bonuses based on ability modifiers
+            bonuses.extend(self.get_ability_bonuses(item))
+
+            for bonus in bonuses:
+                if (isinstance(bonus, AbilityBonus) or
+                    isinstance(bonus, AttackBonus)):
+                    hand_bonuses.add_bonus(bonus)
+                else:
+                    print("Have a bonus I'm not handling while equiping: ")
+                    print(bonus)
+            
         return Status.all_good
 
-    def unequip(self, eqslot=None, item=None):
-        if eqslot is not None:
+    def unequip(self, thing_to_unequip):
+        if isinstance(thing_to_unequip, EqSlots):
+            eqslot = thing_to_unequip
             # make sure there's an item in the eqslot
             item = self.equipment[eqslot]
             if item is None:
                 return Status.eqslot_empty
 
-        elif item is not None:
+        elif isinstance(thing_to_unequip, Entity):
+            item = thing_to_unequip
             # make sure the item is in the equipment
             if item not in self.equipment:
                 return Status.item_not_in_equipment
@@ -303,6 +318,13 @@ class Living(Entity):
 
         # remove the item in the eqslot
         del self.equipment[eqslot]
+
+        # remove the bonuses associated with it
+        if isinstance(item, Weapon):
+            if eqslot == EqSlots.right_hand:
+                self.base_attack_bonus.main_hand.clear()
+            elif eqslot == EqSlots.left_hand:
+                self.base_attack_bonus.off_hand.clear()
         
         # add the item to the inventory
         self.inventory.add_item(item)

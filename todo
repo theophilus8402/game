@@ -1,19 +1,23 @@
 
-make the equipment manager keep track of bonuses for each item slot
-    Living.Equipment.bonuses[EqSlot.right_hand]
+maybe change proficiencies to being feats
+    because that's how you would add new proficiencies
+    No, I'm not going to do this because simple_weapons are made proficient
+        by one feat, the others are one for one
 
 add proficiencies
-    penalty for not having proficiency AttackBonus(-4, not_proficient)
-    Living.proficiencies
-    EntityClass.proficiencies
-        AddedByLevel.proficiencies (... feats)
-    Race.proficiencies
+    for each race
+    for each class
 
 make some items that follow pathfinder rules
-    can add bonuses within the class
+    finish weapons
+    make armor
 
 wield/wear items
     adds bonuses to the appropriate spots
+        change it so we add bonuses for weapons via the same path
+        Living.add_bonus(bonus, main_hand=True)
+    apply str or dex attack bonus
+    apply dmg bonuses
 
 check to see if attack connects
 
