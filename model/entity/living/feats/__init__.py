@@ -1,3 +1,3 @@
 
-from .base_feats import Feat,FeatRequirement
+from .base_feats import Feat
 from .feats_ab import *

@@ -49,6 +49,8 @@ class Living(Entity):
         self.skills = {}
         self.initialize_skills()
 
+        self.proficiencies = set()
+
         self.ac = ArmorClass()
         dex_mod = self.ability_scores[Ability.dex].modifier
         self.ac.add_bonus(dex_mod)
@@ -59,7 +61,7 @@ class Living(Entity):
         self.set_race(race)
 
         self.classes = []
-        self.add_class(class_name)
+        self.add_level(class_name)
         self.equipment = HumanoidEquipment()
         self.inventory = Inventory()
         self.cur_hp = 10
@@ -79,6 +81,9 @@ class Living(Entity):
             self.add_bonus(bonus)
         self.race = race
         self.size_modifier = get_size_modifier(self.race.size)
+
+        # proficiencies
+        self.proficiencies = self.proficiencies.union(race.proficiencies)
 
         # add size_modifier to things affected by size
         self.base_attack_bonus.add_bonus(self.size_modifier)
@@ -102,6 +107,8 @@ class Living(Entity):
             self.add_bonus(bonus)
 
         self.base_attack_bonus.add_bonus(class_type.class_bab)
+
+        self.proficiencies = self.proficiencies.union(class_type.proficiencies)
 
     def is_proficient(self, weapon_type):
         for class_ in self.classes:
@@ -284,6 +291,7 @@ class Living(Entity):
                 else:
                     print("Have a bonus I'm not handling while equiping: ")
                     print(bonus)
+                    self.add_bonus(bonus)
             
         return Status.all_good
 
@@ -330,5 +338,63 @@ class Living(Entity):
         self.inventory.add_item(item)
 
         return Status.all_good
+
+    def meets_feat_reqs(self, feat):
+        # checks requirements of feat
+        # if entity satisfies requirements, returns True
+        # False otherwise
+
+        # check ability_scores
+        for ab,score in feat.ability_scores:
+            if score > self.ability_scores[ab]:
+                return False
+
+        # check base attack bonus
+        if feat.base_attack_bonus:
+            # assuming base_attack_bonus is going solely off class bab's
+            babs = [cbab[0] for cbab in self.base_attack_bonus.class_babs]
+            if feat.base_attack_bonus > sum(class_babs):
+                return False
+
+        # check skill ranks
+        for skill,rank in feat.skill_ranks:
+            if rank > self.skills[skill].total:
+                return False
+
+        # check feats
+        if feat.feats:
+            if not set(feat.feats).issubset(self.feats):
+                return False
+
+        # check caster level
+        if feat.caster_level or feat.arcane_caster_level:
+            caster_level = 0
+            arcane_caster_level = 0
+            for eclass in self.classes:
+                # divine spell classes
+                if eclass.name in [ClassName.cleric, ClassName.druid,
+                    ClassName.paladin, ClassName.ranger]:
+                    caster_level += eclass.level
+                elif eclass.name in [ClassName.bard, ClassName.sorcerer,
+                    ClassName.wizard]:
+                    arcane_caster_level += eclass.level
+            caster_level += arcane_caster_level
+
+            if feat.caster_level > caster_level:
+                return False
+            if feat.arcane_caster_level > arcane_caster_level:
+                return False
+
+        # check channel energy
+        if feat.channel_energy:
+            class_names = set([eclass.name for eclass in self.classes])
+            if class_names.isdisjoint({ClassName.cleric, ClassName.paladin}):
+                return False
+
+        # check proficiencies
+        if not self.proficiencies(feat.proficiencies):
+            return False
+
+        return True
 
 

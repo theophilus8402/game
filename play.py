@@ -1,7 +1,7 @@
 #!/usr/bin/python3.4
 
 from model.entity.basic_entity import Entity
-from model.entity.classes.util import ClassName
+from model.entity.classes import ClassName
 from model.entity.living.ability_scores import *
 from model.entity.living.armor_class import ArmorBonus,ArmorClass
 from model.entity.living.races import *

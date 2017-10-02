@@ -4,6 +4,7 @@ from enum import unique, Enum
 from model.entity.living.size import Size,SizeBonus
 from model.entity.living.ability_scores import Ability, AbilityBonus
 from model.entity.living.skills import Skill, SkillName, SkillBonus
+from model.entity.weapons import WeaponType
 from model.bonuses import BonusReason
 
 
@@ -37,7 +38,10 @@ class Dwarf(Race):
                         AbilityBonus(Ability.wis, 2, BonusReason.race),
                         AbilityBonus(Ability.cha, -2, BonusReason.race),
                         ]
-        self.proficiencies = set()
+        self.proficiencies = {WeaponType.battleaxe, WeaponType.heavy_pick,
+            WeaponType.warhammer}
+        # NOTE: treat anything dwarven as a martial weapon
+        #   WeaponType.dwarven_waraxe, WeaponType.dwarven_urgrosh
 
 
 class Elf(Race):
@@ -50,7 +54,11 @@ class Elf(Race):
                         AbilityBonus(Ability.int, 2, BonusReason.race),
                         AbilityBonus(Ability.con, -2, BonusReason.race),
                         ]
-        self.proficiencies = set()
+        self.proficiencies = {WeaponType.longbow, WeaponType.composite_longbow,
+            WeaponType.longsword, WeaponType.rapier, WeaponType.shortbow,
+            WeaponType.composite_shortbow}
+        # NOTE: treat anything elven as a martial weapon
+        #   WeaponType.elven_curve_blade
 
 
 class Gnome(Race):
@@ -64,6 +72,8 @@ class Gnome(Race):
                         AbilityBonus(Ability.str, -2, BonusReason.race),
                         ]
         self.proficiencies = set()
+        # NOTE: treat anything gnome as a martial weapon
+        #   WeaponType.gnome_hooked_hammer
 
 
 class HalfElf(Race):
@@ -85,7 +95,9 @@ class HalfOrc(Race):
         self.size = Size.medium
         self.bonuses = [ability_bonus,
                         ]
-        self.proficiencies = set()
+        self.proficiencies = {WeaponType.greataxe, WeaponType.falchion}
+        # NOTE: treat anything orc as martial
+        #   WeaponType.orc_double_axe
 
 
 class Halfling(Race):
@@ -99,7 +111,9 @@ class Halfling(Race):
                         AbilityBonus(Ability.str, -2, BonusReason.race),
                         SkillBonus(SkillName.stealth, 4, BonusReason.race),
                         ]
-        self.proficiencies = set()
+        self.proficiencies = {WeaponType.sling}
+        # NOTE: Treat anything halfling as martial weapon
+        #   WeaponType.halfling_sling_staff
 
 
 class Human(Race):
