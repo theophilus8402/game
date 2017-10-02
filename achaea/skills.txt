@@ -1,0 +1,26 @@
+
+
+
+
+Skyrax        derv	     knocks peeps out of the skies
+Rixil         syc   	 increases recovery time of next focus
+Eerion        grem       shatters shield
+Arctar        orb  	     defense
+Scrag         leech      afflictions of the body
+*Pyradius             converts afflictions of body to mind
+*Golgotha             protection from being banished
+*Dameron              same?
+Palpatar             inhibits gaining the speed defense
+Nin'kharsag          longer to recover to use tree
+*Istria               pathfinder
+Marduk               order someone to do something
+*Nemesis              afflictions to the mind
+Buul                 chimera, strip defs
+Cadmus               if affs three or more, it gives them another aff if they try to focus
+Piridon              doppleganger
+Danaeus              vertigo
+Xenophage            go to chaos plane
+Lycantha             dmg
+Tarotlink            doppie can throw cards
+Hecate               if 5 affs, whispering madness is uncurable for a lil bit
+Glaaki               another way of getting truenames

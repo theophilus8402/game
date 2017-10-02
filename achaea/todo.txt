@@ -1,0 +1,62 @@
+
+TALK TO RHAEGAR ABOUT THE SECRET BROTHERHOOD
+join the army!
+
+X Make a way to highlight bad bleeding
+
+_ Get some bombs
+Madi tells you, "Bombs hit everyone in the room, so yes."
+Madi tells you, "Dust, concussion and web are the most important!"
+Madi tells you, "Dust does blackout, concussion does stun and web does entangled by ropes."
+
+_ startup
+	_ common defs - blind, deaf, clk, hide, ...
+	_ starts windows
+	_ checks pipes
+
+_ Setup a healing system
+May start with just the major scarey stuff and warning me when things are bad
+
+_ Make sure I'm smoking for weapon rebound aura
+_ Finish up check pipes
+Skullcap      (Smoked) Anti-weapon field that lasts until taken down by others
+
+_ Make a system from doing mass
+
+X Make sure I'm doing auto moss
+made it so that autocuring will kick up the % when I run defup
+So! I'll need to remember to lower it later
+
+X Make a system for queuing my attacks
+may just make a wrapper for most/if not all my attacks
+that way I can change the wrapper as I want
+
+_ Make a way to highlight blindness/deafness stuff
+did some, but need to make sure they work and add triggs for:
+calamine - gives deafness
+Eolan eats a calamine crystal.
+arsenic - gives blindness
+Eolan eats an arsenic pellet.
+
+
+config prompt custom *hh, *mm, *ee, *ww, *R *d*b*c
+c - cloak
+k - kola
+d - deaf
+b - blind
+e - equilibrium
+x - balance
+E - class balance
+
+
+
+CONFIG USEQUEUEING <ON|OFF>             - Enable or disable the queueing functionality.
+CONFIG SHOWQUEUEALERTS <ON|OFF>         - Enable or disable the system messages
+                                          regarding queueing.
+CLEARQUEUE <BAL|EQ|EQBAL|CLASS>         - Clear one of your queues.
+CLEARQUEUE ALL                          - Clear everything out of your queues.
+QUEUE LIST                              - List your current queue.
+QUEUE ADD <queue> <command>             - Add an item to the end of one of your queues.
+QUEUE PREPEND <queue> <command>         - Add an item to the start of one of your queues.
+QUEUE REPLACE <queue> <index> <command> - Replace an item in one of your queues.
+QUEUE REMOVE <queue< <index>            - Remove an item from a queue.

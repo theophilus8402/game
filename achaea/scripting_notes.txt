@@ -1,0 +1,81 @@
+################################
+# highlighting
+How to highlight my current target?
+
+You can put the following script into your targetting alias:
+if id then killTrigger(id) end
+id = tempTrigger(target, [[selectString("]] .. target .. [[", 1) fg("gold") deselect() resetFormat()]])
+Where target is your target variable. Note that you have to use the full name, capitalized. If you’d like the script to auto-capitalize for you, you can use this version:
+target = target:title()
+if id then killTrigger(id) end
+id = tempTrigger(target, [[selectString("]] .. target .. [[", 1) fg("gold") deselect() resetFormat()]])
+
+
+
+################################
+# deleting lines
+The deleteLine() function runs on the line where the cursor is placed. When the trigger fires, the cursor will be on the last line of your and trigger. If you know where the other line is relative to that, you can move the cursor using the moveCursor() function, and then call deleteLine() to delete the line you moved the cursor to.
+
+In this case, assuming your trigger fires on the line with all the numbers, you could do this:
+Syntax: [ Download ] [ Hide ]
+Using lua Syntax Highlighting
+moveCursor(0,getLineNumber()-2)
+deleteLine()
+
+That would just get rid of the top line. I haven't personally played around with deleting multiple lines at a time, but you may just be able to call deleteLine() a few more times to cut them all out. A little experimentation should sort that out fairly quickly, I would think.
+
+
+################################
+# tables
+def_herb_queue = {}
+table.insert(def_herb_queue, "bayberry")
+table.insert(def_herb_queue, "hawthorn")
+display(def_herb_queue)
+
+
+################################
+# highlighting based on a number
+trigger on the bleeding line:
+
+blood = tonumber(matches[2])
+if blood > 200 then
+  selectCurrentLine()
+  setFgColor(255,0,0)
+  setBgColor(255,255,255)
+  resetFormat()
+end
+
+
+
+################################
+# making windows to show queues/afflictions
+want to use miniconsoles
+to make one:
+HelloWorld = Geyser.MiniConsole:new({
+  name="HelloWorld",
+  x="70%", y="50%",
+  width="30%", height="50%",
+})
+
+HelloWorld:setColor("black") -- give it a nice black background
+
+HelloWorld:echo("hello!")
+HelloWorld:cecho("<green>hey, <blue>colored <red>text!\n")
+
+to put stuff triggered from the main window into the next window:
+selectCurrentLine()
+copy()
+appendBuffer("HelloWorld")
+
+to clear:
+clearUserWindow("Chat")
+
+
+
+################################
+# working with tables
+local test_table = { "value1", "value2", "value3", "value4" }
+table.insert(table, [pos,] value)
+table.index_of(table, value)
+table.contains (t, value)
+
