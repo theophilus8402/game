@@ -52,8 +52,8 @@ class World:
         # TODO: not gonna do this yet
         #attacker.roll_attack(full_hit=full_hit, main_hand=False)
 
-        # figure out attacks from main hand
-        roll_results = attacker.roll_attack(full_hit=full_hit, main_hand=True)
+        # get attack results
+        mresults, oresults = attacker.roll_attack(full_hit=full_hit)
 
         # determine ac of defender
         # TODO: determine if defender is flat footed
@@ -62,14 +62,17 @@ class World:
 
         # roll dmg when appropriate
         final_results = []
-        for att_roll in roll_results:
+        mlen = len(mresults)
+        mresults.extend(oresults)
+        for att_roll, i in zip(mresults, range(len(mresults))):
             if att_roll.total >= ac:
-                dmg_result = attacker.roll_damage(main_hand=True)
+                main_hand = True if i < mlen else False
+                dmg_info = attacker.roll_damage(main_hand=main_hand)
                 # TODO: apply the dmg
+                defender.apply_damage(dmg_info)
             else:
-                dmg_result = None
-            final_results.append((att_roll, dmg_result))
-
+                dmg_info = None
+            final_results.append((att_roll, dmg_info))
 
         return final_results
 

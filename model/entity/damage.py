@@ -60,3 +60,9 @@ class DmgInfo():
         total -= self._block_info["amt"] 
         return total if total >= 0 else 0
 
+    def __repr__(self):
+        dmg_strs = []
+        for dmg_type, amt in self._final.items():
+            dmg_strs.append("{}/-{}".format(amt, self._orig_dmg[dmg_type]-amt))
+        return "<dmg: {}>".format(", ".join(dmg_strs))
+

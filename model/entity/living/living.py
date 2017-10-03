@@ -153,24 +153,34 @@ class Living(Entity):
         return RollInfo(1, 20, bonuses=self.skills[skill_name].bonuses)
 
     def roll_attack(self, full_hit=False, main_hand=True):
-        results = []
+        mresults = []
+        oresults = []
 
         bonuses = self.base_attack_bonus.bonuses
         if full_hit == True:
             # do a full hit for main_hand
             hbonus = self.base_attack_bonus.main_hand.total
             for att_bonus in self.base_attack_bonus.total:
-                results.append(RollInfo(1, 20, flat_bonus=att_bonus+hbonus))
+                mresults.append(RollInfo(1, 20, flat_bonus=att_bonus+hbonus))
+
+            # do a full hit for off hand
+            obonus = self.base_attack_bonus.off_hand.total
+            # TODO: determine how many off hand attacks to do
+
         elif main_hand == True:
             # roll for just the first main_hand attack
             hbonus = self.base_attack_bonus.main_hand.total
             first_bonus = self.base_attack_bonus.total[0]
-            results.append(RollInfo(1, 20, flat_bonus=first_bonus+hbonus))
-        else:
-            # roll attack roll for just off-hand
-            pass
+            mresults.append(RollInfo(1, 20, flat_bonus=first_bonus+hbonus))
 
-        return results
+        return (mresults, oresults)
+
+    def apply_damage(self, dmg_info):
+        # Get's DmgInfo with dmg_types and amounts set
+        # Applies all appropriate dmg resistances
+        # Applies final dmg to entity
+
+        self.cur_hp -= dmg_info.total
 
     def roll_damage(self, main_hand=True):
 
@@ -188,7 +198,14 @@ class Living(Entity):
         sides = weapon.num_side
         roll_result = RollInfo(dice, sides, flat_bonus=dmg_bonus)
 
-        return roll_result
+        # dmg type
+        # TODO: for now just return the first dmg type we see on the weapon
+        dmg_type = weapon.dmg_types[0]
+
+        dmg_info = DmgInfo()
+        dmg_info.add_dmg(dmg_type, roll_result.total)
+
+        return dmg_info
 
     def sneak(self, hide=True):
         if hide:
