@@ -1,11 +1,12 @@
 from copy import copy
-from math import sqrt
+from math import sqrt,floor
 import sys
 
 from model.info import Status, Coord
 from model.tile import *
 from model.util import distance_between_coords
 from model.entity.living.skills import SkillName
+from model.entity.dead import DeathInfo,determine_who_gets_xp
 
 class World:
 
@@ -74,7 +75,47 @@ class World:
                 dmg_info = None
             final_results.append((att_roll, dmg_info))
 
+        # see if the defender died
+        if defender.cur_hp <= 0:
+            self.kill(defender)
+
         return final_results
+
+    def kill(self, dead_guy):
+        # determine if his death should be permanent or if he can come back
+        # non-permanent are simple animals/monsters
+        # permanent, are NPCs that are pertanent to a story or quest?
+        #   or PCs
+        # TODO: permanent guys should have their "souls" put some where safe
+        
+
+        # start gathering DeathInfo
+        death_info = DeathInfo(dead_guy)
+
+        # TODO: leave a body (and loot?) on the ground
+        # body = death_info.body
+
+        # add xp to the appropriate peeps
+        # have each entity keep track of both bad and good things done to them
+        # if an entity is killed, look through all of it's bads
+        #   give xp to those guys, AND
+        #   look through all those guys who have recently done good things
+        #   to them... need a way to age things off
+        attackers = determine_who_gets_xp(dead_guy)
+
+        # divy up the xp equally
+        if attackers:
+            xp_per_peep = floor(dead_guy.xp_to_give / len(attackers))
+        else:
+            xp_per_peep = 0
+
+        for peep in attackers:
+            gained_level = peep.gain_xp(xp_per_peep)
+            # TODO: if they gain a level, notify them!!!
+        death_info.xp_per_attacker = xp_per_peep
+        death_info.attackers = attackers
+
+        return death_info
 
 
 def move_entity(world, entity, dst_loc):

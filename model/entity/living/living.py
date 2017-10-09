@@ -34,6 +34,7 @@ CMDS_DEBUG = {}
 class Living(Entity):
 
     def __init__(self, ab_scores=None, race=None, class_name=ClassName.fighter):
+        self.total_xp = 0
         self.name = ""
         self.base_attack_bonus = BaseAttackBonus()
         if not ab_scores:
@@ -206,6 +207,22 @@ class Living(Entity):
         dmg_info.add_dmg(dmg_type, roll_result.total)
 
         return dmg_info
+
+    @property
+    def xp_to_give(self):
+        # Returns the amount of xp to give to it's killers
+        # TODO: give a better amt than this static value
+        return 100
+
+    def gain_xp(self, xp_amt):
+        # Add xp to the entity
+        # Return True if the entity gains a level
+        #   False otherwise
+        gained_level = False
+        self.total_xp += xp_amt
+
+        # TODO: Determine if they gained a level
+        return gained_level
 
     def sneak(self, hide=True):
         if hide:

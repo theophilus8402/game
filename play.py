@@ -88,9 +88,10 @@ def make_bob():
         AbilityScore(Ability.cha, 12),
         ]
     human = Human(str_bonus)
-    fighter = ClassName.fighter
-    bob = Living(ab_scores=ability_scores, race=human, class_name=fighter)
+    barbarian = ClassName.barbarian
+    bob = Living(ab_scores=ability_scores, race=human, class_name=barbarian)
     bob.name = "bob"
+    bob.permanent = True
 
     return bob
 
@@ -110,6 +111,8 @@ def make_tim():
 
     armor_bonus = ArmorBonus(10, BonusReason.armor_bonus)
     tim.add_bonus(armor_bonus)
+
+    tim.permanent = True
 
     return tim
 

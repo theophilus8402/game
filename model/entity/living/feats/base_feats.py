@@ -32,3 +32,12 @@ class Feat():
     def __eq__(self, other_feat):
         return ((self.subset == other_feat.subset) and
             isinstance(other_feat, self.__class__))
+
+
+class Proficiency(Feat):
+
+    short_desc = ""
+
+    def __init__(self, proficiency):
+        self.subset = proficiency
+

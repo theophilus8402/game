@@ -9,7 +9,9 @@ ArmorType = Enum("ArmorType", [
     "light_armor",
     "medium_armor",
     "heavy_armor",
-    ])
+    "shield",
+    "tower_shield",
+])
 
 # Basic armor:
 class Armor(Entity):

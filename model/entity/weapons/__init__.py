@@ -1,5 +1,5 @@
 
 from .base_weapon import Weapon,WeaponType,DmgType,WeaponSpecial
-from .base_weapon import light_weapons,martial_weapons,exotic_weapons
+from .base_weapon import simple_weapon_group,martial_weapon_group,exotic_weapon_group
 from .simple_weapons import *
 

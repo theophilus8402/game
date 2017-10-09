@@ -1,5 +1,5 @@
 
-from .base_feats import Feat
+from .base_feats import Feat,Proficiency
 
 
 class SpellFocus(Feat):
@@ -8,4 +8,9 @@ class SpellFocus(Feat):
 
     def __init__(self, school):
         self.subset = school
+
+
+class ShieldProficiency(Proficiency):
+
+    short_desc = "No penalties on attack rolls when using a shield"
 

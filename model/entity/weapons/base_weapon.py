@@ -82,11 +82,12 @@ WeaponType = Enum("WeaponName", [
     "halfling_sling_staff",
      ])
 
-str_light_weapons = ["gauntlet", "unarmed_strike", "dagger", "punching_dagger",
+str_simple_weapons = ["gauntlet", "unarmed_strike", "dagger", "punching_dagger",
     "spiked_gauntlet", "light_mace", "sickle", "club", "heavy_mace",
     "morningstar", "shortspear", "longspear", "quarterstaff", "spear",
     "blowgun", "heavy_crossbow", "light_crossbow", "dart", "javelin", "sling"]
-light_weapons = {getattr(WeaponType, weapon) for weapon in str_light_weapons}
+simple_weapon_group = {getattr(WeaponType, weapon)
+                    for weapon in str_simple_weapons}
 
 str_martial_weapons = ["throwing_axe", "light_hammer", "handaxe", "kukri",
     "light_pick", "sap", "spiked_armor", "starknife", "short_sword",
@@ -94,7 +95,7 @@ str_martial_weapons = ["throwing_axe", "light_hammer", "handaxe", "kukri",
     "trident", "warhammer", "falchion", "glaive", "greataxe", "greatclub",
     "heavy_flail", "greatsword", "guisarme", "halberd", "lance", "ranseur",
     "scythe", "longbow", "composite_longbow", "shortbow", "composite_shortbow"]
-martial_weapons = {getattr(WeaponType, weapon)
+martial_weapon_group = {getattr(WeaponType, weapon)
                     for weapon in str_martial_weapons}
 
 str_exotic_weapons = ["kama", "nunchaku", "sai", "siangham", "bastard_sword",
@@ -103,7 +104,8 @@ str_exotic_weapons = ["kama", "nunchaku", "sai", "siangham", "bastard_sword",
     "two_bladed_sword", "dwarven_urgrosh", "bolas", "hand_crossbow",
     "repeating_heavy_crossbow", "repeating_light_crossbow",
     "net", "shuriken", "halfling_sling_staff"]
-exotic_weapons = {getattr(WeaponType, weapon) for weapon in str_exotic_weapons}
+exotic_weapon_group = {getattr(WeaponType, weapon)
+                    for weapon in str_exotic_weapons}
 
 
 DmgType = Enum("DmgType", [

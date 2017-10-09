@@ -4,7 +4,7 @@ from model.entity.classes.util import ClassName,class_name_map
 from model.entity.living.attack_bonus import AttackBonus
 
 
-fighter_bab_map = {
+paladin_bab_map = {
     1 : [1],
     2 : [2],
     3 : [3],
@@ -27,14 +27,14 @@ fighter_bab_map = {
     20 : [20, 15, 10, 5],
 }
 
-class Fighter():
+class Paladin():
 
-    name = ClassName.fighter
+    name = ClassName.paladin
 
     def __init__(self):
         self.bonuses = []
         self.level = 1
-        self.class_bab = AttackBonus(fighter_bab_map[self.level], BonusReason.entity_class)
+        self.class_bab = AttackBonus(paladin_bab_map[self.level], BonusReason.entity_class)
         self.proficiencies = set()
 
     def __repr__(self):
@@ -43,7 +43,7 @@ class Fighter():
     def level_up(self):
         self.level += 1
         # do other things like set class_attack_bonus, feats, abilities
-        self.class_bab.amount = fighter_bab_map[self.level]
+        self.class_bab.amount = paladin_bab_map[self.level]
 
 
-class_name_map[ClassName.fighter] = Fighter
+class_name_map[ClassName.paladin] = Paladin

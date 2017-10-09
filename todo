@@ -1,12 +1,40 @@
 
+kill someone / knock someone out
+    model.entity.dead - Body
+    model.world - world.kill()
+
 maybe change proficiencies to being feats
     because that's how you would add new proficiencies
     No, I'm not going to do this because simple_weapons are made proficient
         by one feat, the others are one for one
 
+actually add feats
+    proficiency feats should add proficiencies appropriately
+
 add proficiencies
-    for each race
-    for each class
+    bard
+    cleric
+    druid
+    fighter
+    monk
+    paladin
+    ranger
+    rogue
+    sorcerer
+    wizard
+
+set bab's
+    barbarian
+    bard
+    cleric
+    druid
+    fighter
+    monk
+    paladin
+    ranger
+    rogue
+    sorcerer
+    wizard
 
 make some items that follow pathfinder rules
     finish weapons
@@ -19,8 +47,6 @@ wield/wear items
     apply str or dex attack bonus
     apply dmg bonuses
 
-check to see if attack connects
-
 determine damage
     Weapon.damage
     Living.damage.main_hand (total)
@@ -30,8 +56,6 @@ determine damage
     Living.damage.bonuses
 
 apply damage
-
-kill someone / knock someone out
 
 cast heal
 

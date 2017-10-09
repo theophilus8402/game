@@ -1,5 +1,5 @@
 
-from .base_feats import Feat
+from .base_feats import Feat,Proficiency
 from .feats_st import SpellFocus
 from model.entity.armor import ArmorType
 from model.entity.living.spells import SpellSchool
@@ -50,21 +50,30 @@ class ArcaneStrike(Feat):
     short_desc = "+1 damage and weapons are considered magic"
 
 
-class ArmorProficiencyLight(Feat):
+class ArmorProficiencyLight(Proficiency):
 
     short_desc = "No penalties on attack rolls while wearing light armor"
 
+    def __init__(self):
+        super().__init__(ArmorType.light_armor)
 
-class ArmorProficiencyMedium(Feat):
+
+class ArmorProficiencyMedium(Proficiency):
 
     proficiencies = {ArmorType.light_armor}
     short_desc = "No penalties on attack rolls while wearing medium armor"
 
+    def __init__(self):
+        super().__init__(ArmorType.medium_armor)
 
-class ArmorProficiencyHeavy(Feat):
+
+class ArmorProficiencyHeavy(Proficiency):
 
     proficiencies = {ArmorType.medium_armor}
     short_desc = "No penalties on attack rolls while wearing heavy armor"
+
+    def __init__(self):
+        super().__init__(ArmorType.heavy_armor)
 
 
 class Athletic(Feat):
