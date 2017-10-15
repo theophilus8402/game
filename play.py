@@ -14,6 +14,7 @@ from model.entity.weapons import *
 from model.info import Coord
 from model.tile import *
 from model.world import World
+from model.map import Map
 from model.util import roll
 
 prof = Proficiency
@@ -91,6 +92,7 @@ def make_bob():
     barbarian = ClassName.barbarian
     bob = Living(ab_scores=ability_scores, race=human, class_name=barbarian)
     bob.name = "bob"
+    bob.symbol = "B"
     bob.permanent = True
 
     return bob
@@ -108,6 +110,7 @@ def make_tim():
     wizard = ClassName.wizard
     tim = Living(ab_scores=ability_scores, race=Halfling(), class_name=wizard)
     tim.name = "tim"
+    tim.symbol = "T"
 
     armor_bonus = ArmorBonus(10, BonusReason.armor_bonus)
     tim.add_bonus(armor_bonus)
@@ -136,5 +139,9 @@ if __name__ == "__main__":
     world.living_ents[tim.name] = tim
     world.living_ents[bob.name] = bob
 
+    world.map = Map((-3, 6), (5, -4), ".")
+    world.map.add_symbol(Coord(0, 0), "0")
 
+    world.place_entity(bob, Coord(1, 2))
+    world.place_entity(tim, Coord(2, 2))
 

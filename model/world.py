@@ -1,5 +1,5 @@
 from copy import copy
-from math import sqrt,floor
+from math import sqrt,floor,ceil
 import sys
 
 from model.info import Status, Coord
@@ -47,6 +47,11 @@ class World:
                 found_entities.append(ent)
         return search_result, found_entities
 
+    def action_look(self, entity):
+        # determines map to display to the user
+        map_rows = self.map.get_map(entity.coords, 4)
+        print("\n".join(map_rows))
+
     def action_hit(self, attacker, defender, full_hit=False):
 
         # determine if we're doing a two weapon attack
@@ -77,9 +82,11 @@ class World:
 
         # see if the defender died
         if defender.cur_hp <= 0:
-            self.kill(defender)
+            death_info = self.kill(defender)
+        else:
+            death_info = None
 
-        return final_results
+        return final_results, death_info
 
     def kill(self, dead_guy):
         # determine if his death should be permanent or if he can come back
@@ -87,13 +94,16 @@ class World:
         # permanent, are NPCs that are pertanent to a story or quest?
         #   or PCs
         # TODO: permanent guys should have their "souls" put some where safe
-        
+        if dead_guy.permanent:
+            # put his normal body in different place to be resurrected later
+            body_coords = dead_guy.coords
+            self.move_entity(dead_guy, Coord(-99, -99))
 
         # start gathering DeathInfo
         death_info = DeathInfo(dead_guy)
 
         # TODO: leave a body (and loot?) on the ground
-        # body = death_info.body
+        self.place_entity(death_info.body, body_coords)
 
         # add xp to the appropriate peeps
         # have each entity keep track of both bad and good things done to them
@@ -116,6 +126,33 @@ class World:
         death_info.attackers = attackers
 
         return death_info
+
+    def place_entity(self, entity, coords):
+        # Doesn't do any checks what so ever
+        # set's the entities coords to that location
+        # TODO: tiles?
+        entity.coords = coords
+        self.map.add_symbol(entity.coords, entity.symbol)
+
+    def remove_entity(self, entity):
+        self.map.remove_symbol(entity.coords)
+        entity.coords = None
+
+    def move_entity(self, entity, coords):
+        # doesn't do any checks
+        # TODO: tiles?
+
+        # removes the entity from it's original location
+        self.remove_entity(entity)
+
+        # places the entity in the new location
+        self.place_entity(entity, coords)
+
+
+def distance_between(coord1, coord2):
+    distance = sqrt((coord1.x - coord2.x)**2 + 
+                    (coord1.y - coord2.y)**2)
+    return ceil(distance)
 
 
 def move_entity(world, entity, dst_loc):
