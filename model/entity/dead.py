@@ -18,6 +18,7 @@ class Body(Entity):
         self.permanent = orig_guy.permanent
         self.set_descriptions()
         self.loot = set()
+        self.symbol = "b"
 
     def set_descriptions(self):
         if self.permanent:

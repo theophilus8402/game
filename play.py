@@ -11,10 +11,8 @@ from model.entity.living.status_effects import *
 from model.entity.living.feats import *
 from model.entity.util import *
 from model.entity.weapons import *
-from model.info import Coord
-from model.tile import *
 from model.world import World
-from model.map import Map
+from model.map import Map,Coord
 from model.util import roll
 
 prof = Proficiency
@@ -28,13 +26,7 @@ def mtile(uid, coord):
 
 def make_world():
     # create the temporary world (it is a 4x4 world)
-    dim = 4
-    uuid = 0
     world = World()
-    for y in range(-dim, dim+1):
-        for x in range(-dim, dim+1):
-            world.tiles[Coord(x,y)] = mtile(uuid, Coord(x,y))
-            uuid = uuid+1
     return world
 
 

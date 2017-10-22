@@ -6,6 +6,7 @@ from model.entity.basic_entity import Entity
 from model.entity.classes.util import ClassName, class_name_map
 from model.entity.classes.fighter import Fighter
 from model.entity.classes.wizard import Wizard
+from model.entity.damage import DmgType
 from model.entity.living.ability_scores import Ability, AbilityScore, AbilityBonus
 from model.entity.living.armor_class import ArmorClass
 from model.entity.living.attack_bonus import BaseAttackBonus, AttackBonus
@@ -181,7 +182,12 @@ class Living(Entity):
         # Applies all appropriate dmg resistances
         # Applies final dmg to entity
 
-        self.cur_hp -= dmg_info.total
+        if DmgType.healing in dmg_info._orig_dmg.keys():
+            # heal the person!
+            # TODO: may need to determine if the person should be hurt by healing
+            self.cur_hp += dmg_info.total
+        else:
+            self.cur_hp -= dmg_info.total
 
     def roll_damage(self, main_hand=True):
 

@@ -1,8 +1,39 @@
 #!/usr/bin/python3
 
-from collections import defaultdict
+from collections import defaultdict,namedtuple
 
-from model.world import Coord
+
+class Coord(namedtuple("Coord", "x y")):
+
+    def __sub__(self, other_coord):
+        return Coord(other_coord.x - self.x, other_coord.y - self.y)
+
+    def __add__(self, other_coord):
+        return Coord(self.x + other_coord.x, self.y + other_coord.y)
+
+    def __repr__(self):
+        return "({}, {})".format(self.x, self.y)
+
+
+direction_coords = {
+    "n": Coord(0, 1),
+    "north": Coord(0, 1),
+    "ne": Coord(1, 1),
+    "northeast": Coord(1, 1),
+    "e": Coord(1, 0),
+    "east": Coord(1, 0),
+    "se": Coord(1, -1),
+    "southeast": Coord(1, -1),
+    "s": Coord(0, -1),
+    "south": Coord(0, -1),
+    "sw": Coord(-1, -1),
+    "southwest": Coord(-1, -1),
+    "w": Coord(-1, 0),
+    "west": Coord(-1, 0),
+    "nw": Coord(-1, 1),
+    "northwest": Coord(-1, 1),
+}
+
 
 class Map():
 

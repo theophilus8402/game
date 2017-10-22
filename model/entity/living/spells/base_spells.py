@@ -11,3 +11,11 @@ SpellSchool = Enum("SpellSchool", [
     "necromancy",
     "transmutation",
 ])
+
+
+SpellName = Enum("SpellName", [
+    "cure_light_wounds",
+])
+
+spell_map = {}
+

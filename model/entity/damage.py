@@ -14,6 +14,7 @@ DmgType = Enum("DmgType", [
     "radiant",
     "lightning",
     "thunder",
+    "healing",
     ])
 
 class DmgInfo():

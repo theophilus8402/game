@@ -4,6 +4,7 @@ from enum import Enum,unique
 from random import choice
 
 from model.entity.basic_entity import Entity
+from model.entity.damage import DmgType
 from model.entity.living.equip import EqSlots
 
 WeaponType = Enum("WeaponName", [
@@ -107,12 +108,6 @@ str_exotic_weapons = ["kama", "nunchaku", "sai", "siangham", "bastard_sword",
 exotic_weapon_group = {getattr(WeaponType, weapon)
                     for weapon in str_exotic_weapons}
 
-
-DmgType = Enum("DmgType", [
-    "bludgeoning",
-    "piercing",
-    "slashing",
-    ])
 
 dmg_type_str_map = {
     DmgType.bludgeoning : "B",
