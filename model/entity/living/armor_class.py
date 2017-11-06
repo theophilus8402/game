@@ -1,6 +1,6 @@
 
 from model.bonuses import Bonus,BonusReason
-from model.entity.living.ability_scores import Ability,AbilityBonus
+from model.entity.living.ability_scores import Ability
 
 class ArmorClass():
 
@@ -18,7 +18,7 @@ class ArmorClass():
         total = 0
         dex_bonus = 0
         for bonus in self.bonuses:
-            if isinstance(bonus, AbilityBonus) and (bonus.type == Ability.dex):
+            if bonus.subtype == Ability.dex:
                 dex_bonus = bonus.amount
             else:
                 total += bonus.amount
@@ -29,6 +29,7 @@ class ArmorClass():
 class ArmorBonus(Bonus):
 
     def __init__(self, amt, reason):
+        super().__init__()
         self.amount = amt
         self.reason = reason
 

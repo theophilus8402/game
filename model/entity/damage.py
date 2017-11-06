@@ -1,6 +1,8 @@
 
 from enum import Enum
 
+from model.bonuses import Bonus
+
 DmgType = Enum("DmgType", [
     "slashing",
     "piercing",
@@ -66,4 +68,10 @@ class DmgInfo():
         for dmg_type, amt in self._final.items():
             dmg_strs.append("{}/-{}".format(amt, self._orig_dmg[dmg_type]-amt))
         return "<dmg: {}>".format(", ".join(dmg_strs))
+
+
+class DmgBonus(Bonus):
+
+    def __init__(self, amt, reason):
+        super.__init__(amt, reason)
 

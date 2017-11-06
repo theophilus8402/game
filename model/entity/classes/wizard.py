@@ -1,14 +1,9 @@
 #!/usr/bin/python3
 
-from model.bonuses import BonusReason
-from model.entity.classes.util import ClassName, class_name_map
-from model.entity.living.attack_bonus import AttackBonus
+from model.entity.classes.util import ClassName,BaseClass
 from model.entity.weapons import WeaponType
 
-from collections import defaultdict
-
-
-wizard_bab_map = {
+wizard_babs = {
     1 : [0],
     2 : [1],
     3 : [1],
@@ -32,7 +27,7 @@ wizard_bab_map = {
 }
 
 
-class Wizard():
+class Wizard(BaseClass):
 
     name = ClassName.wizard
 
@@ -45,16 +40,7 @@ class Wizard():
     }
 
     def __init__(self):
+        super().__init__()
         self.bonuses = []
-        self.level = 1
-        self.class_bab = AttackBonus(wizard_bab_map[self.level], BonusReason.entity_class)
+        self.level_up()
 
-    def __repr__(self):
-        return "<{} : {}>".format(self.name.name, self.level)
-
-    def level_up(self):
-        self.level += 1
-        self.class_bab.amount = wizard_bab_map[self.level]
-
-
-class_name_map[ClassName.wizard] = Wizard

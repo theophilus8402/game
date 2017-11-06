@@ -1,10 +1,9 @@
 
 from model.bonuses import BonusReason
-from model.entity.classes.util import ClassName,class_name_map
-from model.entity.living.attack_bonus import AttackBonus
+from model.entity.classes.util import ClassName,BaseClass
 
 
-fighter_bab_map = {
+fighter_babs = {
     1 : [1],
     2 : [2],
     3 : [3],
@@ -27,23 +26,13 @@ fighter_bab_map = {
     20 : [20, 15, 10, 5],
 }
 
-class Fighter():
+class Fighter(BaseClass):
 
     name = ClassName.fighter
 
     def __init__(self):
+        super().__init__()
         self.bonuses = []
-        self.level = 1
-        self.class_bab = AttackBonus(fighter_bab_map[self.level], BonusReason.entity_class)
+        self.level_up()
         self.proficiencies = set()
 
-    def __repr__(self):
-        return "<{} : {}>".format(self.name.name, self.level)
-
-    def level_up(self):
-        self.level += 1
-        # do other things like set class_attack_bonus, feats, abilities
-        self.class_bab.amount = fighter_bab_map[self.level]
-
-
-class_name_map[ClassName.fighter] = Fighter

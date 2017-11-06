@@ -7,7 +7,7 @@ from model.entity.basic_entity import Entity
 from model.entity.damage import DmgType
 from model.entity.living.equip import EqSlots
 
-WeaponType = Enum("WeaponName", [
+WeaponType = Enum("WeaponType", [
     "gauntlet",
     "unarmed_strike",
     "dagger",
@@ -141,6 +141,7 @@ class Weapon(Entity):
         self.weapon_type = weapon_type
         self.name = weapon_type.name
         self.eq_slot = EqSlots.hand
+        self.base_bonuses = []
 
         self.category = category
 

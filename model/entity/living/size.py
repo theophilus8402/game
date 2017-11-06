@@ -1,7 +1,7 @@
 
 from enum import unique,Enum
 
-from model.bonuses import Bonus,BonusReason
+from model.bonuses import Bonus,BonusReason,BonusType
 
 @unique
 class Size(Enum):
@@ -28,6 +28,12 @@ size_modifier_map = {
     Size.fine : 8,
 }
 
+def get_size_ac_bonus(size):
+    return Bonus(BonusType.ac, size_modifier_map[size], BonusReason.size)
+
+def get_size_attack_bonus(size):
+    return Bonus(BonusType.attack, size_modifier_map[size], BonusReason.size)
+
 def get_size_modifier(size):
     return SizeBonus(size_modifier_map[size], BonusReason.size)
 
@@ -35,6 +41,7 @@ def get_size_modifier(size):
 class SizeBonus(Bonus):
 
     def __init__(self, amt, reason):
+        super().__init__()
         self.amount = amt
         self.reason = reason
 

@@ -1,5 +1,6 @@
 #!/usr/bin/python3.4
 
+from model.bonuses import Bonus,BonusType
 from model.entity.basic_entity import Entity
 from model.entity.classes import ClassName
 from model.entity.living.ability_scores import *
@@ -71,7 +72,8 @@ def make_shoes():
 
 
 def make_bob():
-    str_bonus = AbilityBonus(Ability.str, 2, BonusReason.race)
+    str_bonus = Bonus(BonusType.ability, 2, BonusReason.race,
+                        subtype=Ability.str)
     ability_scores = [
         AbilityScore(Ability.str, 17),
         AbilityScore(Ability.dex, 14),

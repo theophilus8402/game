@@ -51,31 +51,6 @@ class BaseEquipment():
         # keep a list of all bonuses/penalties due to spells/skills/items...
         self.bonuses = {slot : [] for slot in self.allowed_eq_slots}
 
-    def update_info(self):
-        self.possibilities.clear()
-        self.special_effects.clear()
-        # don't keep track of possibilities based on stuff wielded, just worn
-        for slot, item in self._equipment.items():
-
-            # skip if item is wielded
-            if slot in {EqSlots.left_hand, EqSlots.right_hand}:
-                continue
-
-            for roll_type, value in item.possibilities.items():
-                self.possibilities[roll_type] += value
-
-            # special effects
-
-    def get_blocking_items(self):
-        # Returns a list of all items capable of blocking attacks
-        blocking_list = []
-        for eq in self._equipment.values():
-            for effect in eq.special_effects:
-                if effect.spec_type == Effect.block:
-                    blocking_list.append(eq)
-                    break
-        return blocking_list
-
     def __len__(self):
         return len(self._equipment)
 
@@ -95,11 +70,12 @@ class BaseEquipment():
     def __setitem__(self, key, value):
         if key in self.allowed_eq_slots and self._equipment[key] is None:
             self._equipment[key] = value
-            self.update_info()
 
     def __delitem__(self, key):
         del(self._equipment[key])
-        self.update_info()
+
+    def add_bonus(self, item, bonus):
+        self.item.add_bonus(bonus)
 
 
 class HumanoidEquipment(BaseEquipment):
@@ -120,7 +96,42 @@ class HumanoidEquipment(BaseEquipment):
  
     def __init__(self):
         super().__init__()
-       
+        self.main_hand_bonuses = EqSlotBonuses()
+        self.off_hand_bonuses = EqSlotBonuses()
+
+    def add_bonus(self, item, bonus):
+        super().add_bonus(item, bonus)
+        # find out if the item should update hand bonuses
+        for eq_slot, eq_item in self._equipment.items():
+            if eq_item == item:
+                if eq_slot == EqSlots.right_hand:
+                    self.main_hand_bonuses.add_bonus(bonus)
+                elif eq_slot == EqSlots.left_hand:
+                    self.off_hand_bonuses.add_bonus(bonus)
+
+
+class EqSlotBonuses():
+
+    def __init__(self):
+        self.bonuses = []
+        self.attack_bonus = 0
+        self.dmg_bonus = 0
+
+    def add_bonus(self, bonus):
+        # NOTE: ability bonuses will have to come in the form of
+        #   attack and/or dmg bonuses, not as normal AbilityBonuses
+        #   because attack bonus could be dex and dmg bonus could be str
+        self.bonuses.append(bonus)
+        self.calculate_total()
+
+    def calculate_total(self):
+        self.attack_bonus = 0
+        self.dmg_bonus = 0
+        for bonus in self.bonuses:
+            if isinstance(bonus, AttackBonus):
+                self.attack_bonus += bonus.amount
+            elif isinstance(bonus, DmgBonus):
+                self.dmg_bonus += bonus.amount
 
 
 def get_eq_slot_name(eq_slot):

@@ -1,21 +1,21 @@
 
 from collections import defaultdict
 
-from model.bonuses import BonusReason
+from model.bonuses import BonusReason,Bonus,BonusType
 from model.entity.basic_entity import Entity
-from model.entity.classes.util import ClassName, class_name_map
+from model.entity.classes.util import ClassName,class_name_map,get_bab
 from model.entity.classes.fighter import Fighter
 from model.entity.classes.wizard import Wizard
-from model.entity.damage import DmgType
-from model.entity.living.ability_scores import Ability, AbilityScore, AbilityBonus
+from model.entity.damage import DmgType,DmgBonus
+from model.entity.living.ability_scores import Ability, AbilityScore
 from model.entity.living.armor_class import ArmorClass
-from model.entity.living.attack_bonus import BaseAttackBonus, AttackBonus
+from model.entity.living.attack_bonus import AttackBonusHandler,calculate_attack_bonuses
 from model.entity.living.status_effects import *
 from model.entity.inventory import Inventory
 from model.entity.living.equip import HumanoidEquipment
 from model.entity.living.skills import *
-from model.entity.living.size import SizeBonus,get_size_modifier,size_modifier_map
-from model.entity.living.equip import possible_equipment_slots, EqSlots
+from model.entity.living.size import SizeBonus,get_size_modifier,size_modifier_map,get_size_ac_bonus
+from model.entity.living.equip import possible_equipment_slots,EqSlots
 from model.entity.living.races import Human
 from model.entity.living.round_info import RoundInfo
 from model.entity.inventory import Inventory
@@ -37,7 +37,8 @@ class Living(Entity):
     def __init__(self, ab_scores=None, race=None, class_name=ClassName.fighter):
         self.total_xp = 0
         self.name = ""
-        self.base_attack_bonus = BaseAttackBonus()
+        self.attack_bonus = AttackBonusHandler()
+        self.size_modifier = 0
         if not ab_scores:
             ab_scores = [
                 AbilityScore(Ability.str, 10),
@@ -55,10 +56,13 @@ class Living(Entity):
 
         self.ac = ArmorClass()
         dex_mod = self.ability_scores[Ability.dex].modifier
-        self.ac.add_bonus(dex_mod)
+        dex_bonus = Bonus(BonusType.ac, dex_mod,
+                            BonusReason.ability_modifier, subtype=Ability.dex)
+        self.ac.add_bonus(dex_bonus)
 
         if not race:
-            ability_bonus = AbilityBonus(AbilityName.str, 2, BonusReason.race)
+            ab_bonus = Bonus(BonusType.ability, 2, BonusReason.race,
+                                subtype=Ability.str)
             race = Human(ability_bonus)
         self.set_race(race)
 
@@ -69,6 +73,8 @@ class Living(Entity):
         self.cur_hp = 10
         self.sneaking = 0
 
+        self.attack_bonus.calculate()
+
     def __repr__(self):
         classes_str = ",".join(["{}:{}".format(ctype.name.name, ctype.level) for ctype in self.classes])
         return "<{} - {} / {}>".format(self.name, self.race.name.name, classes_str)
@@ -78,27 +84,31 @@ class Living(Entity):
         for ability_score in ability_scores:
             self.ability_scores[ability_score.ability] = ability_score
 
+    calculate_attack_bonuses = calculate_attack_bonuses
+
     def set_race(self, race):
         for bonus in race.bonuses:
             self.add_bonus(bonus)
         self.race = race
-        self.size_modifier = get_size_modifier(self.race.size)
+        self.set_size(self.race.size)
 
         # proficiencies
         self.proficiencies = self.proficiencies.union(race.proficiencies)
 
         # add size_modifier to things affected by size
-        self.base_attack_bonus.add_bonus(self.size_modifier)
-        self.ac.add_bonus(self.size_modifier)
+        self.calculate_attack_bonuses()
+        size_bonus = get_size_ac_bonus(self.size)
+        self.ac.add_bonus(size_bonus)
 
         self.set_size(self.race.size)
 
     def set_size(self, size):
         self.size = size
-        self.size_modifier.amount = size_modifier_map[size]
+        self.size_modifier = size_modifier_map[size]
 
         # update values that are affected by size
-        self.base_attack_bonus.calculate_total()
+        self.calculate_attack_bonuses()
+        self.attack_bonus.calculate()
         self.ac.calculate_total()
 
     def add_class(self, class_name):
@@ -108,9 +118,24 @@ class Living(Entity):
         for bonus in class_type.bonuses:
             self.add_bonus(bonus)
 
-        self.base_attack_bonus.add_bonus(class_type.class_bab)
-
         self.proficiencies = self.proficiencies.union(class_type.proficiencies)
+
+    def add_level(self, class_name):
+        found_class = False
+        for class_type in self.classes:
+            if class_type.name == class_name:
+                class_type.level_up()
+                level = class_type.level
+                found_class = True
+                break
+        if not found_class:
+            level = 1
+            self.add_class(class_name)
+
+        self.attack_bonus.babs[class_name] = get_bab(class_name, level)
+
+        # recalculate things that might have changed by the level up
+        self.attack_bonus.calculate()
 
     def is_proficient(self, weapon_type):
         for class_ in self.classes:
@@ -121,35 +146,24 @@ class Living(Entity):
         # couldn't find the proficiency
         return False
 
-    def add_bonus(self, bonus):
-        if isinstance(bonus, AbilityBonus):
-            self.ability_scores[bonus.type].add_bonus(bonus)
-        elif isinstance(bonus, SkillBonus):
-            self.skills[bonus.type].add_bonus(bonus)
-        elif isinstance(bonus, AttackBonus):
+    def add_bonus(self, bonus, eqslot=None):
+        if bonus.type == BonusType.ability:
+            self.ability_scores[bonus.subtype].add_bonus(bonus)
+        elif bonus.type == BonusType.skill:
+            self.skills[bonus.subtype].add_bonus(bonus)
+        elif bonus.type == BonusType.attack:
             self.base_attack_bonus.add_bonus(bonus)
-        elif isinstance(bonus, SizeBonus):
+        elif bonus.type == BonusType.size:
             self.base_attack_bonus.add_bonus(bonus)
             self.ac.add_bonus(bonus)
-
-    def add_level(self, class_name):
-        found_class = False
-        for class_type in self.classes:
-            if class_type.name == class_name:
-                class_type.level_up()
-                found_class = True
-                break
-        if not found_class:
-            self.add_class(class_name)
-
-        # recalculate things that might have changed by the level up
-        self.base_attack_bonus.calculate_total()
 
     def initialize_skills(self):
         for skill_name in SkillName:
             ability = skill_ability_map[skill_name]["ability"]
-            ability_bonus = self.ability_scores[ability].modifier
-            self.skills[skill_name] = Skill(skill_name, ability_bonus)
+            ability_modifier = self.ability_scores[ability].modifier
+            ab_bonus = Bonus(BonusType.skill, ability_modifier,
+                                BonusReason.ability_modifier, subtype=ability)
+            self.skills[skill_name] = Skill(skill_name, ab_bonus)
 
     def skill_check(self, skill_name):
         return RollInfo(1, 20, bonuses=self.skills[skill_name].bonuses)
@@ -246,7 +260,7 @@ class Living(Entity):
         # check if proficient
         if not self.is_proficient(item.weapon_type):
             reason = BonusReason.not_weapon_proficient
-            bonus = AttackBonus(amt=-4, reason=reason)
+            bonus = Bonus(BonusType.attack, -4, reason)
             feat_bonuses.append(bonus)
 
         # check for weapon focuses
@@ -277,13 +291,19 @@ class Living(Entity):
             # melee/thrown usually uses str
             # TODO: check to see if should use dex w/ weapon_finess
             str_mod = self.ability_scores[Ability.str].modifier
-            ability_bonuses.append(str_mod)
+            str_bonus = Bonus(BonusType.attack, str_mod,
+                                BonusReason.ability_modifier,
+                                subtype=Ability.str)
+            ability_bonuses.append(str_bonus)
         elif item.category == WeaponCategory.two_handed_melee:
             str_mod = self.ability_scores[Ability.str].modifier
 
             # should use two handed str bonus 1.5
-            two_handed_mod = TwoHandedBonus(str_mod)
-            ability_bonuses.append(two_handed_mod)
+            two_handed_mod = ceil(1.5*str_mod)
+            str_bonus = Bonus(BonusType.attack, two_handed_mod,
+                                BonusReason.ability_modifier,
+                                subtype=Ability.str)
+            ability_bonuses.append(str_bonus)
         else:
             # ranged/ray usually uses dex
             pass
@@ -311,28 +331,32 @@ class Living(Entity):
         # add the item to the equipment slot
         self.equipment[eqslot] = item
 
+        bonuses = item.base_bonuses
+        print("Item bonuses: {}".format(bonuses))
+
         # deal with all the bonuses and what not by equiping the item
         if isinstance(item, Weapon):
             if eqslot == EqSlots.right_hand:
-                hand_bonuses = self.base_attack_bonus.main_hand
+                hand_bonuses = self.attack_bonus.main_hand_bonuses
             else:
-                hand_bonuses = self.base_attack_bonus.off_hand
+                hand_bonuses = self.base_attack_bonus.off_hand_bonuses
 
-            # get feat attack bonuses
-            bonuses = self.get_feat_bonuses(item)
+            # get feat bonuses
+            bonuses.extend(self.get_feat_bonuses(item))
 
             # get bonuses based on ability modifiers
             bonuses.extend(self.get_ability_bonuses(item))
 
-            for bonus in bonuses:
-                if (isinstance(bonus, AbilityBonus) or
-                    isinstance(bonus, AttackBonus)):
-                    hand_bonuses.add_bonus(bonus)
-                else:
-                    print("Have a bonus I'm not handling while equiping: ")
-                    print(bonus)
-                    self.add_bonus(bonus)
-            
+        print("Equip'ing bonuses: {}".format(bonuses))
+        for bonus in bonuses:
+            if ((eqslot in {EqSlots.right_hand, EqSlots.left_hand}) and
+                (bonus.type in {BonusType.attack, BonusType.damage})):
+                hand_bonuses.append(bonus)
+            else:
+                self.add_bonus(bonus, eqslot=eqslot)
+
+        self.calculate_attack_bonuses()
+
         return Status.all_good
 
     def unequip(self, thing_to_unequip):

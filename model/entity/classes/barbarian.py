@@ -1,12 +1,10 @@
 
-from model.bonuses import BonusReason
-from model.entity.classes.util import ClassName,class_name_map
-from model.entity.living.attack_bonus import AttackBonus
+from model.entity.classes.util import ClassName,BaseClass
 from model.entity.weapons import simple_weapon_group,martial_weapon_group
 from model.entity.armor import ArmorType
 
 
-barbarian_bab_map = {
+barbarian_babs = {
     1 : [1],
     2 : [2],
     3 : [3],
@@ -29,14 +27,13 @@ barbarian_bab_map = {
     20 : [20, 15, 10, 5],
 }
 
-class Barbarian():
+class Barbarian(BaseClass):
 
     name = ClassName.barbarian
 
     def __init__(self):
+        super().__init__()
         self.bonuses = []
-        self.level = 1
-        self.class_bab = AttackBonus(barbarian_bab_map[self.level], BonusReason.entity_class)
         self.proficiencies = {
             *simple_weapon_group,
             *martial_weapon_group,
@@ -44,14 +41,5 @@ class Barbarian():
             ArmorType.medium_armor,
             ArmorType.shield
         }
+        self.level_up()
 
-    def __repr__(self):
-        return "<{} : {}>".format(self.name.name, self.level)
-
-    def level_up(self):
-        self.level += 1
-        # do other things like set class_attack_bonus, feats, abilities
-        self.class_bab.amount = barbarian_bab_map[self.level]
-
-
-class_name_map[ClassName.barbarian] = Barbarian
