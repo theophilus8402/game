@@ -10,7 +10,8 @@ from control.entity.send_msg import format_and_send_msg, send_error_msg
 from model.entity.inventory import *
 from model.entity.living.status_effects import *
 from model.entity.util import *
-from model.info import dir_coord_changes, Status, get_dir_word
+from model.info import Status, get_dir_word
+from model.map import direction_coords
 from model.msg import ActionMsgs
 from model.world import get_tile, move_entity, entities_within_distance
 from model.tile import tile_get_entity, tile_remove_entity
@@ -79,7 +80,7 @@ def action_move(world, msg):
         return status
 
     #TODO: Make sure we can move into the room
-    delta_coord = dir_coord_changes[direction]
+    delta_coord = directioin_coords[direction]
     dst_coord = entity.coord + delta_coord
 
     right_leg_aff = check_health(entity, {Body.right_leg})

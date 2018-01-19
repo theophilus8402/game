@@ -136,12 +136,12 @@ WeaponCategory = Enum("WeaponCategory", [
 # Basic weapon:
 class Weapon(Entity):
 
-    def __init__(self, weapon_type=WeaponType.gauntlet, category=WeaponCategory.light_melee, cost=100, dmg="0d0", crit="20x0", weapon_range=0, weight=0, dmg_types=[DmgType.bludgeoning], specials=[], cur_hp=0):
+    def __init__(self, weapon_type=WeaponType.gauntlet, category=WeaponCategory.light_melee, cost=100, dmg="0d0", crit="20x0", weapon_range=0, weight=0, dmg_types=[DmgType.bludgeoning], specials=[], bonuses=[], cur_hp=0):
         super(Weapon, self).__init__(cur_hp=cur_hp)
         self.weapon_type = weapon_type
         self.name = weapon_type.name
         self.eq_slot = EqSlots.hand
-        self.base_bonuses = []
+        self.bonuses = bonuses
 
         self.category = category
 

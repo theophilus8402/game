@@ -33,6 +33,5 @@ class Fighter(BaseClass):
     def __init__(self):
         super().__init__()
         self.bonuses = []
-        self.level_up()
         self.proficiencies = set()
 

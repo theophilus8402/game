@@ -3,6 +3,21 @@
 import enum
 from collections import namedtuple, defaultdict
 
+dir_map = {
+    "n" : "north",
+    "north" : "north",
+    "ne" : "north east",
+    "north east" : "north east",
+    "e" : "east",
+    "east" : "east",
+    "s" : "south",
+    "w" : "west",
+    }
+
+def get_dir_word(direction):
+    return dir_map[direction]
+
+
 @enum.unique
 class Status(enum.Enum):
     all_good = 0
@@ -27,4 +42,5 @@ class Status(enum.Enum):
     item_not_in_equipment = 19
     invalid_eqslot = 20
     eqslot_empty = 21
+    equipment_slot_not_free = 22
 

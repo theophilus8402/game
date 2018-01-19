@@ -5,7 +5,8 @@ import queue
 import sys
 
 from model.entity.living.living import Living
-from model.info import Status, Coord
+from model.info import Status
+from model.map import Coord
 
 
 def tile_add_entity(tile, entity):

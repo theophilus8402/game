@@ -1,23 +1,24 @@
 
 from enum import unique, Enum
 
-from model.entity.living.size import Size,SizeBonus
+from model.entity.living.size import Size
 from model.entity.living.ability_scores import Ability
-from model.entity.living.skills import Skill, SkillName, SkillBonus
+from model.entity.living.skills import SkillName
 from model.entity.weapons import WeaponType
-from model.bonuses import Bonus,BonusReason,BonusType
+from model.bonuses import Bonus,BonusReason,BonusType,SkillBonus,AbilityBonus
 
 
-@unique
-class RaceName(Enum):
-    dwarf = 1
-    elf = 2
-    gnome = 3
-    half_elf = 4
-    half_orc = 5
-    halfling = 6
-    human = 7
-
+RaceName = Enum("RaceName", [
+    "dwarf",
+    "elf",
+    "gnome",
+    "half_elf",
+    "half_orc",
+    "halfling",
+    "human",
+    "goblin",
+    ])
+    
 
 class Race():
 
@@ -35,13 +36,13 @@ class Dwarf(Race):
     def __init__(self):
         self.size = Size.medium
 
-        con = Bonus(btype=BonusType.ability, amt=2, reason=BonusReason.race)
+        con = AbilityBonus(amt=2, reason=BonusReason.race)
         con.subtype = Ability.con
 
-        wis = Bonus(btype=BonusType.ability, amt=2, reason=BonusReason.race)
+        wis = AbilityBonus(amt=2, reason=BonusReason.race)
         wis.subtype = Ability.wis
 
-        cha = Bonus(btype=BonusType.ability, amt=-2, reason=BonusReason.race)
+        cha = AbilityBonus(amt=-2, reason=BonusReason.race)
         cha.subtype = Ability.cha
 
         self.bonuses = [con, wis, cha]
@@ -59,13 +60,13 @@ class Elf(Race):
 
         self.size = Size.medium
 
-        dex = Bonus(btype=BonusType.ability, amt=2, reason=BonusReason.race)
+        dex = AbilityBonus(amt=2, reason=BonusReason.race)
         dex.subtype = Ability.dex
 
-        ab_int = Bonus(btype=BonusType.ability, amt=2, reason=BonusReason.race)
+        ab_int = AbilityBonus(amt=2, reason=BonusReason.race)
         ab_int.subtype = Ability.int
 
-        con = Bonus(btype=BonusType.ability, amt=-2, reason=BonusReason.race)
+        con = AbilityBonus(amt=-2, reason=BonusReason.race)
         con.subtype = Ability.con
 
         self.bonuses = [dex, ab_int, con]
@@ -84,13 +85,13 @@ class Gnome(Race):
     def __init__(self):
         self.size = Size.small
 
-        con = Bonus(btype=BonusType.ability, amt=2, reason=BonusReason.race)
+        con = AbilityBonus(amt=2, reason=BonusReason.race)
         con.subtype = Ability.con
 
-        cha = Bonus(btype=BonusType.ability, amt=2, reason=BonusReason.race)
+        cha = AbilityBonus(amt=2, reason=BonusReason.race)
         cha.subtype = Ability.cha
 
-        ab_str = Bonus(btype=BonusType.ability, amt=-2, reason=BonusReason.race)
+        ab_str = AbilityBonus(amt=-2, reason=BonusReason.race)
         ab_str.subtype = Ability.str
 
         self.bonuses = [con, cha, ab_str]
@@ -130,18 +131,18 @@ class Halfling(Race):
     def __init__(self):
         self.size = Size.small
 
-        dex = Bonus(btype=BonusType.ability, amt=2, reason=BonusReason.race)
+        dex = AbilityBonus(amt=2, reason=BonusReason.race)
         dex.subtype = Ability.dex
 
-        cha = Bonus(btype=BonusType.ability, amt=2, reason=BonusReason.race)
+        cha = AbilityBonus(amt=2, reason=BonusReason.race)
         cha.subtype = Ability.cha
 
-        ab_str = Bonus(btype=BonusType.ability, amt=2, reason=BonusReason.race)
+        ab_str = AbilityBonus(amt=2, reason=BonusReason.race)
         ab_str.subtype = Ability.cha
 
-        self.bonuses = [dex, cha, ab_str,
-                        SkillBonus(SkillName.stealth, 4, BonusReason.race),
-                        ]
+        stealth = SkillBonus(4, BonusReason.race, subtype=SkillName.stealth)
+
+        self.bonuses = [dex, cha, ab_str, stealth]
 
         self.proficiencies = {WeaponType.sling}
         # NOTE: Treat anything halfling as martial weapon

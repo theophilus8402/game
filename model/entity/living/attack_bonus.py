@@ -3,82 +3,9 @@ from collections import defaultdict
 from copy import copy
 
 from model.bonuses import *
-from model.entity.classes.util import ClassName
+from model.entity.classes.util import ClassName,get_bab
+from model.entity.living.equip import EqSlots
 from model.entity.living.size import get_size_attack_bonus
-
-
-class HandAttackBonus():
-
-    def __init__(self):
-        self.total = 0
-        self.bonuses = set()
-
-    def add_bonus(self, bonus):
-        self.bonuses.add(bonus)
-        self.calculate_total()
-
-    def remove_bonus(self, bonus):
-        self.bonuses.remove(bonus)
-        self.calculate_total()
-
-    def calculate_total(self):
-        self.total = 0
-        for bonus in self.bonuses:
-            self.total += bonus.amount
-
-    def clear(self):
-        self.bonuses.clear()
-        self.total = 0
-
-    def __repr__(self):
-        return "<HandAttackBonus: {}>".format(self.total)
-
-
-class BaseAttackBonus():
-
-    def __init__(self):
-        self.total = []
-        self.bonuses = set()
-        self.class_babs = []
-        self.main_hand = HandAttackBonus()
-        self.off_hand = HandAttackBonus()
-
-    def add_bonus(self, bonus, main_hand=True, off_hand=False):
-        #TODO apply bonuses to main/off hand
-        if bonus.reason == BonusReason.entity_class:
-            self.class_babs.append(bonus)
-        else:
-            self.bonuses.add(bonus)
-        self.calculate_total()
-
-    def remove_bonus(self, bonus):
-        if bonus in self.bonuses:
-            self.bonuses.remove(bonus)
-            self.calculate_total()
-
-    def calculate_total(self):
-        # first, determine individual bonuses
-        total = 0
-        for bonus in self.bonuses:
-            total += bonus.amount
-
-        # second, determine class_babs
-        babs = [bab.amount for bab in self.class_babs]
-        if len(babs) > 1:
-            babs.reverse()
-            total_babs = copy(babs[0])
-            for bab in babs[1:]:
-                for i in range(len(bab)):
-                    total_babs[i] += bab[i]
-        elif len(babs) == 1:
-            total_babs = babs[0]
-        else:
-            total_babs = [0]
-        
-        self.total = [class_bonus+total for class_bonus in total_babs]
-
-    def __repr__(self):
-        return "<BaseAttackBonus: {}>".format(self.total)
 
 
 class AttackBonusHandler():
@@ -87,6 +14,7 @@ class AttackBonusHandler():
         self.clear()
 
     def clear(self):
+        # this should show _all_ attack bonuses
         self.bonuses = []
         self.babs = {}
         self.off_hand_babs = []
@@ -115,7 +43,7 @@ class AttackBonusHandler():
 
         # find max bab len
         babs = list(self.babs.values())
-        if len(babs) <= 1:
+        if len(babs) < 1:
             return []
         babs.sort(key=len, reverse=True)
         bab_len = len(babs[0])
@@ -124,14 +52,6 @@ class AttackBonusHandler():
         for i in range(bab_len):
             final_bab.append(sum([bab[i] for bab in babs if i < len(bab)]))
         return final_bab
-
-        """
-        final_babs = []
-        for i in range(bab_len):
-            final_babs[i] = sum([bab[i] for bab in babs])
-
-        return final_babs
-        """
 
 
 def calculate_attack_bonuses(self):
@@ -143,12 +63,40 @@ def calculate_attack_bonuses(self):
         # size
         bonus_handler.bonuses.append(get_size_attack_bonus(self.size))
 
-        # spell effects
+        # TODO: spell effects
+
         # class babs
-        # feats
+        for _class in self.classes:
+            name = _class.name
+            bonus_handler.babs[name] = get_bab(name, _class.level)
+
+        # TODO: feats
+        # feat_attack_bonuses = []
+        # for feat in self.feats:
+        #   feat_attack_bonuses.extend([bonus for bonus in feat.bonuses if bonus == att])
+
         # hands
-        #   proficient
-        #   feats
-        #   ability modifier
-        #   item bonuses
+        for slot,hand_bonuses in [
+                (EqSlots.right_hand, bonus_handler.main_hand_bonuses),
+                (EqSlots.left_hand, bonus_handler.off_hand_bonuses)]:
+
+            # find the weapon
+            weapon = self.equipment[slot]
+            if not weapon:
+                # TODO: gotta figure out how to use hands as weapons
+                #   probably go with actually having an "item" for hands
+                continue
+
+            # proficient
+            if not self.is_proficient(weapon.weapon_type):
+                penalty = AttackBonus(-4, BonusReason.not_weapon_proficient)
+                hand_bonuses.append(penalty)
+            
+            # ability modifier
+            hand_bonuses.append(self.get_ability_attack_bonus(weapon))
+
+            # TODO: feats
+            # TODO: item bonuses
+
+        self.attack_bonus.calculate()
 

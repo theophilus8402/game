@@ -2,7 +2,6 @@
 
 from control.comm import Socket_IO
 from model.entity.living.blob import BlobState, States
-from model.world import world_add_entity
 from play import make_tim
 
 

@@ -123,25 +123,19 @@ class Skill():
         self.bonuses.append(bonus)
         self.calculate_total()
 
-    def remove_bonus(self, bonus):
+    def remove_bonus(self, bonus=None, bonus_reason=None):
         # remove the bonus if it was in the list
-        if bonus in self.bonuses:
+        if bonus and (bonus in self.bonuses):
             self.bonuses.remove(bonus)
-            self.calculate_total()
+
+        elif bonus_reason:
+            saved_bonuses = [bonus for bonus in self.bonuses
+                                if bonus.reason != bonus_reason]
+            self.bonuses = saved_bonuses
+
+        self.calculate_total()
 
     def __repr__(self):
         return "<{}: {}>".format(self.skill.name, self.total)
 
-
-class SkillBonus(Bonus):
-
-    def __init__(self, skill, amt, reason):
-        self.type = skill
-        self.amount = amt
-        self.reason = reason
-
-    def __repr__(self):
-        sign = "+" if self.amount > 0 else ""
-        return "<{} {}{} - {}>".format(self.type.name, sign, self.amount,
-            self.reason.name)
 

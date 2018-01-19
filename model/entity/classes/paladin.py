@@ -33,5 +33,4 @@ class Paladin(BaseClass):
         super().__init__()
         self.bonuses = []
         self.proficiencies = set()
-        self.level_up()
 

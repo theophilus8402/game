@@ -1,6 +1,12 @@
 
 from enum import Enum
 
+FeatTypes = Enum("FeatType", [
+    "combat",
+    "metamagic",
+    "critical",
+])
+
 
 class Feat():
 
@@ -14,10 +20,12 @@ class Feat():
     caster_level = 0
     arcane_caster_level = 0
     channel_energy = False
+    proficient_with_subset = True
     proficiencies = set()
 
     short_desc = "some feat"
     long_desc = "some longer feat description"
+    feat_type = None
 
     def __init__(self):
         self.subset = None

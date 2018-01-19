@@ -9,6 +9,7 @@ ClassName = Enum("ClassName", [
     "druid",
     "fighter",
     "monk",
+    "monster",
     "paladin",
     "ranger",
     "rogue",
@@ -21,7 +22,15 @@ class_name_map = {}
 class_babs = {}
 
 def get_bab(class_name, class_level):
-    return class_babs[class_name][class_level]
+    """
+    # TODO: maybe do this sometime in the future for more granular insight?
+    simple_babs = class_babs[class_name][class_level]
+    babs = [
+        Bonus(BonusType.attack, bab, BonusReason.class_bab, subtype=class_name)
+            for bab in simple_babs]
+    """
+    babs = class_babs[class_name][class_level]
+    return babs
 
 
 class BaseClass():

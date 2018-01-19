@@ -4,7 +4,7 @@ from random import choice
 from time import time
 
 from model.entity.living.equip import EqSlots
-from model.entity.living.living import get_roll_possibilities, determine_weapon_dmg
+#from model.entity.living.living import get_roll_possibilities, determine_weapon_dmg
 from model.entity.living.round_info import *
 from model.entity.living.status_effects import *
 from model.info import Status
@@ -98,10 +98,11 @@ def hit(src_ent, dst_ent, eqslot):
     # and, we might do exp for a particular branch of skills like physical combat
 
     # determine attack possibilities
-    possibilities = get_roll_possibilities(src_ent, eqslot=eqslot)
+    possibilities = []
+    #possibilities = get_roll_possibilities(src_ent, eqslot=eqslot)
 
     # determine defence possibilities
-    possibilities.update(get_roll_possibilities(dst_ent, defence=True))
+    #possibilities.update(get_roll_possibilities(dst_ent, defence=True))
 
     # determine level of success
     roll_result, roll_num = new_roll(possibilities)

@@ -1,7 +1,8 @@
 
 from enum import unique,Enum
 
-from model.bonuses import Bonus,BonusReason,BonusType
+from model.bonuses import Bonus,ACBonus,AttackBonus,SkillBonus,BonusReason
+from model.entity.living.skills import SkillName
 
 @unique
 class Size(Enum):
@@ -28,25 +29,14 @@ size_modifier_map = {
     Size.fine : 8,
 }
 
+def get_size_stealth_bonus(size):
+    return SkillBonus(size_modifier_map[size]*4, BonusReason.size,
+        subtype=SkillName.stealth)
+
 def get_size_ac_bonus(size):
-    return Bonus(BonusType.ac, size_modifier_map[size], BonusReason.size)
+    return ACBonus(size_modifier_map[size], BonusReason.size)
 
 def get_size_attack_bonus(size):
-    return Bonus(BonusType.attack, size_modifier_map[size], BonusReason.size)
-
-def get_size_modifier(size):
-    return SizeBonus(size_modifier_map[size], BonusReason.size)
-
-
-class SizeBonus(Bonus):
-
-    def __init__(self, amt, reason):
-        super().__init__()
-        self.amount = amt
-        self.reason = reason
-
-    def __repr__(self):
-        sign = "+" if self.amount > 0 else ""
-        return "<SizeBonus:{} {}{}>".format(self.reason.name, sign, self.amount)
+    return AttackBonus(size_modifier_map[size], BonusReason.size)
 
 

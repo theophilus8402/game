@@ -7,30 +7,35 @@ import queue
 
 from control.world import world_get_input
 import control.comm
-from model.world import get_tile, area_entity_check
-from model.tile import Coord, tile_add_entity
+from model.map import Coord,Map
 from model.entity.living import *
 from model.entity.living.status_effects import Body, add_status_effect, Blessings
 import control.entity.ai
-from control.entity.living import default_world_actions
+import control.entity.living
+#from control.entity.living import default_world_actions
 import play
 
 
 if __name__ == "__main__":
 
     world = play.make_world()
-    world.actions = default_world_actions
+    #world.actions = default_world_actions
     world.socket_entity_map = {}
     world.immediate_action_msgs = queue.Queue()
+    world.map = Map((-3, 6), (5, -4), ".")
+    world.map.add_symbol(Coord(0, 0), "0")
 
     bob = play.make_bob()
-    add_status_effect(bob, Blessings.game_master)
+    #add_status_effect(bob, Blessings.game_master)
     bob.comms = control.comm.Std_IO()
     world.socket_entity_map[bob.comms.input_handle] = bob
-    tile_add_entity(get_tile(world, Coord(1, 0)), bob)
-    print("bob's current coord: {}".format(bob.coord))
+    world.place_entity(bob, Coord(1, 0))
+    #tile_add_entity(get_tile(world, Coord(1, 0)), bob)
+    print("bob's current coord: {}".format(bob.coords))
 
+    """
     tim = play.make_tim()
+    """
     """
     ai_tim = control.entity.ai.Simple_AI(tim)
     ai_tim.run_cmds = ["n", "e", "s", "w", "hit bob"]
@@ -41,6 +46,7 @@ if __name__ == "__main__":
     tile_add_entity(get_tile(world, Coord(0, 0)), tim)
     """
 
+    """
     dog = play.make_dog()
     ai_dog = control.entity.ai.Simple_AI(dog)
     ai_dog.cmd_interval = (5, 10)
@@ -72,6 +78,7 @@ if __name__ == "__main__":
     #print("peeps nearby: {}".format(tim.peeps_nearby))
     area_entity_check(world, dog)
     #print("peeps nearby: {}".format(dog.peeps_nearby))
+    """
 
     control.comm.start_server(world, "", 2222)
 
@@ -84,6 +91,6 @@ if __name__ == "__main__":
 
         world_get_input(world, readable)
 
-        control.entity.living.run_ai(world)
+        #control.entity.living.run_ai(world)
 
         continue_loop = control.entity.living.handle_action_msgs(world)

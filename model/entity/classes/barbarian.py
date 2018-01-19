@@ -41,5 +41,4 @@ class Barbarian(BaseClass):
             ArmorType.medium_armor,
             ArmorType.shield
         }
-        self.level_up()
 

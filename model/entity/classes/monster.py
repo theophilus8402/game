@@ -1,16 +1,16 @@
-#!/usr/bin/python3
 
 from model.entity.classes.util import ClassName,BaseClass
-from model.entity.weapons import WeaponType
 
-wizard_babs = {
-    1 : [0],
-    2 : [1],
-    3 : [1],
-    4 : [2],
-    5 : [2],
-    6 : [3],
-    7 : [3],
+
+monster_babs = {
+    0 : [0],
+    1 : [1],
+    2 : [2],
+    3 : [3],
+    4 : [4],
+    5 : [5],
+    6 : [6, 1],
+    7 : [7, 2],
     8 : [8, 3],
     9 : [9, 4],
     10 : [10, 5],
@@ -26,20 +26,12 @@ wizard_babs = {
     20 : [20, 15, 10, 5],
 }
 
+class Monster(BaseClass):
 
-class Wizard(BaseClass):
-
-    name = ClassName.wizard
-
-    proficiencies = {
-        WeaponType.club,
-        WeaponType.dagger,
-        WeaponType.heavy_crossbow,
-        WeaponType.light_crossbow,
-        WeaponType.quarterstaff,
-    }
+    name = ClassName.monster
 
     def __init__(self):
         super().__init__()
         self.bonuses = []
+        self.proficiencies = set()
 

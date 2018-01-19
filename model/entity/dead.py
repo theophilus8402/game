@@ -40,9 +40,11 @@ def determine_who_gets_xp(entity):
     attackers = set()
 
     # determine who recently attacked the entity
-    # for each attacker:
-    #   attackers.add(attacker)
-    #   determine people who helped the attackers
+    for attacker in entity.recent_attackers.keys():
+        attackers.add(attacker)
+        # determine people who helped the attackers
+        for accomplice in attacker.recent_defenders.keys():
+            attackers.add(accomplice)
 
     return attackers
 
