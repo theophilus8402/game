@@ -132,7 +132,11 @@ class TestWorld(unittest.TestCase):
     def test_apply_transaction(self):
 
         coords = (1, 1)
-        trans = Transaction("set_piece", {"piece": "x", "coords": coords})
+        trans = {
+                    "action" : "set_piece",
+                    "input"  : {"piece": "x", "coords": coords},
+                }
+        #trans = Transaction("set_piece", {"piece": "x", "coords": coords})
         self.world.apply_transaction(trans)
 
         # make sure "x" is in coords
@@ -141,7 +145,12 @@ class TestWorld(unittest.TestCase):
     def test_undo_transaction(self):
 
         coords = (-1, 0)
-        trans = Transaction("set_piece", {"piece": "x", "coords": coords})
+        trans = {
+                    "action" : "set_piece",
+                    "input"  : {"piece": "x", "coords": coords},
+                    "undo"   : True,
+                }
+        #trans = Transaction("set_piece", {"piece": "x", "coords": coords})
         self.world.apply_transaction(trans)
         self.assertEqual(self.world.map[coords], "x")
 

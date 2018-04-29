@@ -1,4 +1,5 @@
 
+from unique_dict import PlayerDict,WorldDict,ConnectionDict
 from world import World
 
 # to test things from the barebones user interface:
@@ -11,6 +12,13 @@ from world import World
 # world1;tim;undo
 # server;kevin;login
 # server;kevin;watch,world1
+
+
+class PlayerAlreadyInWorld(Exception):
+    pass
+
+class WorldFull(Exception):
+    pass
 
 
 class Player():
@@ -38,142 +46,79 @@ class Player():
 #       self.name
 
 
-class WorldExists(Exception):
-    def __init__(self, msg, game_id):
-        self.message = msg
-        self.game_id = game_id
-
-class WorldDoesNotExist(Exception):
-    def __init__(self, msg, game_id):
-        self.message = msg
-        self.game_id = game_id
-
-class ConnectionExists(Exception):
-    def __init__(self, msg, connection):
-        self.message = msg
-        self.connection = connection
-
-class ConnectionDoesNotExist(Exception):
-    def __init__(self, msg, connection):
-        self.message = msg
-        self.connection = connection
-
-class NameExists(Exception):
-    def __init__(self, msg, name):
-        self.message = msg
-        self.name = name
-
-class NameDoesNotExist(Exception):
-    def __init__(self, msg, name):
-        self.message = msg
-        self.name = name
-
-
 class Interactor():
 
     def __init__(self):
 
         # self.worlds = {name : World}
-        self.worlds = {}
+        self.worlds = WorldDict()
 
         # self.players = {name : Player}
-        self._players = {}
+        self.players = PlayerDict()
 
         # self.connections = {connection : Player}
-        self.connections = {}
+        self.connections = ConnectionDict()
 
-    @property
-    def players(self, name):
-        try:
-            return self._players[name.lower()]
-        except KeyError:
-            raise NameDoesNotExist(
-                "A Player with the name {} does not exist.".format(name),
-                name)
+        self.transaction_actions = {
+            "create_world" : (self.create_world, self.undo_create_world),
+            "create_player" : (self.create_player, self.undo_create_player),
+            "join_world" : (self.join_world, self.undo_join_world),
+            "change_connection" : (
+                   self.change_connection, self.undo_change_connection),
+        }
 
-    @players.setter
-    def players(self, name, player):
-        if lower_name not in self._players.keys():
-            self._players[lower_name] = Player(name)
+    def apply_transaction(self, trans, undo=False):
+
+        entity_name = trans["entity"]
+        action_name = trans["action"]
+        action_input = trans["input"]
+
+        if entity_name == "server":
+            # the server needs to do something
+            entity = self
         else:
-            raise NameExists(
-                "A Player with the name, {}, already exists.".format(name),
-                name)
+            # one of the worlds needs to do something
+            entity = self.worlds[entity_name]
 
-    def apply_transaction(self, trans):
+        action,undo_action = entity.transaction_actions[action_name]
 
-        action,undo_action = self.transaction_actions[trans.action]
-        action(**trans.input)
+        if not undo:
+            action(**action_input)
+        else:
+            undo_action(**action_input)
 
     def create_world(self, game_id):
 
         # creates the world with the associated name and enters it into
         #   self.worlds
 
-        if game_id not in self.worlds.keys():
-            new_world = World(game_id=game_id)
-            self.worlds[game_id] = new_world
-        else:
-            raise WorldExists(
-                "A world already exists with game_id: {}".format(game_id),
-                game_id)
+        new_world = World(game_id=game_id)
+        self.worlds[game_id] = new_world
         
     def undo_create_world(self, game_id):
 
         # undoes the creation of the specified world
         # raises a WorldDoesNotExist error if game_id doesn't exist
 
-        try:
-            del(self.worlds[game_id])
-        except KeyError:
-            raise WorldDoesNotExist(
-                "World with game_id {} doesn't exist.".format(game_id),
-                game_id)
+        del(self.worlds[game_id])
 
     def create_player(self, name):
 
         lower_name = name.lower()
-
-        if lower_name not in self.players.keys():
-            self.players[lower_name] = Player(name)
-        else:
-            raise NameExists(
-                "A Player with the name, {}, already exists.".format(name),
-                name)
+        self.players[lower_name] = Player(name)
 
     def undo_create_player(self, name):
 
-        try:
-            del(self.players[name.lower()])
-        except KeyError:
-            raise NameDoesNotExist(
-                "A Player with the name {} does not exist.".format(name),
-                name)
+        del(self.players[name.lower()])
 
     def change_connection(self, name, old_connection, new_connection):
 
         # find the player
-        try:
-            player = self.players[name.lower()]
-        except KeyError:
-            raise NameDoesNotExist(
-                "A Player with the name {} does not exist.".format(name),
-                name)
-
-        # make sure this new_connection doesn't already exist
-        if new_connection and new_connection in self.connections.keys():
-            raise ConnectionExists(
-                "A connection, {}, already exists.".format(new_connection),
-                new_connection)
+        player = self.players[name.lower()]
 
         # change the self.connections entries as appropriate
-        try:
+        if old_connection is not None:
             del(self.connections[old_connection])
-        except KeyError:
-            if old_connection:
-                raise ConnectionDoesNotExist(
-                    "Connection, {}, doesn't exist.".format(old_connection),
-                    old_connection)
 
         # set the connection
         player.connection = new_connection
@@ -183,33 +128,77 @@ class Interactor():
     def undo_change_connection(self, name, old_connection, new_connection):
 
         # find the player
-        try:
-            player = self.players[name.lower()]
-        except KeyError:
-            raise NameDoesNotExist(
-                "A Player with the name {} does not exist.".format(name),
-                name)
-
-        # make sure this new_connection doesn't already exist
-        if old_connection and old_connection in self.connections.keys():
-            raise ConnectionExists(
-                "A connection, {}, already exists.".format(old_connection),
-                old_connection)
+        player = self.players[name.lower()]
 
         # change the self.connections entries as appropriate
-        try:
+        if new_connection is not None:
             del(self.connections[new_connection])
-        except KeyError:
-            if new_connection:
-                raise ConnectionDoesNotExist(
-                    "Connection, {}, doesn't exist.".format(new_connection),
-                    new_connection)
 
         # set the connection
         player.connection = old_connection
         if old_connection:
             self.connections[old_connection] = player
 
+    # server;tim;join,world1
+    def join_world(self, player_name, game_id):
+
+        # find the player
+        player = self.players[player_name.lower()]
+
+        # make sure the player isn't already in a world
+        if player.world != None:
+            raise PlayerAlreadyInWorld()
+
+        # find the world
+        world = self.worlds[game_id]
+
+        # the order in which players join the world will dictate
+        # the piece the player gets.  The players can't choose which
+        # piece they get to play.  The first player that joins will
+        # become the "o" player.  The second will become the "x" player.
+        if not world.o_player:
+
+            # add the player to the world
+            world.o_player = player.name
+
+            # set the player piece
+            player.piece = "o"
+
+        elif not world.x_player:
+
+            # add the player to the world
+            world.x_player = player.name
+
+            # set the player piece
+            player.piece = "x"
+
+        else:
+
+            raise WorldFull()
+
+        # add the world to the player
+        player.world = world.game_id
+
+    def undo_join_world(self, player_name, game_id):
+
+        # find the player
+        player = self.players[player_name.lower()]
+
+        # find the world
+        world = self.worlds[game_id]
+
+        # remove the player from the world
+        if player.piece == "o":
+            world.o_player = None
+
+        elif player.piece == "x":
+            world.x_player = None
+
+        # remove the player piece
+        player.piece = None
+
+        # remove the world from the player
+        player.world = None
 
 # if server get's a new connection
 

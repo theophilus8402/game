@@ -34,6 +34,12 @@ def display_map(world):
         print("".join(row))
 
 
+def display_world(world):
+    print("Player 'o': {}".format(world.o_player))
+    print("Player 'x': {}".format(world.x_player))
+    display_map(world)
+
+
 def generate_map(x_range=range(-1, 2), y_range=range(-1, 2)):
     game_map = {}
     for x in x_range:
@@ -48,6 +54,8 @@ class World():
         self.game_id = game_id
         self.x_range = x_range
         self.y_range = y_range
+        self.x_player = None
+        self.o_player = None
         self.map = generate_map(x_range=self.x_range, y_range=self.y_range)
 
         self.transaction_actions = {
@@ -81,16 +89,16 @@ class World():
 
     def apply_transaction(self, trans):
 
-        action,undo_action = self.transaction_actions[trans.action]
+        action,undo_action = self.transaction_actions[trans["action"]]
 
         #import pdb;pdb.set_trace()
-        action(**trans.input)
+        action(**trans["input"])
 
     def undo_transaction(self, trans):
 
-        action,undo_action = self.transaction_actions[trans.action]
+        action,undo_action = self.transaction_actions[trans["action"]]
 
-        undo_action(**trans.input)
+        undo_action(**trans["input"])
 
     @property
     def winner(self):
