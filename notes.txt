@@ -1,0 +1,8 @@
+
+make a character
+    health
+    some percent chance to hit
+
+be able to deduct health from a character/entity
+
+keep a history of changes
